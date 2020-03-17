@@ -1,8 +1,8 @@
-package tech.ikora;
+package tech.ikora.evolution;
 
 import org.apache.commons.lang3.tuple.Pair;
+import tech.ikora.analytics.Clone;
 import tech.ikora.analytics.CloneDetection;
-import tech.ikora.analytics.Difference;
 import tech.ikora.model.*;
 
 import java.io.File;
@@ -70,7 +70,7 @@ public class NodeMatcher {
         Map<Edit, List<T>> candidates = new HashMap<>();
 
         for (T current: unmatched){
-            if(!CloneDetection.isCloneTypeI(keyword.getClass(), Difference.of(keyword, current))){
+            if(CloneDetection.getCloneType(keyword, current) != Clone.Type.TYPE_1){
                 continue;
             }
 

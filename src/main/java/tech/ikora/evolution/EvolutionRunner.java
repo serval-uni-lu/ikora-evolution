@@ -1,4 +1,4 @@
-package tech.ikora;
+package tech.ikora.evolution;
 
 import org.apache.commons.lang3.tuple.Pair;
 import tech.ikora.analytics.Difference;
@@ -7,31 +7,22 @@ import tech.ikora.model.*;
 
 import java.util.*;
 
-public class EvolutionAnalyzer {
-    private List<Project> projects;
+public class EvolutionRunner {
+    private final List<Project> projects;
 
-    public EvolutionAnalyzer(){
+    public EvolutionRunner(){
         projects = new ArrayList<>();
     }
 
-    public static EvolutionAnalyzer fromGit(String gitUrl, String branch, String username, String password) {
-        EvolutionAnalyzer analyzer = new EvolutionAnalyzer();
-
-        GitRepository repository = new GitRepository(gitUrl, branch, username, password);
-        List<GitCommit> commits = repository.getRevisions();
-
-        for(GitCommit commit: commits){
-            repository.checkout(commit.getId(), true);
-            Project project = repository.getProject();
-
-            analyzer.projects.add(project);
-        }
-
-        return analyzer;
+    public void addProjects(Set<Project> projects) {
+        this.projects.addAll(projects);
     }
 
+    public EvolutionResults execute() {
+        return findDifferences();
+    }
 
-    public EvolutionResults findDifferences(){
+    private EvolutionResults findDifferences(){
         EvolutionResults results = new EvolutionResults();
 
         Project project1 = null;
@@ -78,10 +69,10 @@ public class EvolutionAnalyzer {
     }
 
     private <T extends Node> T getElement(Pair<T,T> pair, Project project){
-        if(pair.getRight() != null && pair.getRight().getFile() != null && pair.getRight().getFile().getProject() == project) {
+        if(pair.getRight() != null && pair.getRight().getFile() != null && pair.getRight().getProject() == project) {
             return pair.getRight();
         }
-        else if(pair.getLeft() != null && pair.getLeft().getFile() != null && pair.getLeft().getFile().getProject() == project){
+        else if(pair.getLeft() != null && pair.getLeft().getFile() != null && pair.getLeft().getProject() == project){
             return pair.getLeft();
         }
 

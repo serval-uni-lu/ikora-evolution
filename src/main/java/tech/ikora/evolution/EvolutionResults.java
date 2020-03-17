@@ -1,4 +1,4 @@
-package tech.ikora;
+package tech.ikora.evolution;
 
 import tech.ikora.analytics.Clone;
 import tech.ikora.analytics.CloneDetection;
@@ -181,7 +181,7 @@ public class EvolutionResults {
         return coEvolutionTypes.getOrDefault(differentiable, CoEvolutionType.Invalid);
     }
 
-    public Clones getKeywordClones(Project project){
+    public <T extends Node> Clones<T> getKeywordClones(Project project){
         if(keywordClones == null){
             keywordClones = new HashMap<>();
 
@@ -191,10 +191,10 @@ public class EvolutionResults {
             }
         }
 
-        return keywordClones.get(project);
+        return (Clones<T>) keywordClones.get(project);
     }
 
-    public Clones getTestCaseClones(Project project){
+    public <T extends Node> Clones<T> getTestCaseClones(Project project){
         if(testCaseClones == null){
             testCaseClones = new HashMap<>();
 
@@ -204,7 +204,7 @@ public class EvolutionResults {
             }
         }
 
-        return testCaseClones.get(project);
+        return (Clones<T>) testCaseClones.get(project);
     }
 
     public <T extends Node> int getTotalElement(Class<T> nodeType, Clone.Type cloneType, CoEvolutionType coEvolutionType){

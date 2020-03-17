@@ -1,4 +1,4 @@
-package tech.ikora;
+package tech.ikora.evolution;
 
 import tech.ikora.analytics.Action;
 import tech.ikora.analytics.Clone;
