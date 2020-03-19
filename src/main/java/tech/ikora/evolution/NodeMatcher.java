@@ -13,36 +13,36 @@ public class NodeMatcher {
         ChangeName, ChangeFolder, ChangeFile, ChangeAll
     }
 
-    public static <T extends Node> List<Pair<T,T>> getPairs(Class<T> type, Project project1, Project project2) {
+    public static <T extends Node> List<Pair<T,T>> getPairs(Class<T> type, Projects version1, Projects version2) {
         List<Pair<T,T>> pairs = new ArrayList<>();
 
-        NodeTable<T> node1 = createNodeTable(project1, type);
-        NodeTable<T> node2 = createNodeTable(project2, type);
+        Set<T> nodes1 = version1.getNodes(type);
+        Set<T> nodes2 = version2.getNodes(type);
 
         List<T> unmatched = new ArrayList<>();
 
-        while(!node1.isEmpty()){
-            T keyword1 = node1.iterator().next();
-            Set<T> keyword2 = node2.findNode(keyword1);
+        while(!nodes1.isEmpty()){
+            T node1 = nodes1.iterator().next();
+            Set<T> nodesFound2 = matchNode(nodes2, node1);
 
-            if(keyword2.isEmpty()){
-                unmatched.add(keyword1);
+            if(nodesFound2.isEmpty()){
+                unmatched.add(node1);
             }
             else{
                 //TODO: Find best match if multiple hits
-                pairs.add(Pair.of(keyword1, keyword2.iterator().next()));
-                node2.remove(keyword2.iterator().next());
+                pairs.add(Pair.of(node1, nodesFound2.iterator().next()));
+                nodes2.remove(nodesFound2.iterator().next());
             }
 
-            node1.remove(keyword1);
+            nodes1.remove(node1);
         }
 
-        while(!node2.isEmpty()){
-            T keyword2 = node2.iterator().next();
+        while(!nodes2.isEmpty()){
+            T keyword2 = nodes2.iterator().next();
             T keyword1 = findBestCandidate(keyword2, unmatched);
 
             pairs.add(Pair.of(keyword1, keyword2));
-            node2.remove(keyword2);
+            nodes2.remove(keyword2);
         }
 
         while(!unmatched.isEmpty()){
@@ -55,14 +55,47 @@ public class NodeMatcher {
         return pairs;
     }
 
-    private static <T extends Node> NodeTable<T> createNodeTable(Project project, Class<T> type) {
-        NodeTable<T> table = new NodeTable<>();
+    private static <T extends Node> Set<T> matchNode(Set<T> nodeList, T node){
+        Set<T> nodesFound = new HashSet<>();
 
-        for (Node node: project.getNodes(type)) {
-            table.add((T)node);
+        for(T currentNode: nodeList){
+            if(matches(node, currentNode)){
+                nodesFound.add(node);
+            }
         }
 
-        return table;
+        return nodesFound;
+    }
+
+    private static boolean matches(Node node1, Node node2){
+        if(!isSameProject(node1, node2)){
+            return false;
+        }
+
+        if(!isSameFile(node1, node2)){
+            return false;
+        }
+
+        return node1.matches(node2.getName());
+    }
+
+    private static boolean isSameProject(Node node1, Node node2){
+        Project project1 = node1.getProject();
+        Project project2 = node2.getProject();
+
+        if(project1 == project2){
+            return true;
+        }
+
+        if(project1 == null || project2 == null){
+            return false;
+        }
+
+        return project1.getName().equalsIgnoreCase(project2.getName());
+    }
+
+    private static boolean isSameFile(Node node1, Node node2){
+        return node1.getFileName().equalsIgnoreCase(node2.getFileName());
     }
 
     private static <T extends Node> Map<Edit, List<T>> findPotentialCandidates(T keyword, List<T> unmatched) {

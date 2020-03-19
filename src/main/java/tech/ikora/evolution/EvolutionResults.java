@@ -1,5 +1,6 @@
 package tech.ikora.evolution;
 
+import org.apache.commons.collections4.list.SetUniqueList;
 import tech.ikora.analytics.Clone;
 import tech.ikora.analytics.CloneDetection;
 import tech.ikora.analytics.Clones;
@@ -13,22 +14,22 @@ public class EvolutionResults {
         CoEvolution, NoCoEvolution, NoChange, Invalid
     }
 
-    private Set<Project> projects;
+    private SetUniqueList<Projects> versions;
 
-    private Map<Project, List<Sequence>> sequences;
-    private Map<Project, List<Difference>> differences;
-    private Map<Project, List<Difference>> sequenceDifferences;
+    private Map<Projects, List<Sequence>> sequences;
+    private Map<Projects, List<Difference>> differences;
+    private Map<Projects, List<Difference>> sequenceDifferences;
 
     private List<TimeLine> timeLines;
     private DifferentiableMatcher timeLineMatcher;
     private List<TimeLine> timeLineNotChanged;
-    private Map<Project, Clones<UserKeyword>> keywordClones;
-    private Map<Project, Clones<TestCase>> testCaseClones;
+    private Map<Projects, Clones<UserKeyword>> keywordClones;
+    private Map<Projects, Clones<TestCase>> testCaseClones;
 
     private Map<Differentiable, CoEvolutionType> coEvolutionTypes;
 
     EvolutionResults(){
-        projects = new HashSet<>();
+        versions = SetUniqueList.setUniqueList(new ArrayList<>());
         sequences = new LinkedHashMap<>();
 
         differences = new LinkedHashMap<>();
@@ -43,26 +44,26 @@ public class EvolutionResults {
         coEvolutionTypes = null;
     }
 
-    public void addProject(Project project) {
-        if(project == null){
+    public void addVersion(Projects version) {
+        if(version == null){
             return;
         }
 
-        projects.add(project);
+        versions.add(version);
     }
 
-    public void addSequence(Project project, Sequence sequence){
+    public void addSequence(Projects version, Sequence sequence){
         if(sequence == null){
             return;
         }
 
-        List<Sequence> sequenceList = sequences.getOrDefault(project, new ArrayList<>());
+        List<Sequence> sequenceList = sequences.getOrDefault(version, new ArrayList<>());
         sequenceList.add(sequence);
 
-        sequences.put(project, sequenceList);
+        sequences.put(version, sequenceList);
     }
 
-    public void addDifference(Project project, Difference difference) {
+    public void addDifference(Projects version, Difference difference) {
         if(difference == null){
             return;
         }
@@ -73,11 +74,11 @@ public class EvolutionResults {
             return;
         }
 
-        update(project, difference, differences);
+        update(version, difference, differences);
     }
 
-    public void addDifference(Project project, Difference difference, Difference sequenceDifference) {
-        addDifference(project, difference);
+    public void addDifference(Projects version, Difference difference, Difference sequenceDifference) {
+        addDifference(version, difference);
 
         if(sequenceDifference == null){
             return;
@@ -87,33 +88,29 @@ public class EvolutionResults {
             return;
         }
 
-        update(project, sequenceDifference, sequenceDifferences);
+        update(version, sequenceDifference, sequenceDifferences);
     }
 
-    public List<Project> getProjects(){
-        List<Project> projectList = new ArrayList<>(projects);
-
-        projectList.sort(Comparator.comparing(Project::getEpoch));
-
-        return projectList;
+    public List<Projects> getVersions(){
+        return versions;
     }
 
-    public List<Difference> getDifferences(Project project){
-        return differences.getOrDefault(project,  new ArrayList<>());
+    public List<Difference> getDifferences(Projects version){
+        return differences.getOrDefault(version,  new ArrayList<>());
     }
 
-    public List<Difference> getSequenceDifferences(Project project){
-        return sequenceDifferences.getOrDefault(project,  new ArrayList<>());
+    public List<Difference> getSequenceDifferences(Projects version){
+        return sequenceDifferences.getOrDefault(version,  new ArrayList<>());
     }
 
     public List<Sequence> getSequence(Project project){
         return sequences.getOrDefault(project, new ArrayList<>());
     }
 
-    private void update(Project project, Difference difference, Map<Project, List<Difference>> container){
-        List<Difference> differences = container.getOrDefault(project, new ArrayList<>());
+    private void update(Projects version, Difference difference, Map<Projects, List<Difference>> container){
+        List<Difference> differences = container.getOrDefault(version, new ArrayList<>());
         differences.add(difference);
-        container.put(project, differences);
+        container.put(version, differences);
     }
 
     private void updateTimeLine(Difference difference){
@@ -181,44 +178,44 @@ public class EvolutionResults {
         return coEvolutionTypes.getOrDefault(differentiable, CoEvolutionType.Invalid);
     }
 
-    public <T extends Node> Clones<T> getKeywordClones(Project project){
+    public <T extends Node> Clones<T> getKeywordClones(Projects version){
         if(keywordClones == null){
             keywordClones = new HashMap<>();
 
-            for(Project current: projects){
-                Clones<UserKeyword> clones = CloneDetection.findClones(current, UserKeyword.class);
-                keywordClones.put(current, clones);
+            for(Projects currentVersion: versions){
+                Clones<UserKeyword> clones = CloneDetection.findClones(currentVersion, UserKeyword.class);
+                keywordClones.put(currentVersion, clones);
             }
         }
 
-        return (Clones<T>) keywordClones.get(project);
+        return (Clones<T>) keywordClones.get(version);
     }
 
-    public <T extends Node> Clones<T> getTestCaseClones(Project project){
+    public <T extends Node> Clones<T> getTestCaseClones(Projects version){
         if(testCaseClones == null){
             testCaseClones = new HashMap<>();
 
-            for(Project current: projects){
-                Clones<TestCase> clones = CloneDetection.findClones(current, TestCase.class);
-                testCaseClones.put(current, clones);
+            for(Projects currentVersion: versions){
+                Clones<TestCase> clones = CloneDetection.findClones(currentVersion, TestCase.class);
+                testCaseClones.put(currentVersion, clones);
             }
         }
 
-        return (Clones<T>) testCaseClones.get(project);
+        return (Clones<T>) testCaseClones.get(version);
     }
 
     public <T extends Node> int getTotalElement(Class<T> nodeType, Clone.Type cloneType, CoEvolutionType coEvolutionType){
         int total = 0;
 
-        for(Project project: projects){
-            Set<T> nodes = project.getNodes(nodeType);
+        for(Projects version: versions){
+            Set<T> nodes = version.getNodes(nodeType);
 
             if(nodes == null){
                 continue;
             }
 
             for (Node node : nodes){
-                if(!checkCloneCriterion(project, node, cloneType)){
+                if(!checkCloneCriterion(version, node, cloneType)){
                     continue;
                 }
 
@@ -233,13 +230,13 @@ public class EvolutionResults {
         return total;
     }
 
-    private <T extends Node> boolean checkCloneCriterion(Project project, T node, Clone.Type cloneType){
+    private <T extends Node> boolean checkCloneCriterion(Projects version, T node, Clone.Type cloneType){
         Clones<T> clones = null;
         if(node.getClass() == UserKeyword.class){
-            clones = getKeywordClones(project);
+            clones = getKeywordClones(version);
         }
         else if(node.getClass() == TestCase.class){
-            clones = getTestCaseClones(project);
+            clones = getTestCaseClones(version);
         }
 
         if(clones == null){

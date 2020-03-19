@@ -3,12 +3,10 @@ package tech.ikora.evolution;
 import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
-import tech.ikora.BuildConfiguration;
-import tech.ikora.builder.BuildResult;
-import tech.ikora.builder.Builder;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
 import tech.ikora.evolution.configuration.FolderConfiguration;
 import tech.ikora.evolution.configuration.GitConfiguration;
+import tech.ikora.evolution.versions.GitProvider;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
 import tech.ikora.gitloader.git.LocalRepository;
@@ -31,8 +29,6 @@ public class EvolutionRunnerFactory {
             throw new InvalidConfigurationException("Configuration should have a folder or git section");
         }
 
-
-
         return runner;
     }
 
@@ -41,18 +37,10 @@ public class EvolutionRunnerFactory {
     }
 
     private static EvolutionRunner fromGit(GitConfiguration configuration) throws IOException, GitAPIException {
-        EvolutionRunner runner = new EvolutionRunner();
+        final LocalRepository localRepository = GitUtils.loadCurrentRepository(configuration.getUrl(), configuration.getToken(), new File(System.getProperty("java.io.tmpdir")), configuration.getBranch());
+        final List<GitCommit> commits = GitUtils.getCommits(localRepository.getGit(), configuration.getStartDate(), configuration.getEndDate(), configuration.getBranch());
+        final GitProvider provider = new GitProvider(localRepository, commits);
 
-        final LocalRepository repo = GitUtils.loadCurrentRepository(configuration.getUrl(), configuration.getToken(), new File(System.getProperty("java.io.tmpdir")), configuration.getBranch());
-        final List<GitCommit> commits = GitUtils.getCommits(repo.getGit(), configuration.getStartDate(), configuration.getEndDate(), configuration.getBranch());
-
-        for(GitCommit commit: commits){
-            GitUtils.checkout(repo.getGit(), commit.getId());
-            final BuildResult build = Builder.build(repo.getLocation(), new BuildConfiguration(), true);
-
-            runner.addProjects(build.getProjects());
-        }
-
-        return runner;
+        return  new EvolutionRunner(provider);
     }
 }
