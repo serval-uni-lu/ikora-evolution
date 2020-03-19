@@ -1,5 +1,6 @@
 package tech.ikora.evolution;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
@@ -13,6 +14,7 @@ import tech.ikora.gitloader.git.LocalRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 public class EvolutionRunnerFactory {
@@ -43,7 +45,7 @@ public class EvolutionRunnerFactory {
             final LocalRepository localRepository = GitUtils.loadCurrentRepository(
                     url,
                     configuration.getToken(),
-                    new File(System.getProperty("java.io.tmpdir")),
+                    new File(provider.getRootFolder(), FilenameUtils.getBaseName(url)),
                     configuration.getBranch()
             );
 

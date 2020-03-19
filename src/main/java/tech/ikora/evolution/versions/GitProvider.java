@@ -1,5 +1,6 @@
 package tech.ikora.evolution.versions;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,11 +13,15 @@ import tech.ikora.gitloader.git.GitUtils;
 import tech.ikora.gitloader.git.LocalRepository;
 import tech.ikora.model.Projects;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class GitProvider implements VersionProvider {
     private static final Logger logger = LogManager.getLogger(GitProvider.class);
+
+    private File rootFolder;
 
     private final Frequency frequency;
     private final Map<LocalRepository, List<GitCommit>> repositories;
@@ -24,6 +29,7 @@ public class GitProvider implements VersionProvider {
     public GitProvider(Frequency frequency) {
         this.frequency = frequency;
         this.repositories = new HashMap<>();
+        this.rootFolder = null;
     }
 
     public void addRepository(LocalRepository localRepository, List<GitCommit> commits) {
@@ -102,5 +108,23 @@ public class GitProvider implements VersionProvider {
                 return commits;
             }
         };
+    }
+
+    @Override
+    public File getRootFolder() throws IOException {
+        if(this.rootFolder == null){
+            this.rootFolder = new File(System.getProperty("java.io.tmpdir"), "git-provider");
+
+            if(this.rootFolder.exists()){
+                FileUtils.deleteDirectory(this.rootFolder);
+            }
+
+            if(!this.rootFolder.mkdir()){
+                throw new IOException(String.format("Failed to create directory: %s",
+                        this.rootFolder.getAbsolutePath()));
+            }
+        }
+
+        return this.rootFolder;
     }
 }

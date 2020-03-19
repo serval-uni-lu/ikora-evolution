@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 
 public class Utils {
     public static List<GitCommit> removeIgnoredCommit(List<GitCommit> commits, Set<String> ignoreCommits) {
+        if(ignoreCommits == null){
+            return commits;
+        }
+
         return commits.stream()
                 .filter(commit -> ignoreCommits.contains(commit.getId()))
                 .collect(Collectors.toList());

@@ -9,9 +9,9 @@ import java.util.Set;
 public class GitConfiguration {
     @JsonProperty(value = "urls", required = true)
     private Set<String> urls;
-    @JsonProperty(value = "url", defaultValue = "master")
+    @JsonProperty(value = "branch", defaultValue = "master")
     private String branch;
-    @JsonProperty(value = "url", required = true)
+    @JsonProperty(value = "token", required = true)
     private String token;
     @JsonProperty(value = "start date")
     private Date startDate;
@@ -19,7 +19,7 @@ public class GitConfiguration {
     private Date endDate;
     @JsonProperty(value = "ignore commits")
     private Set<String> ignoreCommits;
-    @JsonProperty(value = "maximum number of commits")
+    @JsonProperty(value = "maximum number of commits", defaultValue = "0")
     private int maximumCommitsNumber;
     @JsonProperty(value = "frequency", defaultValue = "ALL")
     private Frequency frequency;
