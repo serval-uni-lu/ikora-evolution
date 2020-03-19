@@ -1,13 +1,11 @@
 package tech.ikora.evolution;
 
-import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
 import tech.ikora.evolution.configuration.FolderConfiguration;
 import tech.ikora.evolution.configuration.GitConfiguration;
-import tech.ikora.evolution.versions.Frequency;
 import tech.ikora.evolution.versions.GitProvider;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
