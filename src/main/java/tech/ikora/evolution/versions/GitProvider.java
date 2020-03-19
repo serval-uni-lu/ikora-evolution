@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jgit.lib.Ref;
 import tech.ikora.BuildConfiguration;
 import tech.ikora.builder.BuildResult;
 import tech.ikora.builder.Builder;
@@ -46,7 +47,21 @@ public class GitProvider implements VersionProvider {
         allCommits = allCommits.stream().sorted(Comparator.comparing(GitCommit::getDate)).collect(Collectors.toList());
         allCommits = Utils.filterCommitsByFrequency(allCommits, frequency);
 
-        return allCommits.stream().map(GitCommit::getDate).collect(Collectors.toList());
+        return allCommits.stream()
+                .map(GitCommit::getDate)
+                .filter(this::isDateValid)
+                .collect(Collectors.toList());
+    }
+
+    private boolean isDateValid(Date date){
+        for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
+            GitCommit commit = Utils.lastCommitBeforeDate(entry.getValue(), date);
+            if(commit == null){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -65,7 +80,7 @@ public class GitProvider implements VersionProvider {
                 Projects projects = new Projects();
 
                 try {
-                    for(Map.Entry<LocalRepository, GitCommit> entry: getCommits(dateIterator.next()).entrySet()){
+                    for(Map.Entry<LocalRepository, GitCommit> entry: getLastCommits(dateIterator.next()).entrySet()){
                         GitUtils.checkout(entry.getKey().getGit(), entry.getValue().getId());
 
                         final BuildResult build = Builder.build(entry.getKey().getLocation(), new BuildConfiguration(), true);
@@ -79,33 +94,15 @@ public class GitProvider implements VersionProvider {
                 return projects;
             }
 
-            /**
-             * This method gets the last commit before a certain date for each each project has a commit. If some projects
-             * have not been initialized at this date, then the dateIterate moves to the next date until all project have
-             * a valid commit.
-             * @param date The date before which we want to take the commit
-             * @return The return value is a map containing the last commit before a date for each project
-             */
-            private Map<LocalRepository, GitCommit> getCommits(Date date){
-                Map<LocalRepository, GitCommit> commits = new HashMap<>(repositories.size());
+            private Map<LocalRepository, GitCommit> getLastCommits(Date date){
+                Map<LocalRepository, GitCommit> lastCommits = new HashMap<>(repositories.size());
 
-                boolean nullFlag = false;
                 for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
                     GitCommit commit = Utils.lastCommitBeforeDate(entry.getValue(), date);
-
-                    if(commit == null){
-                        nullFlag = true;
-                        break;
-                    }
-
-                    commits.put(entry.getKey(), commit);
+                    lastCommits.put(entry.getKey(), commit);
                 }
 
-                if(nullFlag){
-                    commits = getCommits(dateIterator.next());
-                }
-
-                return commits;
+                return lastCommits;
             }
         };
     }
