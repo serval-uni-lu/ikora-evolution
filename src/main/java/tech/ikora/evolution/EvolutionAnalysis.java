@@ -30,9 +30,11 @@ public class EvolutionAnalysis {
 
             EvolutionConfiguration configuration = ConfigurationParser.parse(cmd.getOptionValue("config"));
             EvolutionRunner runner = EvolutionRunnerFactory.fromConfiguration(configuration);
+
             runner.execute();
 
         } catch (ParseException | IOException | GitAPIException e) {
+            logger.error(String.format("Exit with error: %s", e.getMessage()));
             System.exit(1);
         }
     }

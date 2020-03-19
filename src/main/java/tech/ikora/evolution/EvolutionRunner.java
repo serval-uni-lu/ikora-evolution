@@ -3,6 +3,7 @@ package tech.ikora.evolution;
 import org.apache.commons.lang3.tuple.Pair;
 import tech.ikora.analytics.Difference;
 import tech.ikora.analytics.KeywordStatistics;
+import tech.ikora.evolution.differences.NodeMatcher;
 import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.model.*;
 

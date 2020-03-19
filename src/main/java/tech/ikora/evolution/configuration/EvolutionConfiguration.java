@@ -7,7 +7,7 @@ public class EvolutionConfiguration {
     private GitConfiguration gitConfiguration;
     @JsonProperty(value = "folder")
     private FolderConfiguration folderConfiguration;
-    @JsonProperty(value = "output")
+    @JsonProperty(value = "output", required = true)
     private OutputConfiguration outputConfiguration;
 
     @JsonProperty(value = "git")

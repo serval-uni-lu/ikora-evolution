@@ -1,11 +1,13 @@
 package tech.ikora.evolution;
 
+import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
 import tech.ikora.evolution.configuration.FolderConfiguration;
 import tech.ikora.evolution.configuration.GitConfiguration;
+import tech.ikora.evolution.versions.Frequency;
 import tech.ikora.evolution.versions.GitProvider;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
@@ -13,7 +15,7 @@ import tech.ikora.gitloader.git.LocalRepository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 public class EvolutionRunnerFactory {
     public static EvolutionRunner fromConfiguration(EvolutionConfiguration configuration) throws GitAPIException, IOException {
@@ -37,9 +39,28 @@ public class EvolutionRunnerFactory {
     }
 
     private static EvolutionRunner fromGit(GitConfiguration configuration) throws IOException, GitAPIException {
-        final LocalRepository localRepository = GitUtils.loadCurrentRepository(configuration.getUrl(), configuration.getToken(), new File(System.getProperty("java.io.tmpdir")), configuration.getBranch());
-        final List<GitCommit> commits = GitUtils.getCommits(localRepository.getGit(), configuration.getStartDate(), configuration.getEndDate(), configuration.getBranch());
-        final GitProvider provider = new GitProvider(localRepository, commits);
+        final GitProvider provider = new GitProvider(configuration.getFrequency());
+
+        for(String url: configuration.getUrls()){
+            final LocalRepository localRepository = GitUtils.loadCurrentRepository(
+                    url,
+                    configuration.getToken(),
+                    new File(System.getProperty("java.io.tmpdir")),
+                    configuration.getBranch()
+            );
+
+            List<GitCommit> commits = GitUtils.getCommits(localRepository.getGit(),
+                    configuration.getStartDate(),
+                    configuration.getEndDate(),
+                    configuration.getBranch()
+            );
+
+            commits = Utils.removeIgnoredCommit(commits, configuration.getIgnoreCommits());
+            commits = Utils.filterCommitsByFrequency(commits, configuration.getFrequency());
+            commits = Utils.truncateCommits(commits, configuration.getMaximumCommitsNumber());
+
+            provider.addRepository(localRepository, commits);
+        }
 
         return  new EvolutionRunner(provider);
     }

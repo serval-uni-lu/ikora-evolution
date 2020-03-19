@@ -1,4 +1,4 @@
-package tech.ikora.evolution;
+package tech.ikora.evolution.differences;
 
 import org.apache.commons.lang3.tuple.Pair;
 import tech.ikora.analytics.Clone;

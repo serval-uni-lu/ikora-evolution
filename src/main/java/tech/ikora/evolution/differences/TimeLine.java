@@ -1,4 +1,4 @@
-package tech.ikora.evolution;
+package tech.ikora.evolution.differences;
 
 import tech.ikora.analytics.Action;
 import tech.ikora.analytics.Clone;
@@ -17,7 +17,7 @@ public class TimeLine implements Differentiable, Iterable<Difference> {
     private Differentiable last;
     private Differentiable lastValid;
 
-    TimeLine() {
+    public TimeLine() {
         sequence = new ArrayList<>();
         items = new LinkedHashSet<>();
         actions = new ArrayList<>();

@@ -1,4 +1,4 @@
-package tech.ikora.evolution;
+package tech.ikora.evolution.differences;
 
 import tech.ikora.model.Differentiable;
 

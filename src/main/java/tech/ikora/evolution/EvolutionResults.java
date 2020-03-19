@@ -5,6 +5,8 @@ import tech.ikora.analytics.Clone;
 import tech.ikora.analytics.CloneDetection;
 import tech.ikora.analytics.Clones;
 import tech.ikora.analytics.Difference;
+import tech.ikora.evolution.differences.DifferentiableMatcher;
+import tech.ikora.evolution.differences.TimeLine;
 import tech.ikora.model.*;
 
 import java.util.*;

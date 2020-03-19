@@ -1,23 +1,35 @@
 package tech.ikora.evolution.configuration;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import tech.ikora.evolution.versions.Frequency;
+
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 public class GitConfiguration {
-    private String url;
+    @JsonProperty(value = "urls", required = true)
+    private Set<String> urls;
+    @JsonProperty(value = "url", defaultValue = "master")
     private String branch;
+    @JsonProperty(value = "url", required = true)
     private String token;
+    @JsonProperty(value = "start date")
     private Date startDate;
+    @JsonProperty(value = "end date")
     private Date endDate;
-    private List<String> ignoreReleases;
-    private int maximumReleasesNumber;
+    @JsonProperty(value = "ignore commits")
+    private Set<String> ignoreCommits;
+    @JsonProperty(value = "maximum number of commits")
+    private int maximumCommitsNumber;
+    @JsonProperty(value = "frequency", defaultValue = "ALL")
+    private Frequency frequency;
 
-    public String getUrl() {
-        return url;
+    public Set<String> getUrls() {
+        return urls;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setUrls(Set<String> url) {
+        this.urls = url;
     }
 
     public String getBranch() {
@@ -52,19 +64,27 @@ public class GitConfiguration {
         this.endDate = endDate;
     }
 
-    public List<String> getIgnoreReleases() {
-        return ignoreReleases;
+    public Set<String> getIgnoreCommits() {
+        return ignoreCommits;
     }
 
-    public void setIgnoreReleases(List<String> ignoreReleases) {
-        this.ignoreReleases = ignoreReleases;
+    public void setIgnoreCommits(Set<String> ignoreCommits) {
+        this.ignoreCommits = ignoreCommits;
     }
 
-    public int getMaximumReleasesNumber() {
-        return maximumReleasesNumber;
+    public int getMaximumCommitsNumber() {
+        return maximumCommitsNumber;
     }
 
-    public void setMaximumReleasesNumber(int maximumReleasesNumber) {
-        this.maximumReleasesNumber = maximumReleasesNumber;
+    public void setMaximumCommitsNumber(int maximumCommitsNumber) {
+        this.maximumCommitsNumber = maximumCommitsNumber;
+    }
+
+    public Frequency getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Frequency frequency) {
+        this.frequency = frequency;
     }
 }
