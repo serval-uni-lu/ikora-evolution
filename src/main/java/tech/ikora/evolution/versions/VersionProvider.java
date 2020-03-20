@@ -7,4 +7,5 @@ import java.io.IOException;
 
 public interface VersionProvider extends Iterable<Projects> {
     File getRootFolder() throws IOException;
+    void clean() throws IOException;
 }

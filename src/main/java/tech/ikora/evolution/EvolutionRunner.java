@@ -7,6 +7,8 @@ import tech.ikora.evolution.differences.NodeMatcher;
 import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.model.*;
 
+import java.io.IOException;
+
 public class EvolutionRunner {
     private final VersionProvider versionProvider;
     private final EvolutionResults results;
@@ -16,13 +18,15 @@ public class EvolutionRunner {
         this.results = new EvolutionResults();
     }
 
-    public void execute() {
+    public void execute() throws IOException {
         Projects version1 = null;
 
         for(Projects version2: versionProvider){
             findDifferences(version1, version2);
             version1 = version2;
         }
+
+        versionProvider.clean();
     }
 
     private void findDifferences(Projects version1, Projects version2){

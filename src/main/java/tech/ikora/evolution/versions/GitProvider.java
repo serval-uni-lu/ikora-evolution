@@ -36,31 +36,31 @@ public class GitProvider implements VersionProvider {
         this.repositories.put(localRepository, commits);
     }
 
-    private List<Date> getDates(){
-        List<GitCommit> allCommits = new ArrayList<>();
+    @Override
+    public File getRootFolder() throws IOException {
+        if(this.rootFolder == null){
+            this.rootFolder = new File(System.getProperty("java.io.tmpdir"), "git-provider");
 
-        for(List<GitCommit> commits: repositories.values()){
-            allCommits.addAll(commits);
-        }
+            if(this.rootFolder.exists()){
+                FileUtils.deleteDirectory(this.rootFolder);
+            }
 
-        allCommits = allCommits.stream().sorted(Comparator.comparing(GitCommit::getDate)).collect(Collectors.toList());
-        allCommits = Utils.filterCommitsByFrequency(allCommits, frequency);
-
-        return allCommits.stream()
-                .map(GitCommit::getDate)
-                .filter(this::isDateValid)
-                .collect(Collectors.toList());
-    }
-
-    private boolean isDateValid(Date date){
-        for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
-            GitCommit commit = Utils.lastCommitBeforeDate(entry.getValue(), date);
-            if(commit == null){
-                return false;
+            if(!this.rootFolder.mkdir()){
+                throw new IOException(String.format("Failed to create directory: %s",
+                        this.rootFolder.getAbsolutePath()));
             }
         }
 
-        return true;
+        return this.rootFolder;
+    }
+
+    @Override
+    public void clean() throws IOException {
+        for(LocalRepository localRepository: repositories.keySet()){
+            localRepository.getGit().getRepository().close();
+        }
+
+        FileUtils.forceDelete(this.rootFolder);
     }
 
     @Override
@@ -103,24 +103,33 @@ public class GitProvider implements VersionProvider {
 
                 return lastCommits;
             }
+
+            private List<Date> getDates(){
+                List<GitCommit> allCommits = new ArrayList<>();
+
+                for(List<GitCommit> commits: repositories.values()){
+                    allCommits.addAll(commits);
+                }
+
+                allCommits = allCommits.stream().sorted(Comparator.comparing(GitCommit::getDate)).collect(Collectors.toList());
+                allCommits = Utils.filterCommitsByFrequency(allCommits, frequency);
+
+                return allCommits.stream()
+                        .map(GitCommit::getDate)
+                        .filter(this::isDateValid)
+                        .collect(Collectors.toList());
+            }
+
+            private boolean isDateValid(Date date){
+                for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
+                    GitCommit commit = Utils.lastCommitBeforeDate(entry.getValue(), date);
+                    if(commit == null){
+                        return false;
+                    }
+                }
+
+                return true;
+            }
         };
-    }
-
-    @Override
-    public File getRootFolder() throws IOException {
-        if(this.rootFolder == null){
-            this.rootFolder = new File(System.getProperty("java.io.tmpdir"), "git-provider");
-
-            if(this.rootFolder.exists()){
-                FileUtils.deleteDirectory(this.rootFolder);
-            }
-
-            if(!this.rootFolder.mkdir()){
-                throw new IOException(String.format("Failed to create directory: %s",
-                        this.rootFolder.getAbsolutePath()));
-            }
-        }
-
-        return this.rootFolder;
     }
 }

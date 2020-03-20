@@ -14,7 +14,6 @@ import tech.ikora.gitloader.git.LocalRepository;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 
 public class EvolutionRunnerFactory {
@@ -42,10 +41,12 @@ public class EvolutionRunnerFactory {
         final GitProvider provider = new GitProvider(configuration.getFrequency());
 
         for(String url: configuration.getUrls()){
+            final File repositoryFolder = new File(provider.getRootFolder(), FilenameUtils.getBaseName(url));
+
             final LocalRepository localRepository = GitUtils.loadCurrentRepository(
                     url,
                     configuration.getToken(),
-                    new File(provider.getRootFolder(), FilenameUtils.getBaseName(url)),
+                    repositoryFolder,
                     configuration.getBranch()
             );
 
