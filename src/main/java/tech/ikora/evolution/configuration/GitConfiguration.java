@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.Set;
 
 public class GitConfiguration {
-    @JsonProperty(value = "urls", required = true)
-    private Set<String> urls;
+    @JsonProperty(value = "locations", required = true)
+    private Set<GitLocation> locations;
     @JsonProperty(value = "branch", defaultValue = "master")
     private String branch;
     @JsonProperty(value = "token", required = true)
@@ -24,12 +24,12 @@ public class GitConfiguration {
     @JsonProperty(value = "frequency", defaultValue = "ALL")
     private Frequency frequency;
 
-    public Set<String> getUrls() {
-        return urls;
+    public Set<GitLocation> getLocations() {
+        return locations;
     }
 
-    public void setUrls(Set<String> url) {
-        this.urls = url;
+    public void setLocations(Set<GitLocation> locations) {
+        this.locations = locations;
     }
 
     public String getBranch() {

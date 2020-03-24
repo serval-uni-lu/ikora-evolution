@@ -25,15 +25,45 @@ public class GitProvider implements VersionProvider {
 
     private final Frequency frequency;
     private final Map<LocalRepository, List<GitCommit>> repositories;
+    private final Map<LocalRepository, Set<String>> projectFolders;
 
     public GitProvider(Frequency frequency) {
         this.frequency = frequency;
         this.repositories = new HashMap<>();
+        this.projectFolders = new HashMap<>();
         this.rootFolder = null;
     }
 
-    public void addRepository(LocalRepository localRepository, List<GitCommit> commits) {
+    public void addRepository(LocalRepository localRepository, List<GitCommit> commits, Set<String> projectFolders) {
         this.repositories.put(localRepository, commits);
+        this.projectFolders.put(localRepository, projectFolders);
+    }
+
+    private Set<File> getProjectFolders(LocalRepository localRepository){
+        Set<String> projectFolderNames = this.projectFolders.get(localRepository);
+
+        if(projectFolderNames == null){
+                return Collections.singleton(localRepository.getLocation());
+        }
+
+        Set<File> projectFolders = new HashSet<>(projectFolderNames.size());
+
+        File repositoryFolder = localRepository.getLocation();
+        for(String projectFolderName: projectFolderNames){
+            File projectFolder = new File(repositoryFolder, projectFolderName);
+
+            if(projectFolder.exists()){
+                projectFolders.add(projectFolder);
+            }
+            else {
+                logger.warn(String.format("Folder %s does not exists in repository %s",
+                        projectFolderName,
+                        localRepository.getRemoteUrl()
+                ));
+            }
+        }
+
+        return projectFolders;
     }
 
     @Override
@@ -81,8 +111,7 @@ public class GitProvider implements VersionProvider {
                 try {
                     for(Map.Entry<LocalRepository, GitCommit> entry: getLastCommits(dateIterator.next()).entrySet()){
                         GitUtils.checkout(entry.getKey().getGit(), entry.getValue().getId());
-
-                        final BuildResult build = Builder.build(entry.getKey().getLocation(), new BuildConfiguration(), true);
+                        final BuildResult build = Builder.build(getProjectFolders(entry.getKey()), new BuildConfiguration(), true);
                         projects.addProjects(build.getProjects());
                     }
                 } catch (GitAPIException e) {

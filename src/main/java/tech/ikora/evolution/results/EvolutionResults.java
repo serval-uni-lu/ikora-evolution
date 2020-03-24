@@ -39,6 +39,10 @@ public class EvolutionResults {
             return;
         }
 
+        if(version.size() == 0){
+            return;
+        }
+
         versions.add(version);
     }
 

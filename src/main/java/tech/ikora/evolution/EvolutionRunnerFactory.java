@@ -7,6 +7,7 @@ import org.eclipse.jgit.api.errors.InvalidConfigurationException;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
 import tech.ikora.evolution.configuration.FolderConfiguration;
 import tech.ikora.evolution.configuration.GitConfiguration;
+import tech.ikora.evolution.configuration.GitLocation;
 import tech.ikora.evolution.versions.GitProvider;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
@@ -40,11 +41,11 @@ public class EvolutionRunnerFactory {
     private static EvolutionRunner fromGit(GitConfiguration configuration) throws IOException, GitAPIException {
         final GitProvider provider = new GitProvider(configuration.getFrequency());
 
-        for(String url: configuration.getUrls()){
-            final File repositoryFolder = new File(provider.getRootFolder(), FilenameUtils.getBaseName(url));
+        for(GitLocation location: configuration.getLocations()){
+            final File repositoryFolder = new File(provider.getRootFolder(), FilenameUtils.getBaseName(location.getUrl()));
 
             final LocalRepository localRepository = GitUtils.loadCurrentRepository(
-                    url,
+                    location.getUrl(),
                     configuration.getToken(),
                     repositoryFolder,
                     configuration.getBranch()
@@ -60,7 +61,7 @@ public class EvolutionRunnerFactory {
             commits = Utils.filterCommitsByFrequency(commits, configuration.getFrequency());
             commits = Utils.truncateCommits(commits, configuration.getMaximumCommitsNumber());
 
-            provider.addRepository(localRepository, commits);
+            provider.addRepository(localRepository, commits, location.getProjectFolders());
         }
 
         return  new EvolutionRunner(provider);
