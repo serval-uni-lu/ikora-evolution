@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import tech.ikora.evolution.configuration.ConfigurationParser;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
+import tech.ikora.evolution.results.DifferenceResults;
 
 import java.io.*;
 
@@ -39,12 +40,12 @@ public class EvolutionAnalysis {
         }
     }
 
-    private void export(JsonSerializer<EvolutionResults> serializer, String fileName, EvolutionResults results){
+    private void export(JsonSerializer<DifferenceResults> serializer, String fileName, DifferenceResults results){
         try {
             ObjectMapper mapper = new ObjectMapper();
 
             SimpleModule module = new SimpleModule();
-            module.addSerializer(EvolutionResults.class, serializer);
+            module.addSerializer(DifferenceResults.class, serializer);
             mapper.registerModule(module);
 
             File file = new File(fileName);
