@@ -1,9 +1,9 @@
 package tech.ikora.evolution;
 
 import org.apache.commons.collections4.list.SetUniqueList;
-import tech.ikora.analytics.Clone;
-import tech.ikora.analytics.CloneDetection;
-import tech.ikora.analytics.Clones;
+import tech.ikora.analytics.clones.Clone;
+import tech.ikora.analytics.clones.CloneDetection;
+import tech.ikora.analytics.clones.Clones;
 import tech.ikora.analytics.Difference;
 import tech.ikora.evolution.differences.DifferentiableMatcher;
 import tech.ikora.evolution.differences.TimeLine;

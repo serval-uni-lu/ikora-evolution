@@ -1,8 +1,8 @@
 package tech.ikora.evolution.differences;
 
 import org.apache.commons.lang3.tuple.Pair;
-import tech.ikora.analytics.Clone;
-import tech.ikora.analytics.CloneDetection;
+import tech.ikora.analytics.clones.Clone;
+import tech.ikora.analytics.clones.CloneDetection;
 import tech.ikora.model.*;
 
 import java.io.File;

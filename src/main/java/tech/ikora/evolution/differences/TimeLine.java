@@ -1,8 +1,8 @@
 package tech.ikora.evolution.differences;
 
 import tech.ikora.analytics.Action;
-import tech.ikora.analytics.Clone;
-import tech.ikora.analytics.CloneDetection;
+import tech.ikora.analytics.clones.Clone;
+import tech.ikora.analytics.clones.CloneDetection;
 import tech.ikora.analytics.Difference;
 import tech.ikora.model.*;
 import tech.ikora.utils.LevenshteinDistance;

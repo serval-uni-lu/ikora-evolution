@@ -6,8 +6,13 @@ import tech.ikora.analytics.KeywordStatistics;
 import tech.ikora.evolution.differences.NodeMatcher;
 import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.model.*;
+import tech.ikora.smells.SmellDetector;
+import tech.ikora.smells.SmellMetric;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EvolutionRunner {
     private final VersionProvider versionProvider;
@@ -22,11 +27,32 @@ public class EvolutionRunner {
         Projects version1 = null;
 
         for(Projects version2: versionProvider){
+            findSmells(version2);
             findDifferences(version1, version2);
             version1 = version2;
         }
 
         versionProvider.clean();
+    }
+
+    private void findSmells(Projects version){
+        final Set<SmellMetric.Type> metrics = new HashSet<>(4);
+        metrics.add(SmellMetric.Type.RESOURCE_OPTIMISM);
+        metrics.add(SmellMetric.Type.HARD_CODED_VALUES);
+        metrics.add(SmellMetric.Type.EAGER_TEST);
+        metrics.add(SmellMetric.Type.CONDITIONAL_TEST_LOGIC);
+
+        final SmellDetector detector = new SmellDetector(metrics);
+
+        HashMap<TestCase, Set<SmellMetric>> results = new HashMap<>();
+
+        for(Project project: version){
+            for(TestCase testCase: project.getTestCases()){
+                results.put(testCase, detector.computeMetrics(testCase));
+            }
+        }
+
+        results.size();
     }
 
     private void findDifferences(Projects version1, Projects version2){
