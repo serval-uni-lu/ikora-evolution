@@ -34,6 +34,14 @@ public class EvolutionResults {
         this.cloneResults = new CloneResults();
     }
 
+    public SmellResults getSmellResults() {
+        return smellResults;
+    }
+
+    public DifferenceResults getDifferenceResults() {
+        return differenceResults;
+    }
+
     public void addVersion(Projects version) {
         if(version == null){
             return;
@@ -63,8 +71,8 @@ public class EvolutionResults {
         this.sequenceResults.addDifference(testCase, sequenceDifference);
     }
 
-    public void setSmells(TestCase testCase, Set<SmellMetric> computeMetrics) {
-        this.smellResults.setSmells(testCase, computeMetrics);
+    public void setSmells(String versionId, TestCase testCase, Map<SmellMetric.Type, SmellMetric> computeMetrics) {
+        this.smellResults.setSmells(versionId, testCase, computeMetrics);
     }
 
     public CoEvolutionType getCoEvolutionType(Differentiable differentiable){

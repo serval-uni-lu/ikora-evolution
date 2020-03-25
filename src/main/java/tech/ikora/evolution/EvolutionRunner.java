@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import tech.ikora.analytics.Difference;
 import tech.ikora.analytics.KeywordStatistics;
 import tech.ikora.evolution.differences.NodeMatcher;
+import tech.ikora.evolution.export.ExportSmells;
 import tech.ikora.evolution.results.EvolutionResults;
 import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.model.*;
@@ -36,6 +37,10 @@ public class EvolutionRunner {
         versionProvider.clean();
     }
 
+    public EvolutionResults getResults() {
+        return this.results;
+    }
+
     private void findSmells(Projects version){
         final Set<SmellMetric.Type> metrics = new HashSet<>(4);
         metrics.add(SmellMetric.Type.RESOURCE_OPTIMISM);
@@ -47,13 +52,17 @@ public class EvolutionRunner {
 
         for(Project project: version){
             for(TestCase testCase: project.getTestCases()){
-                this.results.setSmells(testCase, detector.computeMetrics(testCase));
+                this.results.setSmells(version.getVersionId(), testCase, detector.computeMetrics(testCase));
             }
         }
     }
 
     private void findDifferences(Projects version1, Projects version2){
         if(version1 == null || version2 == null){
+            return;
+        }
+
+        if(version1.isEmpty() || version2.isEmpty()){
             return;
         }
 

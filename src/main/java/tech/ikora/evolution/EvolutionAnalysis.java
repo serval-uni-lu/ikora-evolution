@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import tech.ikora.evolution.configuration.ConfigurationParser;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
+import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.results.DifferenceResults;
 
 import java.io.*;
@@ -30,14 +31,19 @@ public class EvolutionAnalysis {
             }
 
             EvolutionConfiguration configuration = ConfigurationParser.parse(cmd.getOptionValue("config"));
-            EvolutionRunner runner = EvolutionRunnerFactory.fromConfiguration(configuration);
 
+            EvolutionRunner runner = EvolutionRunnerFactory.fromConfiguration(configuration);
             runner.execute();
+
+            EvolutionExport exporter = new EvolutionExport(configuration.getOutputConfiguration());
+            exporter.export(runner.getResults());
 
         } catch (ParseException | IOException | GitAPIException e) {
             logger.error(String.format("Exit with error: %s", e.getMessage()));
             System.exit(1);
         }
+
+        logger.info("Finished without error");
     }
 
     private void export(JsonSerializer<DifferenceResults> serializer, String fileName, DifferenceResults results){

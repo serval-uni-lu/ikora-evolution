@@ -113,6 +113,7 @@ public class GitProvider implements VersionProvider {
                         GitUtils.checkout(entry.getKey().getGit(), entry.getValue().getId());
                         final BuildResult build = Builder.build(getProjectFolders(entry.getKey()), new BuildConfiguration(), true);
                         projects.addProjects(build.getProjects());
+                        projects.setVersionId(entry.getValue().getDate().toString());
                     }
                 } catch (GitAPIException e) {
                     logger.error(String.format("Git API error (this iteration will be ignored): %s", e.getMessage()));
