@@ -1,13 +1,20 @@
 package tech.ikora.evolution;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.eclipse.jgit.diff.DiffEntry;
 import tech.ikora.evolution.versions.Frequency;
 import tech.ikora.gitloader.git.GitCommit;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Utils {
+    private static final Logger logger = LogManager.getLogger(Utils.class);
+
     public static List<GitCommit> removeIgnoredCommit(List<GitCommit> commits, Set<String> ignoreCommits) {
         if(ignoreCommits == null){
             return commits;
@@ -49,6 +56,14 @@ public class Utils {
         }
 
         return commits.subList(0, Math.min(commits.size(), maximumCommitsNumber));
+    }
+
+    public static List<GitCommit> removeCommitsWithNoFileChanged(List<GitCommit> commits, Set<String> projectFolders) {
+        if(projectFolders == null || projectFolders.isEmpty()){
+            return commits;
+        }
+
+        return commits.stream().filter(c -> isSubfolderChanged(c, projectFolders)).collect(Collectors.toList());
     }
 
     public static boolean isSameFrequencyBucket(Date date1, Date date2, Frequency frequency) {
@@ -139,5 +154,26 @@ public class Utils {
         }
 
         return commit;
+    }
+
+    private static boolean isSubfolderChanged(GitCommit commit, Set<String> subFolders) {
+        for(DiffEntry diffEntry: commit.getDiffEntries()){
+            for(String subFolder: subFolders){
+                try {
+                    if(FilenameUtils.directoryContains(subFolder, diffEntry.getOldPath())){
+                        return true;
+                    }
+
+                    if(FilenameUtils.directoryContains(subFolder, diffEntry.getNewPath())){
+                        return true;
+                    }
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
+            }
+
+        }
+
+        return false;
     }
 }

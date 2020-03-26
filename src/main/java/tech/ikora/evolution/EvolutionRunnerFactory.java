@@ -60,6 +60,7 @@ public class EvolutionRunnerFactory {
             commits = Utils.removeIgnoredCommit(commits, configuration.getIgnoreCommits());
             commits = Utils.filterCommitsByFrequency(commits, configuration.getFrequency());
             commits = Utils.truncateCommits(commits, configuration.getMaximumCommitsNumber());
+            commits = Utils.removeCommitsWithNoFileChanged(commits, location.getProjectFolders());
 
             provider.addRepository(localRepository, commits, location.getProjectFolders());
         }
