@@ -4,11 +4,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
-import tech.ikora.evolution.configuration.EvolutionConfiguration;
-import tech.ikora.evolution.configuration.FolderConfiguration;
-import tech.ikora.evolution.configuration.GitConfiguration;
-import tech.ikora.evolution.configuration.GitLocation;
+import tech.ikora.evolution.configuration.*;
+import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.versions.GitProvider;
+import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
 import tech.ikora.gitloader.git.LocalRepository;
@@ -19,26 +18,44 @@ import java.util.*;
 
 public class EvolutionRunnerFactory {
     public static EvolutionRunner fromConfiguration(EvolutionConfiguration configuration) throws GitAPIException, IOException {
-        EvolutionRunner runner;
+        EvolutionExport exporter = createExporter(configuration.getOutputConfiguration());
+        VersionProvider provider = createVersionProvider(configuration);
+
+        return new EvolutionRunner(provider, exporter);
+    }
+
+    private static VersionProvider createVersionProvider(EvolutionConfiguration configuration) throws GitAPIException, IOException {
+        VersionProvider provider;
 
         if(configuration.getFolderConfiguration() != null){
-            runner = fromFolder(configuration.getFolderConfiguration());
+            provider = createFolderProvider(configuration.getFolderConfiguration());
         }
         else if(configuration.getGitConfiguration() != null){
-            runner = fromGit(configuration.getGitConfiguration());
+            provider = createGitProvider(configuration.getGitConfiguration());
         }
         else{
             throw new InvalidConfigurationException("Configuration should have a folder or git section");
         }
 
-        return runner;
+        return provider;
     }
 
-    private static EvolutionRunner fromFolder(FolderConfiguration configuration){
+    private static EvolutionExport createExporter(OutputConfiguration configuration){
+        Map<EvolutionExport.Statistics, File> outputFiles = new HashMap<>();
+
+        File smellsCsvFile = configuration.getSmellsCsvFile();
+        if(smellsCsvFile != null){
+            outputFiles.put(EvolutionExport.Statistics.SMELL, smellsCsvFile);
+        }
+
+        return new EvolutionExport(outputFiles);
+    }
+
+    private static VersionProvider createFolderProvider(FolderConfiguration configuration){
         throw new NotImplementedException("fromFolder method not implemented yet");
     }
 
-    private static EvolutionRunner fromGit(GitConfiguration configuration) throws IOException, GitAPIException {
+    private static VersionProvider createGitProvider(GitConfiguration configuration) throws IOException, GitAPIException {
         final GitProvider provider = new GitProvider(configuration.getFrequency());
 
         for(GitLocation location: configuration.getLocations()){
@@ -65,6 +82,6 @@ public class EvolutionRunnerFactory {
             provider.addRepository(localRepository, commits, location.getProjectFolders());
         }
 
-        return  new EvolutionRunner(provider);
+        return provider;
     }
 }

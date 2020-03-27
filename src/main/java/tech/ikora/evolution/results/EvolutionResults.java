@@ -1,8 +1,6 @@
 package tech.ikora.evolution.results;
 
-import org.apache.commons.collections4.list.SetUniqueList;
 import tech.ikora.analytics.Difference;
-import tech.ikora.analytics.clones.Clone;
 import tech.ikora.evolution.differences.TimeLine;
 import tech.ikora.model.*;
 import tech.ikora.smells.SmellMetric;
@@ -15,7 +13,6 @@ public class EvolutionResults {
     }
 
     private final Map<Differentiable, CoEvolutionType> coEvolutionTypes;
-    private final SetUniqueList<Projects> versions;
 
     private final SmellResults smellResults;
     private final DifferenceResults differenceResults;
@@ -25,7 +22,6 @@ public class EvolutionResults {
 
     public EvolutionResults() {
         this.coEvolutionTypes = new HashMap<>();
-        this.versions = SetUniqueList.setUniqueList(new ArrayList<>());
 
         this.smellResults = new SmellResults();
         this.differenceResults = new DifferenceResults();
@@ -42,25 +38,9 @@ public class EvolutionResults {
         return differenceResults;
     }
 
-    public void addVersion(Projects version) {
-        if(version == null){
-            return;
-        }
-
-        if(version.size() == 0){
-            return;
-        }
-
-        versions.add(version);
-    }
-
-    public List<Projects> getVersions(){
-        return versions;
-    }
-
-    public void addDifference(Projects version, Difference difference){
+    public void addDifference(Difference difference){
         this.timeLineResults.update(difference);
-        this.differenceResults.update(version, difference);
+        this.differenceResults.update(difference);
     }
 
     public void addSequence(TestCase testCase, Sequence sequence) {
@@ -71,8 +51,8 @@ public class EvolutionResults {
         this.sequenceResults.addDifference(testCase, sequenceDifference);
     }
 
-    public void setSmells(String versionId, TestCase testCase, Set<SmellMetric> computeMetrics) {
-        this.smellResults.setSmells(versionId, testCase, computeMetrics);
+    public void setSmells(String versionId, TestCase testCase, Set<SmellMetric> computeMetrics, Set<Difference> changes) {
+        this.smellResults.setSmells(versionId, testCase, computeMetrics, changes);
     }
 
     public CoEvolutionType getCoEvolutionType(Differentiable differentiable){
@@ -98,31 +78,5 @@ public class EvolutionResults {
     private boolean checkCoEvolutionCriterion(Node node, CoEvolutionType type){
         CoEvolutionType found = getCoEvolutionType(node);
         return found == type;
-    }
-
-    public <T extends Node> int getTotalElement(Class<T> nodeType, Clone.Type cloneType, CoEvolutionType coEvolutionType){
-        int total = 0;
-
-        for(Projects version: versions){
-            Set<T> nodes = version.getNodes(nodeType);
-
-            if(nodes == null){
-                continue;
-            }
-
-            for (Node node : nodes){
-                if(!this.cloneResults.checkCloneCriterion(version, node, cloneType)){
-                    continue;
-                }
-
-                if(!checkCoEvolutionCriterion(node, coEvolutionType)){
-                    continue;
-                }
-
-                ++total;
-            }
-        }
-
-        return total;
     }
 }

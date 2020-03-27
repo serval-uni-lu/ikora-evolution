@@ -1,28 +1,68 @@
 package tech.ikora.evolution.export;
 
-import tech.ikora.evolution.configuration.OutputConfiguration;
-import tech.ikora.evolution.results.EvolutionResults;
-import tech.ikora.evolution.results.SmellResults;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import tech.ikora.evolution.results.CsvRecord;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class EvolutionExport {
-    private final File smellEvolutionFile;
+    private static Logger logger = LogManager.getLogger(EvolutionExport.class);
 
-    public EvolutionExport(OutputConfiguration configuration){
-        this.smellEvolutionFile = configuration.getSmellsEvolution();
+    public enum Statistics{
+        PROJECT,
+        SMELL
     }
 
-    public void export(EvolutionResults results) throws IOException {
-        exportSmellEvolution(results.getSmellResults());
-    }
+    private final Map<Statistics, CsvExporter> exporterMap;
 
-    private void exportSmellEvolution(SmellResults results) throws IOException {
-        if(smellEvolutionFile == null){
-            return;
+    public EvolutionExport(Map<Statistics, File> outputFiles){
+        exporterMap = new HashMap<>();
+
+        for(Map.Entry<Statistics, File> outputFile: outputFiles.entrySet()){
+            initializeExporter(outputFile.getKey(), outputFile.getValue());
         }
+    }
 
-        ExportSmells.export(smellEvolutionFile.getAbsolutePath(), results);
+    private void initializeExporter(Statistics statistic, File location){
+        if(location != null){
+            try {
+                CsvExporter smellExporter = new CsvExporter(location.getAbsolutePath());
+                this.exporterMap.put(statistic, smellExporter);
+            } catch (IOException e) {
+                logger.error(String.format("Failed to create csv writer for %s at location '%s'",
+                        statistic.name(),
+                        location.getAbsolutePath()));
+            }
+        }
+    }
+
+    public void export(Statistics statistics, List<? extends CsvRecord> records) throws IOException {
+        final CsvExporter csvExporter = exporterMap.get(statistics);
+
+        if(csvExporter != null){
+            csvExporter.addRecords(records);
+        }
+    }
+
+    public void export(Statistics statistics, CsvRecord record) throws IOException {
+        final CsvExporter csvExporter = exporterMap.get(statistics);
+
+        if(csvExporter != null){
+            csvExporter.addRecord(record);
+        }
+    }
+
+    @Override
+    public void finalize() throws IOException {
+        for(CsvExporter exporter: exporterMap.values()){
+            if(exporter != null){
+                exporter.finalize();
+            }
+        }
     }
 }

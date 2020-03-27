@@ -5,14 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.File;
 
 public class OutputConfiguration {
-    @JsonProperty(value = "smells evolution")
-    private File smellsEvolution;
+    @JsonProperty(value = "smells csv file")
+    private File smellsCsvFile;
 
-    public File getSmellsEvolution() {
-        return smellsEvolution;
+    public File getSmellsCsvFile() {
+        return smellsCsvFile;
     }
 
-    public void setSmellsEvolution(File smellsEvolution) {
-        this.smellsEvolution = smellsEvolution;
+    public void setSmellsCsvFile(File smellsCsvFile) {
+        this.smellsCsvFile = smellsCsvFile;
     }
 }

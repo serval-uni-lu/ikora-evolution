@@ -35,9 +35,6 @@ public class EvolutionAnalysis {
             EvolutionRunner runner = EvolutionRunnerFactory.fromConfiguration(configuration);
             runner.execute();
 
-            EvolutionExport exporter = new EvolutionExport(configuration.getOutputConfiguration());
-            exporter.export(runner.getResults());
-
         } catch (ParseException | IOException | GitAPIException e) {
             logger.error(String.format("Exit with error: %s", e.getMessage()));
             System.exit(1);
