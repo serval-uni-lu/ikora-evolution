@@ -48,6 +48,11 @@ public class EvolutionRunnerFactory {
             outputFiles.put(EvolutionExport.Statistics.SMELL, smellsCsvFile);
         }
 
+        File projectsCsvFile = configuration.getProjectsCsvFile();
+        if(projectsCsvFile != null){
+            outputFiles.put(EvolutionExport.Statistics.PROJECT, projectsCsvFile);
+        }
+
         return new EvolutionExport(outputFiles);
     }
 

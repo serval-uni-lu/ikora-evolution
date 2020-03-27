@@ -3,7 +3,6 @@ package tech.ikora.evolution.results;
 import tech.ikora.analytics.Difference;
 import tech.ikora.evolution.differences.TimeLine;
 import tech.ikora.model.*;
-import tech.ikora.smells.SmellMetric;
 
 import java.util.*;
 
@@ -13,9 +12,6 @@ public class EvolutionResults {
     }
 
     private final Map<Differentiable, CoEvolutionType> coEvolutionTypes;
-
-    private final SmellResults smellResults;
-    private final DifferenceResults differenceResults;
     private final SequenceResults sequenceResults;
     private final TimeLineResults timeLineResults;
     private final CloneResults cloneResults;
@@ -23,24 +19,13 @@ public class EvolutionResults {
     public EvolutionResults() {
         this.coEvolutionTypes = new HashMap<>();
 
-        this.smellResults = new SmellResults();
-        this.differenceResults = new DifferenceResults();
         this.sequenceResults = new SequenceResults();
         this.timeLineResults = new TimeLineResults();
         this.cloneResults = new CloneResults();
     }
 
-    public SmellResults getSmellResults() {
-        return smellResults;
-    }
-
-    public DifferenceResults getDifferenceResults() {
-        return differenceResults;
-    }
-
     public void addDifference(Difference difference){
         this.timeLineResults.update(difference);
-        this.differenceResults.update(difference);
     }
 
     public void addSequence(TestCase testCase, Sequence sequence) {
@@ -49,10 +34,6 @@ public class EvolutionResults {
 
     public void addSequenceDifference(TestCase testCase, Difference sequenceDifference) {
         this.sequenceResults.addDifference(testCase, sequenceDifference);
-    }
-
-    public void setSmells(String versionId, TestCase testCase, Set<SmellMetric> computeMetrics, Set<Difference> changes) {
-        this.smellResults.setSmells(versionId, testCase, computeMetrics, changes);
     }
 
     public CoEvolutionType getCoEvolutionType(Differentiable differentiable){

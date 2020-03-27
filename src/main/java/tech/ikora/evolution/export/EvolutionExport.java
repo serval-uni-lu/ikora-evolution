@@ -13,6 +13,10 @@ import java.util.Map;
 public class EvolutionExport {
     private static Logger logger = LogManager.getLogger(EvolutionExport.class);
 
+    public boolean contains(Statistics statistics) {
+        return exporterMap.keySet().contains(statistics);
+    }
+
     public enum Statistics{
         PROJECT,
         SMELL

@@ -8,9 +8,9 @@ import tech.ikora.analytics.visitor.PathMemory;
 import tech.ikora.evolution.differences.NodeMatcher;
 import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.results.DifferenceResults;
-import tech.ikora.evolution.results.EvolutionResults;
 import tech.ikora.evolution.results.SequenceResults;
 import tech.ikora.evolution.results.SmellResults;
+import tech.ikora.evolution.results.VersionRecord;
 import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.model.*;
 import tech.ikora.smells.SmellDetector;
@@ -21,23 +21,21 @@ import java.util.*;
 
 public class EvolutionRunner {
     private final VersionProvider versionProvider;
-    private final EvolutionExport export;
+    private final EvolutionExport exporter;
 
-    public EvolutionRunner(VersionProvider versionProvider, EvolutionExport export){
+    public EvolutionRunner(VersionProvider versionProvider, EvolutionExport exporter){
         this.versionProvider = versionProvider;
-        this.export = export;
+        this.exporter = exporter;
     }
 
     public void execute() throws IOException {
         Projects previousVersion = null;
 
         for(Projects version: versionProvider){
-            final EvolutionResults results = new EvolutionResults();
+            computeVersionStatistics(version);
 
             if(previousVersion != null){
-                DifferenceResults differenceResults = findDifferences(previousVersion, version);
-                SmellResults smellResults = findSmells(differenceResults, version);
-                this.export.export(EvolutionExport.Statistics.SMELL, smellResults.getRecords());
+                computeSmells(previousVersion, version);
             }
 
             previousVersion = version;
@@ -46,7 +44,25 @@ public class EvolutionRunner {
         versionProvider.clean();
     }
 
-    private SmellResults findSmells(DifferenceResults differenceResults, Projects version){
+    private void computeVersionStatistics(Projects version) throws IOException {
+        if(!this.exporter.contains(EvolutionExport.Statistics.PROJECT)){
+            return;
+        }
+
+        this.exporter.export(EvolutionExport.Statistics.PROJECT, new VersionRecord(version));
+    }
+
+    private void computeSmells(Projects version, Projects nextVersion) throws IOException {
+        if(!this.exporter.contains(EvolutionExport.Statistics.SMELL)){
+            return;
+        }
+
+        DifferenceResults differenceResults = findDifferences(version, nextVersion);
+        SmellResults smellResults = findSmells(nextVersion, differenceResults);
+        this.exporter.export(EvolutionExport.Statistics.SMELL, smellResults.getRecords());
+    }
+
+    private SmellResults findSmells(Projects version, DifferenceResults differenceResults){
         SmellResults smellResults = new SmellResults();
 
         final Set<SmellMetric.Type> metrics = new HashSet<>(4);
@@ -61,7 +77,7 @@ public class EvolutionRunner {
             Map<TestCase, Set<Difference>> changes = computeChanges(project.getTestCases(), differenceResults.getDifferences());
 
             for(TestCase testCase: project.getTestCases()){
-                smellResults.setSmells(version.getVersionId(), testCase, detector.computeMetrics(testCase), getChanges(testCase, changes));
+                smellResults.addTestCase(version.getDate(), testCase, detector.computeMetrics(testCase), getChanges(testCase, changes));
             }
         }
 
@@ -93,9 +109,9 @@ public class EvolutionRunner {
             results.update(Difference.of(testCase1, testCase2));
         }
 
-        for(Pair<Variable,Variable> variablePair: NodeMatcher.getPairs(Variable.class, version1, version2)) {
-            Variable variable1 = getElement(variablePair, version1);
-            Variable variable2 = getElement(variablePair, version2);
+        for(Pair<VariableAssignment,VariableAssignment> variablePair: NodeMatcher.getPairs(VariableAssignment.class, version1, version2)) {
+            VariableAssignment variable1 = getElement(variablePair, version1);
+            VariableAssignment variable2 = getElement(variablePair, version2);
 
             results.update(Difference.of(variable1, variable2));
         }
