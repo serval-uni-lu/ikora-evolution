@@ -34,6 +34,4 @@ public class DifferenceResults {
            return v;
         });
     }
-
-
 }

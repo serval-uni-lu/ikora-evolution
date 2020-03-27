@@ -71,7 +71,7 @@ public class EvolutionResults {
         this.sequenceResults.addDifference(testCase, sequenceDifference);
     }
 
-    public void setSmells(String versionId, TestCase testCase, Map<SmellMetric.Type, SmellMetric> computeMetrics) {
+    public void setSmells(String versionId, TestCase testCase, Set<SmellMetric> computeMetrics) {
         this.smellResults.setSmells(versionId, testCase, computeMetrics);
     }
 
