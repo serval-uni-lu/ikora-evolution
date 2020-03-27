@@ -8,7 +8,6 @@ import tech.ikora.analytics.visitor.PathMemory;
 import tech.ikora.evolution.differences.NodeMatcher;
 import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.results.DifferenceResults;
-import tech.ikora.evolution.results.SequenceResults;
 import tech.ikora.evolution.results.SmellResults;
 import tech.ikora.evolution.results.VersionRecord;
 import tech.ikora.evolution.versions.VersionProvider;
@@ -117,24 +116,6 @@ public class EvolutionRunner {
         }
 
         return results;
-    }
-
-    private SequenceResults findSequences(Projects version1, Projects version2){
-        SequenceResults sequenceResults = new SequenceResults();
-
-        for(Pair<TestCase,TestCase> testCasePair: NodeMatcher.getPairs(TestCase.class, version1, version2)) {
-            TestCase testCase1 = getElement(testCasePair, version1);
-            TestCase testCase2 = getElement(testCasePair, version2);
-
-            Sequence sequence1 = testCase1 != null ? KeywordStatistics.getSequence(testCase1) : null;
-            Sequence sequence2 = testCase2 != null ? KeywordStatistics.getSequence(testCase2) : null;
-
-            sequenceResults.addSequence(testCase1, sequence1);
-            sequenceResults.addSequence(testCase2, sequence2);
-            sequenceResults.addDifference(testCase1, Difference.of(sequence1, sequence2));
-        }
-
-        return sequenceResults;
     }
 
     private <T extends Node> T getElement(Pair<T,T> pair, Projects version){

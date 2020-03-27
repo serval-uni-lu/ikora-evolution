@@ -12,28 +12,18 @@ public class EvolutionResults {
     }
 
     private final Map<Differentiable, CoEvolutionType> coEvolutionTypes;
-    private final SequenceResults sequenceResults;
     private final TimeLineResults timeLineResults;
     private final CloneResults cloneResults;
 
     public EvolutionResults() {
         this.coEvolutionTypes = new HashMap<>();
 
-        this.sequenceResults = new SequenceResults();
         this.timeLineResults = new TimeLineResults();
         this.cloneResults = new CloneResults();
     }
 
     public void addDifference(Difference difference){
         this.timeLineResults.update(difference);
-    }
-
-    public void addSequence(TestCase testCase, Sequence sequence) {
-        this.sequenceResults.addSequence(testCase, sequence);
-    }
-
-    public void addSequenceDifference(TestCase testCase, Difference sequenceDifference) {
-        this.sequenceResults.addDifference(testCase, sequenceDifference);
     }
 
     public CoEvolutionType getCoEvolutionType(Differentiable differentiable){
