@@ -3,10 +3,7 @@ package tech.ikora.evolution.results;
 import tech.ikora.analytics.clones.Clone;
 import tech.ikora.analytics.clones.CloneDetection;
 import tech.ikora.analytics.clones.Clones;
-import tech.ikora.model.Node;
-import tech.ikora.model.Projects;
-import tech.ikora.model.TestCase;
-import tech.ikora.model.UserKeyword;
+import tech.ikora.model.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +35,7 @@ public class CloneResults {
         return testCaseClones.get(version);
     }
 
-    public <T extends Node> boolean checkCloneCriterion(Projects version, T node, Clone.Type cloneType){
+    public <T extends SourceNode> boolean checkCloneCriterion(Projects version, T node, Clone.Type cloneType){
         Clones<T> clones = null;
         if(node.getClass() == UserKeyword.class){
             clones = (Clones<T>) getKeywordClones(version);

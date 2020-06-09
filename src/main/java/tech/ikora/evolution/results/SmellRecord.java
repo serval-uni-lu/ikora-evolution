@@ -19,7 +19,7 @@ public class SmellRecord implements CsvRecord {
     public SmellRecord(Date date, TestCase testCase, SmellMetric smell, int changesCount) {
         this.date = date;
         this.testCaseName = testCase.toString();
-        this.testCaseSize = KeywordStatistics.getSize(testCase);
+        this.testCaseSize = KeywordStatistics.getSize(testCase).getTestCaseSize();
         this.testCaseSequence = KeywordStatistics.getSequenceSize(testCase);
         this.testCaseLevel = KeywordStatistics.getLevel(testCase);
         this.smellMetricName = smell.getType().name();

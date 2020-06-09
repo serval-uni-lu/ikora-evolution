@@ -13,7 +13,7 @@ public class NodeMatcher {
         ChangeName, ChangeFolder, ChangeFile, ChangeAll
     }
 
-    public static <T extends Node> List<Pair<T,T>> getPairs(Class<T> type, Projects version1, Projects version2) {
+    public static <T extends SourceNode> List<Pair<T,T>> getPairs(Class<T> type, Projects version1, Projects version2) {
         List<Pair<T,T>> pairs = new ArrayList<>();
 
         Set<T> nodes1 = version1.getNodes(type);
@@ -55,7 +55,7 @@ public class NodeMatcher {
         return pairs;
     }
 
-    private static <T extends Node> Set<T> matchNode(Set<T> nodeList, T node){
+    private static <T extends SourceNode> Set<T> matchNode(Set<T> nodeList, T node){
         Set<T> nodesFound = new HashSet<>();
 
         for(T currentNode: nodeList){
@@ -67,7 +67,7 @@ public class NodeMatcher {
         return nodesFound;
     }
 
-    private static boolean matches(Node node1, Node node2){
+    private static boolean matches(SourceNode node1, SourceNode node2){
         if(!isSameProject(node1, node2)){
             return false;
         }
@@ -76,10 +76,10 @@ public class NodeMatcher {
             return false;
         }
 
-        return node1.matches(node2.getName());
+        return node1.matches(node2.getNameToken());
     }
 
-    private static boolean isSameProject(Node node1, Node node2){
+    private static boolean isSameProject(SourceNode node1, SourceNode node2){
         Project project1 = node1.getProject();
         Project project2 = node2.getProject();
 
@@ -94,12 +94,12 @@ public class NodeMatcher {
         return project1.getName().equalsIgnoreCase(project2.getName());
     }
 
-    private static boolean isSameFile(Node node1, Node node2){
-        return node1.getFileName().equalsIgnoreCase(node2.getFileName());
+    private static boolean isSameFile(SourceNode node1, SourceNode node2){
+        return node1.getLibraryName().equalsIgnoreCase(node2.getLibraryName());
     }
 
-    private static <T extends Node> Map<Edit, List<T>> findPotentialCandidates(T keyword, List<T> unmatched) {
-        String fileName = new File(keyword.getFileName()).getName();
+    private static <T extends SourceNode> Map<Edit, List<T>> findPotentialCandidates(T keyword, List<T> unmatched) {
+        String fileName = new File(keyword.getLibraryName()).getName();
         Map<Edit, List<T>> candidates = new HashMap<>();
 
         for (T current: unmatched){
@@ -107,7 +107,7 @@ public class NodeMatcher {
                 continue;
             }
 
-            String currentFileName = current.getFileName();
+            String currentFileName = current.getLibraryName();
 
             if(current.getFile().equals(keyword.getFile())){
                 List<T> list = candidates.getOrDefault(Edit.ChangeName, new ArrayList<>());
@@ -134,7 +134,7 @@ public class NodeMatcher {
         return candidates;
     }
 
-    private static <T extends Node> T findBestCandidate(T keyword, List<T> unmatched){
+    private static <T extends SourceNode> T findBestCandidate(T keyword, List<T> unmatched){
         Map<Edit, List<T>> candidates = findPotentialCandidates(keyword, unmatched);
 
         T bestCandidate = null;

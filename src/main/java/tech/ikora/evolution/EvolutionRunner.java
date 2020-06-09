@@ -2,7 +2,6 @@ package tech.ikora.evolution;
 
 import org.apache.commons.lang3.tuple.Pair;
 import tech.ikora.analytics.Difference;
-import tech.ikora.analytics.KeywordStatistics;
 import tech.ikora.analytics.visitor.FindTestCaseVisitor;
 import tech.ikora.analytics.visitor.PathMemory;
 import tech.ikora.evolution.differences.NodeMatcher;
@@ -118,7 +117,7 @@ public class EvolutionRunner {
         return results;
     }
 
-    private <T extends Node> T getElement(Pair<T,T> pair, Projects version){
+    private <T extends SourceNode> T getElement(Pair<T,T> pair, Projects version){
         if(pair.getRight() != null && version.contains(pair.getRight().getProject())) {
             return pair.getRight();
         }
@@ -140,7 +139,7 @@ public class EvolutionRunner {
                 continue;
             }
 
-            final Set<TestCase> changedTestCases = findTestCases((Node) (difference.getLeft() != null ? difference.getLeft() : difference.getRight()));
+            final Set<TestCase> changedTestCases = findTestCases((SourceNode) (difference.getLeft() != null ? difference.getLeft() : difference.getRight()));
 
             for(TestCase testCase: changedTestCases){
                 changes.get(testCase).add(difference);
@@ -150,7 +149,7 @@ public class EvolutionRunner {
         return changes;
     }
 
-    Set<TestCase> findTestCases(Node node){
+    Set<TestCase> findTestCases(SourceNode node){
         FindTestCaseVisitor visitor = new FindTestCaseVisitor();
         visitor.visit(node, new PathMemory());
 

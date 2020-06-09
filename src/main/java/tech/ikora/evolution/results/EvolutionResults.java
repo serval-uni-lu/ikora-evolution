@@ -46,7 +46,7 @@ public class EvolutionResults {
         return coEvolutionTypes.getOrDefault(differentiable, CoEvolutionType.Invalid);
     }
 
-    private boolean checkCoEvolutionCriterion(Node node, CoEvolutionType type){
+    private boolean checkCoEvolutionCriterion(SourceNode node, CoEvolutionType type){
         CoEvolutionType found = getCoEvolutionType(node);
         return found == type;
     }

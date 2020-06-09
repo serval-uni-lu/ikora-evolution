@@ -106,8 +106,12 @@ public class TimeLine implements Differentiable, Iterable<Difference> {
             return Clone.Type.NONE;
         }
 
-        Node thisItem = (Node)this.findItemByCommit(commit);
-        Node otherItem = (Node)other.findItemByCommit(commit);
+        SourceNode thisItem = (SourceNode)this.findItemByCommit(commit);
+        SourceNode otherItem = (SourceNode)other.findItemByCommit(commit);
+
+        if(thisItem == null || otherItem == null){
+            return Clone.Type.NONE;
+        }
 
         return CloneDetection.getCloneType(thisItem, otherItem);
     }
@@ -148,7 +152,7 @@ public class TimeLine implements Differentiable, Iterable<Difference> {
             return "";
         }
 
-        Node node = (Node)item;
+        SourceNode node = (SourceNode)item;
 
         SourceFile file = node.getSourceFile();
         if(file == null){
