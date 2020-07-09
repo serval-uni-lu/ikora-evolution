@@ -10,7 +10,7 @@ public class GitConfiguration {
     @JsonProperty(value = "locations", required = true)
     private Set<GitLocation> locations;
     @JsonProperty(value = "branch", defaultValue = "master")
-    private String branch;
+    private String branch = "master";
     @JsonProperty(value = "token", required = true)
     private String token;
     @JsonProperty(value = "start date")
@@ -20,9 +20,9 @@ public class GitConfiguration {
     @JsonProperty(value = "ignore commits")
     private Set<String> ignoreCommits;
     @JsonProperty(value = "maximum number of commits", defaultValue = "0")
-    private int maximumCommitsNumber;
-    @JsonProperty(value = "frequency", defaultValue = "ALL")
-    private Frequency frequency;
+    private int maximumCommitsNumber = 0;
+    @JsonProperty(value = "frequency", defaultValue = "UNIQUE")
+    private Frequency frequency = Frequency.UNIQUE;
 
     public Set<GitLocation> getLocations() {
         return locations;

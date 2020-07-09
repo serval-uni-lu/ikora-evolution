@@ -2,17 +2,28 @@ package tech.ikora.evolution.export;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.ikora.evolution.results.CsvRecord;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
 public class CsvExporter {
+    private static Logger logger = LogManager.getLogger(CsvExporter.class);
+
     private final FileWriter out;
     private CSVPrinter printer;
 
     public CsvExporter(String output) throws IOException {
+        final File folder = new File(FilenameUtils.getFullPathNoEndSeparator(output));
+        if(folder.mkdirs()){
+            logger.info(String.format("Create folder %s", folder.getAbsolutePath()));
+        }
+
         this.out = new FileWriter(output);
     }
 

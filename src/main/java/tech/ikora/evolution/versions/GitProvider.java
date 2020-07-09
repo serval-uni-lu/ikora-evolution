@@ -56,9 +56,10 @@ public class GitProvider implements VersionProvider {
                 projectFolders.add(projectFolder);
             }
             else {
-                logger.warn(String.format("Folder %s does not exists in repository %s",
+                logger.warn(String.format("Folder %s does not exists in repository %s on %s",
                         projectFolderName,
-                        localRepository.getRemoteUrl()
+                        localRepository.getRemoteUrl(),
+                        localRepository.getGitCommit().getDate().toString()
                 ));
             }
         }

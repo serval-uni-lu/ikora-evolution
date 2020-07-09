@@ -109,7 +109,7 @@ public class NodeMatcher {
 
             String currentFileName = current.getLibraryName();
 
-            if(current.getFile().equals(keyword.getFile())){
+            if(current.getLibraryName().equals(keyword.getLibraryName())){
                 List<T> list = candidates.getOrDefault(Edit.ChangeName, new ArrayList<>());
                 list.add(current);
                 candidates.put(Edit.ChangeName, list);

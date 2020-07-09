@@ -2,17 +2,17 @@ package tech.ikora.evolution;
 
 import org.apache.commons.lang3.tuple.Pair;
 import tech.ikora.analytics.Difference;
+import tech.ikora.analytics.clones.Clones;
 import tech.ikora.analytics.visitor.FindTestCaseVisitor;
 import tech.ikora.analytics.visitor.PathMemory;
 import tech.ikora.evolution.differences.NodeMatcher;
 import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.results.DifferenceResults;
-import tech.ikora.evolution.results.SmellResults;
+import tech.ikora.evolution.results.SmellRecords;
 import tech.ikora.evolution.results.VersionRecord;
 import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.model.*;
 import tech.ikora.smells.SmellDetector;
-import tech.ikora.smells.SmellMetric;
 
 import java.io.IOException;
 import java.util.*;
@@ -56,30 +56,24 @@ public class EvolutionRunner {
         }
 
         DifferenceResults differenceResults = findDifferences(version, nextVersion);
-        SmellResults smellResults = findSmells(nextVersion, differenceResults);
-        this.exporter.export(EvolutionExport.Statistics.SMELL, smellResults.getRecords());
+        SmellRecords smellRecords = findSmells(nextVersion, differenceResults);
+        this.exporter.export(EvolutionExport.Statistics.SMELL, smellRecords.getRecords());
     }
 
-    private SmellResults findSmells(Projects version, DifferenceResults differenceResults){
-        SmellResults smellResults = new SmellResults();
+    private SmellRecords findSmells(Projects version, DifferenceResults differenceResults){
+        SmellRecords smellRecords = new SmellRecords();
 
-        final Set<SmellMetric.Type> metrics = new HashSet<>(4);
-        metrics.add(SmellMetric.Type.RESOURCE_OPTIMISM);
-        metrics.add(SmellMetric.Type.HARD_CODED_VALUES);
-        metrics.add(SmellMetric.Type.EAGER_TEST);
-        metrics.add(SmellMetric.Type.CONDITIONAL_TEST_LOGIC);
-
-        final SmellDetector detector = new SmellDetector(metrics);
+        final SmellDetector detector = SmellDetector.all(new Clones<>());
 
         for(Project project: version){
             Map<TestCase, Set<Difference>> changes = computeChanges(project.getTestCases(), differenceResults.getDifferences());
 
             for(TestCase testCase: project.getTestCases()){
-                smellResults.addTestCase(version.getDate(), testCase, detector.computeMetrics(testCase), getChanges(testCase, changes));
+                smellRecords.addTestCase(version.getDate(), testCase, detector.computeMetrics(testCase), getChanges(testCase, changes));
             }
         }
 
-        return smellResults;
+        return smellRecords;
     }
 
     private DifferenceResults findDifferences(Projects version1, Projects version2){
