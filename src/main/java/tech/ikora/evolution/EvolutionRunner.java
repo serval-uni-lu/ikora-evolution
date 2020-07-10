@@ -72,11 +72,12 @@ public class EvolutionRunner {
         SmellRecords smellRecords = new SmellRecords();
 
         final SmellDetector detector = SmellDetector.all(new Clones<>());
+        final String versionId = version.getVersionId();
 
         for(Project project: version){
             for(TestCase testCase: project.getTestCases()){
                 final SmellResults smellResults = detector.computeMetrics(testCase);
-                smellRecords.addTestCase(version.getDate(), testCase, smellResults, differenceResults, previousSmellRecords);
+                smellRecords.addTestCase(versionId, testCase, smellResults, differenceResults, previousSmellRecords);
             }
         }
 

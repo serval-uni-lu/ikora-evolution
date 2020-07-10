@@ -20,14 +20,16 @@ User \"${username}\" logs in with password \"${password}\"
 
 Input Username
     [Arguments]    ${username}
-    Input Text    username_field    ${username}
+    Input Text    ${USERNAME_FIELD}    ${username}
 
 Input Password
     [Arguments]    ${password}
     Input Text    ${PASSWORD_FIELD}    ${password}
 
 Submit Credentials
-    Click Button    login_button
+    Click Button    ${BOTTON_FIELD}
 
 *** Variables ***
+${USERNAME_FIELD}      username_field
 ${PASSWORD_FIELD}      password_field
+${BOTTON_FIELD}        login_button

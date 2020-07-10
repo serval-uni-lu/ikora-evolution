@@ -50,7 +50,11 @@ public class FolderProvider implements VersionProvider{
             public Projects next() {
                 final File subFolder = subFoldersIterator.next();
                 final BuildResult build = Builder.build(subFolder, new BuildConfiguration(), true);
-                return build.getProjects();
+                final Projects version = build.getProjects();
+
+                version.setVersionId(subFolder.getName());
+
+                return version;
             }
 
             List<File> getSubFolders(){

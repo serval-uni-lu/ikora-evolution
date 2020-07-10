@@ -13,12 +13,12 @@ public class SmellRecords {
     private final List<Record> records = new ArrayList<>();
     private final Map<TestCase, SmellResults> testCaseToSmellResults = new HashMap<>();
 
-    public void addTestCase(Date date, TestCase testCase, SmellResults smells, DifferenceResults differences, SmellRecords previous){
+    public void addTestCase(String version, TestCase testCase, SmellResults smells, DifferenceResults differences, SmellRecords previous){
         testCaseToSmellResults.put(testCase, smells);
 
         for(SmellResult smell: smells){
             long changes = computeChanges(smell.getType(), testCase, differences, previous);
-            records.add(new SmellRecord(date, testCase, smell.getType().name(), smell.getValue(), changes));
+            records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getValue(), changes));
         }
     }
 

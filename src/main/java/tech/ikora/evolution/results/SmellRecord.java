@@ -3,10 +3,8 @@ package tech.ikora.evolution.results;
 import tech.ikora.analytics.KeywordStatistics;
 import tech.ikora.model.TestCase;
 
-import java.util.Date;
-
 public class SmellRecord implements Record {
-    private final Date date;
+    private final String version;
     private final String testCaseName;
     private final int testCaseSize;
     private final int testCaseSequence;
@@ -15,8 +13,8 @@ public class SmellRecord implements Record {
     private final double smellMetricValue;
     private final long changesCount;
 
-    public SmellRecord(Date date, TestCase testCase, String smellMetricName, double smellMetricValue, long changesCount) {
-        this.date = date;
+    public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricValue, long changesCount) {
+        this.version = version;
         this.testCaseName = testCase.toString();
         this.testCaseSize = KeywordStatistics.getSize(testCase).getTestCaseSize();
         this.testCaseSequence = KeywordStatistics.getSequenceSize(testCase);
@@ -26,8 +24,8 @@ public class SmellRecord implements Record {
         this.changesCount = changesCount;
     }
 
-    public Date getDate() {
-        return date;
+    public String getVersion() {
+        return version;
     }
 
     public String getTestCaseName() {
@@ -61,7 +59,7 @@ public class SmellRecord implements Record {
     @Override
     public Object[] getValues(){
         return new Object[] {
-                this.getDate(),
+                this.getVersion(),
                 this.getTestCaseName(),
                 String.valueOf(this.getTestCaseSize()),
                 String.valueOf(this.getTestCaseSequence()),
@@ -82,7 +80,7 @@ public class SmellRecord implements Record {
                 "test_case_level",
                 "smell_name",
                 "smell_metric",
-                "changes"
+                "fixes"
         };
     }
 }
