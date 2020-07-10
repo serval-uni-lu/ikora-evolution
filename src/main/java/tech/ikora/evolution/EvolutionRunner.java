@@ -5,8 +5,8 @@ import tech.ikora.analytics.Difference;
 import tech.ikora.analytics.clones.Clones;
 import tech.ikora.evolution.differences.NodeMatcher;
 import tech.ikora.evolution.export.EvolutionExport;
+import tech.ikora.evolution.export.Exporter;
 import tech.ikora.evolution.results.DifferenceResults;
-import tech.ikora.evolution.results.SmellRecord;
 import tech.ikora.evolution.results.SmellRecords;
 import tech.ikora.evolution.results.VersionRecord;
 import tech.ikora.evolution.versions.FolderProvider;
@@ -16,6 +16,7 @@ import tech.ikora.smells.SmellDetector;
 import tech.ikora.smells.SmellResults;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class EvolutionRunner {
     private final VersionProvider versionProvider;
@@ -24,6 +25,10 @@ public class EvolutionRunner {
     public EvolutionRunner(VersionProvider versionProvider, EvolutionExport exporter){
         this.versionProvider = versionProvider;
         this.exporter = exporter;
+    }
+
+    public Map<EvolutionExport.Statistics, Exporter> getExporter() {
+        return exporter.getExporters();
     }
 
     public void execute() throws IOException {

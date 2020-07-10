@@ -3,6 +3,7 @@ package tech.ikora.evolution;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
 import tech.ikora.evolution.configuration.FolderConfiguration;
 import tech.ikora.evolution.configuration.OutputConfiguration;
+import tech.ikora.evolution.export.Exporter;
 
 import java.io.File;
 
@@ -32,6 +33,7 @@ public class Helpers {
         final OutputConfiguration outputConfiguration = new OutputConfiguration();
         outputConfiguration.setProjectsCsvFile(new File(outputFolder, "projects.csv"));
         outputConfiguration.setSmellsCsvFile(new File(outputFolder, "smells.csv"));
+        outputConfiguration.setStrategy(Exporter.Strategy.IN_MEMORY);
 
         final EvolutionConfiguration evolutionConfiguration = new EvolutionConfiguration();
         evolutionConfiguration.setFolderConfiguration(folderConfiguration);

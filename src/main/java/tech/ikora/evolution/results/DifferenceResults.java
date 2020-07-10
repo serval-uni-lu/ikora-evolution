@@ -54,7 +54,7 @@ public class DifferenceResults {
     }
 
     private Set<TestCase> findTestCases(Differentiable node){
-        if(!SourceNode.class.isAssignableFrom(node.getClass())){
+        if(node == null || !SourceNode.class.isAssignableFrom(node.getClass())){
             return Collections.emptySet();
         }
 

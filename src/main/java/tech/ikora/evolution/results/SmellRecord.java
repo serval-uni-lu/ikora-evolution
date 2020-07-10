@@ -2,11 +2,10 @@ package tech.ikora.evolution.results;
 
 import tech.ikora.analytics.KeywordStatistics;
 import tech.ikora.model.TestCase;
-import tech.ikora.smells.SmellMetric;
 
 import java.util.Date;
 
-public class SmellRecord implements CsvRecord {
+public class SmellRecord implements Record {
     private final Date date;
     private final String testCaseName;
     private final int testCaseSize;
@@ -59,6 +58,7 @@ public class SmellRecord implements CsvRecord {
         return changesCount;
     }
 
+    @Override
     public Object[] getValues(){
         return new Object[] {
                 this.getDate(),
@@ -72,7 +72,8 @@ public class SmellRecord implements CsvRecord {
         };
     }
 
-    public String[] getHeaders() {
+    @Override
+    public String[] getKeys() {
         return new String[] {
                 "version",
                 "test_case_name",

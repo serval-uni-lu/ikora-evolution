@@ -1,6 +1,5 @@
 package tech.ikora.evolution.results;
 
-import com.sun.corba.se.impl.resolver.SplitLocalResolverImpl;
 import tech.ikora.analytics.Difference;
 import tech.ikora.evolution.differences.SmellFixes;
 import tech.ikora.model.TestCase;
@@ -11,7 +10,7 @@ import tech.ikora.smells.SmellResults;
 import java.util.*;
 
 public class SmellRecords {
-    private final List<SmellRecord> records = new ArrayList<>();
+    private final List<Record> records = new ArrayList<>();
     private final Map<TestCase, SmellResults> testCaseToSmellResults = new HashMap<>();
 
     public void addTestCase(Date date, TestCase testCase, SmellResults smells, DifferenceResults differences, SmellRecords previous){
@@ -23,7 +22,7 @@ public class SmellRecords {
         }
     }
 
-    public List<? extends CsvRecord> getRecords() {
+    public List<Record> getRecords() {
         return records;
     }
 

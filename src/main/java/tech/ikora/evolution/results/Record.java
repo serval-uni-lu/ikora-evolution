@@ -1,6 +1,6 @@
 package tech.ikora.evolution.results;
 
-public interface CsvRecord {
-    String[] getHeaders();
+public interface Record {
+    String[] getKeys();
     Object[] getValues();
 }

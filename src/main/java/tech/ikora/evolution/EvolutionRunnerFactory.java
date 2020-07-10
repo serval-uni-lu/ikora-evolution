@@ -54,7 +54,7 @@ public class EvolutionRunnerFactory {
             outputFiles.put(EvolutionExport.Statistics.PROJECT, projectsCsvFile);
         }
 
-        return new EvolutionExport(outputFiles);
+        return new EvolutionExport(configuration.getStrategy(), outputFiles);
     }
 
     private static VersionProvider createFolderProvider(FolderConfiguration configuration){

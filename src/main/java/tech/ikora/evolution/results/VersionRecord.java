@@ -8,7 +8,7 @@ import tech.ikora.model.VariableAssignment;
 import java.time.Instant;
 import java.util.Date;
 
-public class VersionRecord implements CsvRecord {
+public class VersionRecord implements Record {
     private final Date date;
     private final int projects;
     private final int testCases;
@@ -44,7 +44,7 @@ public class VersionRecord implements CsvRecord {
     }
 
     @Override
-    public String[] getHeaders() {
+    public String[] getKeys() {
         return new String[]{
                 "date",
                 "number_projects",
