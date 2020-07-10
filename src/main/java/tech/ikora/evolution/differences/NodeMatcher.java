@@ -13,7 +13,7 @@ public class NodeMatcher {
         ChangeName, ChangeFolder, ChangeFile, ChangeAll
     }
 
-    public static <T extends SourceNode> List<Pair<T,T>> getPairs(Class<T> type, Projects version1, Projects version2) {
+    public static <T extends SourceNode> List<Pair<T,T>> getPairs(Class<T> type, Projects version1, Projects version2, boolean ignoreProjectName) {
         List<Pair<T,T>> pairs = new ArrayList<>();
 
         Set<T> nodes1 = version1.getNodes(type);
@@ -23,15 +23,17 @@ public class NodeMatcher {
 
         while(!nodes1.isEmpty()){
             T node1 = nodes1.iterator().next();
-            Set<T> nodesFound2 = matchNode(nodes2, node1);
+            Set<T> nodesFound2 = matchNode(nodes2, node1, ignoreProjectName);
 
             if(nodesFound2.isEmpty()){
                 unmatched.add(node1);
             }
             else{
                 //TODO: Find best match if multiple hits
-                pairs.add(Pair.of(node1, nodesFound2.iterator().next()));
-                nodes2.remove(nodesFound2.iterator().next());
+                T found = nodesFound2.iterator().next();
+
+                pairs.add(Pair.of(node1, found));
+                nodes2.remove(found);
             }
 
             nodes1.remove(node1);
@@ -55,20 +57,20 @@ public class NodeMatcher {
         return pairs;
     }
 
-    private static <T extends SourceNode> Set<T> matchNode(Set<T> nodeList, T node){
+    private static <T extends SourceNode> Set<T> matchNode(Set<T> nodeList, T node, boolean ignoreProjectName){
         Set<T> nodesFound = new HashSet<>();
 
         for(T currentNode: nodeList){
-            if(matches(node, currentNode)){
-                nodesFound.add(node);
+            if(matches(node, currentNode, ignoreProjectName)){
+                nodesFound.add(currentNode);
             }
         }
 
         return nodesFound;
     }
 
-    private static boolean matches(SourceNode node1, SourceNode node2){
-        if(!isSameProject(node1, node2)){
+    private static boolean matches(SourceNode node1, SourceNode node2, boolean ignoreProjectName){
+        if(!ignoreProjectName && !isSameProject(node1, node2)){
             return false;
         }
 

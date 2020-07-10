@@ -24,7 +24,10 @@ Input Username
 
 Input Password
     [Arguments]    ${password}
-    Input Text    password_field    ${password}
+    Input Text    ${PASSWORD_FIELD}    ${password}
 
 Submit Credentials
     Click Button    login_button
+
+*** Variables ***
+${PASSWORD_FIELD}      password_field
