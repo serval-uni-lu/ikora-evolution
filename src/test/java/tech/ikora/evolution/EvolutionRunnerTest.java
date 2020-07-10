@@ -24,6 +24,10 @@ class EvolutionRunnerTest {
                 .collect(Collectors.toList());
 
         assertEquals(2, records.size());
+        assertEquals(0, records.get(0).getFixesCount());
+        assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(0.14285, records.get(0).getSmellMetricValue(), 0.0001);
+        assertEquals(0.0, records.get(1).getSmellMetricValue(), 0.0001);
     }
 
     @Test

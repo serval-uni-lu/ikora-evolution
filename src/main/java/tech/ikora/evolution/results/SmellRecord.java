@@ -11,9 +11,9 @@ public class SmellRecord implements Record {
     private final int testCaseLevel;
     private final String smellMetricName;
     private final double smellMetricValue;
-    private final long changesCount;
+    private final long fixesCount;
 
-    public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricValue, long changesCount) {
+    public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricValue, long fixesCount) {
         this.version = version;
         this.testCaseName = testCase.toString();
         this.testCaseSize = KeywordStatistics.getSize(testCase).getTestCaseSize();
@@ -21,7 +21,7 @@ public class SmellRecord implements Record {
         this.testCaseLevel = KeywordStatistics.getLevel(testCase);
         this.smellMetricName = smellMetricName;
         this.smellMetricValue = smellMetricValue;
-        this.changesCount = changesCount;
+        this.fixesCount = fixesCount;
     }
 
     public String getVersion() {
@@ -52,8 +52,8 @@ public class SmellRecord implements Record {
         return smellMetricValue;
     }
 
-    public long getChangesCount() {
-        return changesCount;
+    public long getFixesCount() {
+        return fixesCount;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SmellRecord implements Record {
                 String.valueOf(this.getTestCaseLevel()),
                 this.getSmellMetricName(),
                 String.valueOf(this.getSmellMetricValue()),
-                String.valueOf(this.changesCount)
+                String.valueOf(this.fixesCount)
         };
     }
 

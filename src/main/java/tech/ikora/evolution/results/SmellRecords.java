@@ -26,7 +26,7 @@ public class SmellRecords {
         return records;
     }
 
-    public SmellResults getSmellResults(TestCase testCase){
+    private SmellResults getSmellResults(TestCase testCase){
         return testCaseToSmellResults.getOrDefault(testCase, new SmellResults());
     }
 
