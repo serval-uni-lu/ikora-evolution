@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
 import tech.ikora.evolution.configuration.*;
 import tech.ikora.evolution.export.EvolutionExport;
+import tech.ikora.evolution.versions.FolderProvider;
 import tech.ikora.evolution.versions.GitProvider;
 import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.gitloader.git.GitCommit;
@@ -57,7 +58,7 @@ public class EvolutionRunnerFactory {
     }
 
     private static VersionProvider createFolderProvider(FolderConfiguration configuration){
-        throw new NotImplementedException("fromFolder method not implemented yet");
+        return new FolderProvider(configuration.getRootFolder(), configuration.getNameFormat(), configuration.getDateFormat());
     }
 
     private static VersionProvider createGitProvider(GitConfiguration configuration) throws IOException, GitAPIException {

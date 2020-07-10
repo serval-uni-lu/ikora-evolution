@@ -5,6 +5,7 @@ import tech.ikora.model.TestCase;
 import tech.ikora.model.UserKeyword;
 import tech.ikora.model.VariableAssignment;
 
+import java.time.Instant;
 import java.util.Date;
 
 public class VersionRecord implements CsvRecord {
@@ -15,7 +16,7 @@ public class VersionRecord implements CsvRecord {
     private final int variables;
 
     public VersionRecord(Projects version){
-        this.date = version.getDate();
+        this.date = version.getDate() == null ? Date.from(Instant.now()) : version.getDate();
         this.projects = version.size();
         this.testCases = version.getNodes(TestCase.class).size();
         this.userKeywords = version.getNodes(UserKeyword.class).size();

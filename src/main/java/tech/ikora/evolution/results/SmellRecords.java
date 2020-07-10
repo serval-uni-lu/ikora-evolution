@@ -1,6 +1,7 @@
 package tech.ikora.evolution.results;
 
 import tech.ikora.analytics.Difference;
+import tech.ikora.evolution.differences.SmellFixes;
 import tech.ikora.model.TestCase;
 import tech.ikora.smells.SmellResult;
 import tech.ikora.smells.SmellResults;
@@ -12,7 +13,8 @@ public class SmellRecords {
 
     public void addTestCase(Date date, TestCase testCase, SmellResults smellResults, Set<Difference> changes){
         for(SmellResult smellResult: smellResults){
-            records.add(new SmellRecord(date, testCase, smellResult.getType().name(), smellResult.getValue(), changes.size()));
+            int relevantChanges = (int)SmellFixes.count(smellResult, changes);
+            records.add(new SmellRecord(date, testCase, smellResult.getType().name(), smellResult.getValue(), relevantChanges));
         }
     }
 
