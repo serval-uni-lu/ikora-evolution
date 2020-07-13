@@ -3,7 +3,7 @@ Some very interesting test
     Make some clever assertion
 
 *** Keywords ***
-Make some cleaver assertion
+Make some clever assertion
     Should be empty  ${Container}
 
 *** Variables ***

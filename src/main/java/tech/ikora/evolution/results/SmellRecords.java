@@ -1,8 +1,9 @@
 package tech.ikora.evolution.results;
 
 import tech.ikora.analytics.Difference;
-import tech.ikora.evolution.differences.SmellFixes;
+import tech.ikora.model.SourceNode;
 import tech.ikora.model.TestCase;
+import tech.ikora.smells.SmellDetector;
 import tech.ikora.smells.SmellMetric;
 import tech.ikora.smells.SmellResult;
 import tech.ikora.smells.SmellResults;
@@ -41,9 +42,9 @@ public class SmellRecords {
             return 0;
         }
 
-        final Set<Difference> testDifferences = differences.getDifferences(testCase);
-        final SmellResults previousSmellResults = previous.getSmellResults(previousTestCase.get());
+        final Set<Difference> changes = differences.getDifferences(testCase);
+        final Set<SourceNode> smellyNodes = previous.getSmellResults(previousTestCase.get()).getNodes(type);
 
-        return SmellFixes.count(type, previousSmellResults.getNodes(type), testDifferences);
+        return changes.stream().filter(c -> SmellDetector.isFix(type, smellyNodes, c)).count();
     }
 }

@@ -71,7 +71,7 @@ public class EvolutionRunner {
     private SmellRecords findSmells(Projects version, DifferenceResults differenceResults, SmellRecords previousSmellRecords){
         SmellRecords smellRecords = new SmellRecords();
 
-        final SmellDetector detector = SmellDetector.all(new Clones<>());
+        final SmellDetector detector = SmellDetector.all();
         final String versionId = version.getVersionId();
 
         for(Project project: version){
