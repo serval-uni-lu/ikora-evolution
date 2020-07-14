@@ -31,12 +31,25 @@ class EvolutionRunnerTest {
     }
 
     @Test
-    void testConditionalTestLogicAnalysis() throws GitAPIException, IOException {
+    void testConditionalAssertionAnalysis() throws GitAPIException, IOException {
         final List<SmellRecord> records = executeAnalysis("conditional-assertion").stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.CONDITIONAL_ASSERTION.name()))
                 .collect(Collectors.toList());
 
         assertEquals(2, records.size());
+        assertEquals(0, records.get(0).getFixesCount());
+        assertEquals(1, records.get(1).getFixesCount());
+    }
+
+    @Test
+    void testComplexLocatorAnalysis() throws GitAPIException, IOException {
+        final List<SmellRecord> records = executeAnalysis("complex-locator").stream()
+                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.COMPLEX_LOCATORS.name()))
+                .collect(Collectors.toList());
+
+        assertEquals(2, records.size());
+        assertEquals(0, records.get(0).getFixesCount());
+        assertEquals(1, records.get(1).getFixesCount());
     }
 
 

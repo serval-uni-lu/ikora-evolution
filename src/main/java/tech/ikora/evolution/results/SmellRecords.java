@@ -18,8 +18,8 @@ public class SmellRecords {
         testCaseToSmellResults.put(testCase, smells);
 
         for(SmellResult smell: smells){
-            long changes = computeChanges(smell.getType(), testCase, differences, previous);
-            records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getValue(), changes));
+            long fixes = computeFixes(smell.getType(), testCase, differences, previous);
+            records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getValue(), fixes));
         }
     }
 
@@ -31,7 +31,7 @@ public class SmellRecords {
         return testCaseToSmellResults.getOrDefault(testCase, new SmellResults());
     }
 
-    private long computeChanges(SmellMetric.Type type, TestCase testCase, DifferenceResults differences, SmellRecords previous){
+    private long computeFixes(SmellMetric.Type type, TestCase testCase, DifferenceResults differences, SmellRecords previous){
         if(previous == null){
             return 0;
         }

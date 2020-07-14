@@ -16,8 +16,8 @@ public class NodeMatcher {
     public static <T extends SourceNode> List<Pair<T,T>> getPairs(Class<T> type, Projects version1, Projects version2, boolean ignoreProjectName) {
         List<Pair<T,T>> pairs = new ArrayList<>();
 
-        Set<T> nodes1 = version1.getNodes(type);
-        Set<T> nodes2 = version2.getNodes(type);
+        Set<T> nodes1 = getNodes(type, version1);
+        Set<T> nodes2 = getNodes(type, version2);
 
         List<T> unmatched = new ArrayList<>();
 
@@ -55,6 +55,28 @@ public class NodeMatcher {
         }
 
         return pairs;
+    }
+
+    private static <T extends SourceNode> Set<T> getNodes(Class<T> type, Projects version){
+        Set<T> nodes = new HashSet<>();
+
+        if(type == TestCase.class){
+            nodes.addAll((Set<T>)version.getTestCases());
+        }
+        else if(type == UserKeyword.class){
+            nodes.addAll((Set<T>)version.getUserKeywords());
+        }
+        else if(type == VariableAssignment.class){
+            nodes.addAll((Set<T>)version.getVariableAssignments());
+        }
+        else{
+            throw new IllegalArgumentException(String.format(
+                    "Cannot perform clone detection for type '%s'",
+                    type.getName())
+            );
+        }
+
+        return nodes;
     }
 
     private static <T extends SourceNode> Set<T> matchNode(Set<T> nodeList, T node, boolean ignoreProjectName){

@@ -14,13 +14,15 @@ public class VersionRecord implements Record {
     private final int testCases;
     private final int userKeywords;
     private final int variables;
+    private final int lines;
 
     public VersionRecord(Projects version){
         this.date = version.getDate() == null ? Date.from(Instant.now()) : version.getDate();
         this.projects = version.size();
-        this.testCases = version.getNodes(TestCase.class).size();
-        this.userKeywords = version.getNodes(UserKeyword.class).size();
-        this.variables = version.getNodes(VariableAssignment.class).size();
+        this.testCases = version.getTestCases().size();
+        this.userKeywords = version.getUserKeywords().size();
+        this.variables = version.getVariableAssignments().size();
+        this.lines = version.getLoc();
     }
 
     public Date getDate() {
@@ -43,6 +45,10 @@ public class VersionRecord implements Record {
         return variables;
     }
 
+    public int getLines() {
+        return lines;
+    }
+
     @Override
     public String[] getKeys() {
         return new String[]{
@@ -50,7 +56,8 @@ public class VersionRecord implements Record {
                 "number_projects",
                 "number_test_cases",
                 "number_keywords",
-                "number_variables"
+                "number_variables",
+                "number_lines"
         };
     }
 
@@ -61,7 +68,8 @@ public class VersionRecord implements Record {
                 this.getProjects(),
                 this.getTestCases(),
                 this.getUserKeywords(),
-                this.getVariables()
+                this.getVariables(),
+                this.getLines()
         };
     }
 }
