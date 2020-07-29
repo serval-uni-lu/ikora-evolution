@@ -43,7 +43,7 @@ public class GitProvider implements VersionProvider {
         Set<String> projectFolderNames = this.projectFolders.get(localRepository);
 
         if(projectFolderNames == null){
-                return Collections.singleton(localRepository.getLocation());
+            return Collections.singleton(localRepository.getLocation());
         }
 
         Set<File> projectFolders = new HashSet<>(projectFolderNames.size());

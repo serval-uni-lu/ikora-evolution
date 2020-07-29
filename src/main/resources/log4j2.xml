@@ -6,6 +6,9 @@
         </Console>
     </Appenders>
     <Loggers>
+        <Logger name="edu.stanford.nlp" level="ERROR" additivity="false">
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="org.reflections.Reflections" level="ERROR" additivity="false">
             <AppenderRef ref="Console" />
         </Logger>
