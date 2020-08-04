@@ -12,6 +12,7 @@ import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
 import tech.ikora.gitloader.git.LocalRepository;
+import tech.ikora.smells.SmellConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,10 +20,12 @@ import java.util.*;
 
 public class EvolutionRunnerFactory {
     public static EvolutionRunner fromConfiguration(EvolutionConfiguration configuration) throws GitAPIException, IOException {
-        EvolutionExport exporter = createExporter(configuration.getOutputConfiguration());
-        VersionProvider provider = createVersionProvider(configuration);
+        final EvolutionExport exporter = createExporter(configuration.getOutputConfiguration());
+        final VersionProvider provider = createVersionProvider(configuration);
+        final SmellConfiguration smellConfiguration = new SmellConfiguration();
 
-        return new EvolutionRunner(provider, exporter);
+
+        return new EvolutionRunner(provider, exporter, smellConfiguration);
     }
 
     private static VersionProvider createVersionProvider(EvolutionConfiguration configuration) throws GitAPIException, IOException {

@@ -1,9 +1,9 @@
 *** Test Cases ***
 Valid Login
-    User \"demo\" logs in with password \"mode\"
+    User "demo" logs in with password "mode"
 
 *** Keywords ***
-User \"${username}\" logs in with password \"${password}\"
+User "${username}" logs in with password "${password}"
     Input username    ${username}
     Input password    ${password}
     Submit credentials

@@ -1,6 +1,7 @@
 package tech.ikora.evolution.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import tech.ikora.smells.SmellConfiguration;
 
 public class EvolutionConfiguration {
     @JsonProperty(value = "git")
@@ -9,6 +10,8 @@ public class EvolutionConfiguration {
     private FolderConfiguration folderConfiguration;
     @JsonProperty(value = "output", required = true)
     private OutputConfiguration outputConfiguration;
+    @JsonProperty(value= "smells")
+    private SmellConfiguration smellConfiguration;
 
     @JsonProperty(value = "git")
     public GitConfiguration getGitConfiguration() {
@@ -38,5 +41,15 @@ public class EvolutionConfiguration {
     @JsonProperty(value = "output")
     public void setOutputConfiguration(OutputConfiguration outputConfiguration) {
         this.outputConfiguration = outputConfiguration;
+    }
+
+    @JsonProperty(value = "smells")
+    public SmellConfiguration getSmellConfiguration() {
+        return smellConfiguration;
+    }
+
+    @JsonProperty(value = "smells")
+    public void setSmellConfiguration(SmellConfiguration smellConfiguration) {
+        this.smellConfiguration = smellConfiguration;
     }
 }
