@@ -5,9 +5,9 @@ import tech.ikora.model.Differentiable;
 import java.util.*;
 
 public class DifferentiableMatcher {
-    private Map<Differentiable, Set<Differentiable>> matched;
-    private List<? extends Differentiable> differentiableList;
-    private double threshold;
+    private final Map<Differentiable, Set<Differentiable>> matched;
+    private final List<? extends Differentiable> differentiableList;
+    private final double threshold;
 
     private DifferentiableMatcher(List<? extends Differentiable> differentiableList, double threshold){
         this.differentiableList = differentiableList;

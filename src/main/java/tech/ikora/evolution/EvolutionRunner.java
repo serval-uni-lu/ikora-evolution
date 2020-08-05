@@ -15,13 +15,10 @@ import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.model.*;
 import tech.ikora.smells.SmellConfiguration;
 import tech.ikora.smells.SmellDetector;
-import tech.ikora.smells.SmellMetric;
 import tech.ikora.smells.SmellResults;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public class EvolutionRunner {
     private final VersionProvider versionProvider;
@@ -105,21 +102,21 @@ public class EvolutionRunner {
             return results;
         }
 
-        for(Pair<UserKeyword,UserKeyword> keywordPair: NodeMatcher.getPairs(UserKeyword.class, version1, version2, ignoreProjectName)){
+        for(Pair<UserKeyword,UserKeyword> keywordPair: NodeMatcher.getPairs(version1.getUserKeywords(), version2.getUserKeywords(), ignoreProjectName)){
             UserKeyword keyword1 = getElement(keywordPair, version1);
             UserKeyword keyword2 = getElement(keywordPair, version2);
 
             results.update(Difference.of(keyword1, keyword2));
         }
 
-        for(Pair<TestCase,TestCase> testCasePair: NodeMatcher.getPairs(TestCase.class, version1, version2, ignoreProjectName)) {
+        for(Pair<TestCase,TestCase> testCasePair: NodeMatcher.getPairs(version1.getTestCases(), version2.getTestCases(), ignoreProjectName)) {
             TestCase testCase1 = getElement(testCasePair, version1);
             TestCase testCase2 = getElement(testCasePair, version2);
 
             results.update(Difference.of(testCase1, testCase2));
         }
 
-        for(Pair<VariableAssignment,VariableAssignment> variablePair: NodeMatcher.getPairs(VariableAssignment.class, version1, version2, ignoreProjectName)) {
+        for(Pair<VariableAssignment,VariableAssignment> variablePair: NodeMatcher.getPairs(version1.getVariableAssignments(), version2.getVariableAssignments(), ignoreProjectName)) {
             VariableAssignment variable1 = getElement(variablePair, version1);
             VariableAssignment variable2 = getElement(variablePair, version2);
 
