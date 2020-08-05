@@ -2,7 +2,7 @@ package tech.ikora.evolution;
 
 import org.apache.commons.lang3.tuple.Pair;
 import tech.ikora.analytics.Difference;
-import tech.ikora.analytics.clones.CloneDetection;
+import tech.ikora.analytics.clones.KeywordCloneDetection;
 import tech.ikora.analytics.clones.Clones;
 import tech.ikora.evolution.differences.NodeMatcher;
 import tech.ikora.evolution.export.EvolutionExport;
@@ -80,7 +80,7 @@ public class EvolutionRunner {
 
         final SmellDetector detector = SmellDetector.all();
         final String versionId = version.getVersionId();
-        final Clones<UserKeyword> clones = CloneDetection.findClones(version, UserKeyword.class);
+        final Clones<KeywordDefinition> clones = KeywordCloneDetection.findClones(version);
 
         this.smellConfiguration.setClones(clones);
 
