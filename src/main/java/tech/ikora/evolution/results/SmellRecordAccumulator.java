@@ -1,6 +1,6 @@
 package tech.ikora.evolution.results;
 
-import tech.ikora.analytics.Difference;
+import tech.ikora.analytics.Action;
 import tech.ikora.model.SourceNode;
 import tech.ikora.model.TestCase;
 import tech.ikora.smells.*;
@@ -9,13 +9,13 @@ import java.util.*;
 
 public class SmellRecordAccumulator {
     private final List<Record> records = new ArrayList<>();
-    private final Map<TestCase, SmellResults> results = new HashMap<>();
+    private final Map<SmellMetric.Type, Set<SourceNode>> nodes = new HashMap<>();
 
-    public void addTestCase(String version, TestCase testCase, SmellResults smells, Set<Difference> differences, Map<TestCase, SmellResults> previousResults, SmellConfiguration configuration){
-        results.put(testCase, smells);
+    public void addTestCase(String version, TestCase testCase, SmellResults smells, Set<Action> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
+        updateNodes(smells);
 
         for(SmellResult smell: smells){
-            long fixes = computeFixes(smell.getType(), testCase, differences, previousResults, configuration);
+            long fixes = computeFixes(smell.getType(), edits, previousNodes, configuration);
             records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getValue(), fixes));
         }
     }
@@ -24,17 +24,23 @@ public class SmellRecordAccumulator {
         return records;
     }
 
-    public Map<TestCase, SmellResults> getResults() {
-        return this.results;
+    public Map<SmellMetric.Type, Set<SourceNode>> getNodes() {
+        return nodes;
     }
 
-    private long computeFixes(SmellMetric.Type type, TestCase testCase, Set<Difference> differences, Map<TestCase, SmellResults> previousResults, SmellConfiguration configuration){
-        if(previousResults == null){
+    private void updateNodes(SmellResults smells){
+        for(SmellResult smell: smells){
+            final Set<SourceNode> nodesByType = nodes.getOrDefault(smell.getType(), new HashSet<>());
+            nodesByType.addAll(smell.getNodes());
+            nodes.putIfAbsent(smell.getType(), nodesByType);
+        }
+    }
+
+    private long computeFixes(SmellMetric.Type type, Set<Action> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
+        if(previousNodes == null){
             return 0;
         }
 
-        final Set<SourceNode> smellyNodes = previousResults.getOrDefault(testCase, new SmellResults()).getNodes(type);
-
-        return differences.stream().filter(c -> SmellDetector.isFix(type, smellyNodes, c, configuration)).count();
+        return edits.stream().filter(c -> SmellDetector.isFix(type, previousNodes.getOrDefault(type, new HashSet<>()), c, configuration)).count();
     }
 }
