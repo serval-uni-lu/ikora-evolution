@@ -9,8 +9,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import tech.ikora.evolution.configuration.ConfigurationParser;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
-import tech.ikora.evolution.export.EvolutionExport;
-import tech.ikora.evolution.results.DifferenceResults;
 
 import java.io.*;
 
@@ -41,22 +39,5 @@ public class EvolutionAnalysis {
         }
 
         logger.info("Finished without error");
-    }
-
-    private void export(JsonSerializer<DifferenceResults> serializer, String fileName, DifferenceResults results){
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-
-            SimpleModule module = new SimpleModule();
-            module.addSerializer(DifferenceResults.class, serializer);
-            mapper.registerModule(module);
-
-            File file = new File(fileName);
-            mapper.writeValue(file, results);
-
-            logger.info("results written to " + file.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -11,7 +11,7 @@ public class SmellRecordAccumulator {
     private final List<Record> records = new ArrayList<>();
     private final Map<TestCase, SmellResults> results = new HashMap<>();
 
-    public void addTestCase(String version, TestCase testCase, SmellResults smells, DifferenceResults differences, Map<TestCase, SmellResults> previousResults, SmellConfiguration configuration){
+    public void addTestCase(String version, TestCase testCase, SmellResults smells, Set<Difference> differences, Map<TestCase, SmellResults> previousResults, SmellConfiguration configuration){
         results.put(testCase, smells);
 
         for(SmellResult smell: smells){
@@ -28,20 +28,13 @@ public class SmellRecordAccumulator {
         return this.results;
     }
 
-    private long computeFixes(SmellMetric.Type type, TestCase testCase, DifferenceResults differences, Map<TestCase, SmellResults> previousResults, SmellConfiguration configuration){
+    private long computeFixes(SmellMetric.Type type, TestCase testCase, Set<Difference> differences, Map<TestCase, SmellResults> previousResults, SmellConfiguration configuration){
         if(previousResults == null){
             return 0;
         }
 
-        final Optional<TestCase> previousTestCase = differences.getPrevious(testCase);
+        final Set<SourceNode> smellyNodes = previousResults.getOrDefault(testCase, new SmellResults()).getNodes(type);
 
-        if(!previousTestCase.isPresent()){
-            return 0;
-        }
-
-        final Set<Difference> changes = differences.getDifferences(testCase);
-        final Set<SourceNode> smellyNodes = previousResults.getOrDefault(previousTestCase.get(), new SmellResults()).getNodes(type);
-
-        return changes.stream().filter(c -> SmellDetector.isFix(type, smellyNodes, c, configuration)).count();
+        return differences.stream().filter(c -> SmellDetector.isFix(type, smellyNodes, c, configuration)).count();
     }
 }
