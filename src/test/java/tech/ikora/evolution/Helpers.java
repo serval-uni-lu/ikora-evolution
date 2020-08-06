@@ -7,7 +7,7 @@ import tech.ikora.evolution.export.Exporter;
 
 import java.io.File;
 
-import static edu.stanford.nlp.util.logging.Redwood.Util.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class Helpers {
     static EvolutionConfiguration createConfiguration(String resourcesPath){

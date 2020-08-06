@@ -78,6 +78,19 @@ class EvolutionRunnerTest {
         assertEquals(0., records.get(1).getSmellMetricValue(), 0.0001);
     }
 
+    @Test
+    void testMiddleManAnalysis() throws GitAPIException, IOException {
+        final List<SmellRecord> records = executeAnalysis("middle-man").stream()
+                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.MIDDLE_MAN.name()))
+                .collect(Collectors.toList());
+
+        assertEquals(2, records.size());
+        assertEquals(0, records.get(0).getFixesCount());
+        assertEquals(0.5, records.get(0).getSmellMetricValue(), 0.0001);
+        assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(0., records.get(1).getSmellMetricValue(), 0.0001);
+    }
+
     private List<SmellRecord> executeAnalysis(String resourcesPath) throws GitAPIException, IOException {
         final EvolutionConfiguration conditionalAssertion = Helpers.createConfiguration(resourcesPath);
         final EvolutionRunner evolutionRunner = EvolutionRunnerFactory.fromConfiguration(conditionalAssertion);
