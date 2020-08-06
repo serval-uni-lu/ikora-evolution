@@ -1,7 +1,7 @@
 package tech.ikora.evolution;
 
 import org.apache.commons.lang3.tuple.Pair;
-import tech.ikora.analytics.Action;
+import tech.ikora.analytics.Edit;
 import tech.ikora.analytics.Difference;
 import tech.ikora.analytics.clones.KeywordCloneDetection;
 import tech.ikora.analytics.clones.Clones;
@@ -68,14 +68,14 @@ public class EvolutionRunner {
 
         boolean ignoreProjectName = versionProvider instanceof FolderProvider;
 
-        Set<Action> edits = findEdits(previousVersion, version, ignoreProjectName);
+        Set<Edit> edits = findEdits(previousVersion, version, ignoreProjectName);
         SmellRecordAccumulator smellRecordAccumulator = findSmells(version, edits, previousNodes);
         this.exporter.export(EvolutionExport.Statistics.SMELL, smellRecordAccumulator.getRecords());
 
         return smellRecordAccumulator;
     }
 
-    private SmellRecordAccumulator findSmells(Projects version, Set<Action> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes){
+    private SmellRecordAccumulator findSmells(Projects version, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes){
         SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
 
         final SmellDetector detector = SmellDetector.all();
@@ -94,8 +94,8 @@ public class EvolutionRunner {
         return smellRecordAccumulator;
     }
 
-    private Set<Action> findEdits(Projects version1, Projects version2, boolean ignoreProjectName){
-        Set<Action> results = new HashSet<>();
+    private Set<Edit> findEdits(Projects version1, Projects version2, boolean ignoreProjectName){
+        Set<Edit> results = new HashSet<>();
 
         if(version1 == null || version2 == null){
             return results;
@@ -109,21 +109,21 @@ public class EvolutionRunner {
             UserKeyword keyword1 = getElement(keywordPair, version1);
             UserKeyword keyword2 = getElement(keywordPair, version2);
 
-            results.addAll(Difference.of(keyword1, keyword2).getActions());
+            results.addAll(Difference.of(keyword1, keyword2).getEdits());
         }
 
         for(Pair<TestCase,TestCase> testCasePair: NodeMatcher.getPairs(version1.getTestCases(), version2.getTestCases(), ignoreProjectName)) {
             TestCase testCase1 = getElement(testCasePair, version1);
             TestCase testCase2 = getElement(testCasePair, version2);
 
-            results.addAll(Difference.of(testCase1, testCase2).getActions());
+            results.addAll(Difference.of(testCase1, testCase2).getEdits());
         }
 
         for(Pair<VariableAssignment,VariableAssignment> variablePair: NodeMatcher.getPairs(version1.getVariableAssignments(), version2.getVariableAssignments(), ignoreProjectName)) {
             VariableAssignment variable1 = getElement(variablePair, version1);
             VariableAssignment variable2 = getElement(variablePair, version2);
 
-            results.addAll(Difference.of(variable1, variable2).getActions());
+            results.addAll(Difference.of(variable1, variable2).getEdits());
         }
 
         return results;

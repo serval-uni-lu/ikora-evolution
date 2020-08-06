@@ -1,6 +1,6 @@
 package tech.ikora.evolution.results;
 
-import tech.ikora.analytics.Action;
+import tech.ikora.analytics.Edit;
 import tech.ikora.model.SourceNode;
 import tech.ikora.model.TestCase;
 import tech.ikora.smells.*;
@@ -11,7 +11,7 @@ public class SmellRecordAccumulator {
     private final List<Record> records = new ArrayList<>();
     private final Map<SmellMetric.Type, Set<SourceNode>> nodes = new HashMap<>();
 
-    public void addTestCase(String version, TestCase testCase, SmellResults smells, Set<Action> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
+    public void addTestCase(String version, TestCase testCase, SmellResults smells, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
         updateNodes(smells);
 
         for(SmellResult smell: smells){
@@ -36,7 +36,7 @@ public class SmellRecordAccumulator {
         }
     }
 
-    private long computeFixes(SmellMetric.Type type, Set<Action> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
+    private long computeFixes(SmellMetric.Type type, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
         if(previousNodes == null){
             return 0;
         }
