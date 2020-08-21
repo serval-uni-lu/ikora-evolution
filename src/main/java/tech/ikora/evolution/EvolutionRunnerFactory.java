@@ -1,7 +1,6 @@
 package tech.ikora.evolution;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
 import tech.ikora.evolution.configuration.*;
