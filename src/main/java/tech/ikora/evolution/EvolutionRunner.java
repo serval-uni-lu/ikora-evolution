@@ -1,11 +1,11 @@
 package tech.ikora.evolution;
 
 import org.apache.commons.lang3.tuple.Pair;
-import tech.ikora.analytics.Edit;
-import tech.ikora.analytics.Difference;
 import tech.ikora.analytics.clones.KeywordCloneDetection;
 import tech.ikora.analytics.clones.Clones;
-import tech.ikora.evolution.differences.NodeMatcher;
+import tech.ikora.analytics.difference.Difference;
+import tech.ikora.analytics.difference.Edit;
+import tech.ikora.analytics.difference.NodeMatcher;
 import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.export.Exporter;
 import tech.ikora.evolution.results.SmellRecordAccumulator;
