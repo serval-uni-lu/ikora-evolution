@@ -14,20 +14,9 @@ public class EvolutionAnalysis {
 
     public static void main(String[] args) {
         try{
-            Options options = new Options();
+            final EvolutionConfiguration configuration = getConfiguration(args);
+            final EvolutionRunner runner = EvolutionRunnerFactory.fromConfiguration(configuration);
 
-            options.addOption("config", true, "path to the json configuration file");
-
-            CommandLineParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args);
-
-            if(!cmd.hasOption("config")){
-                throw new MissingArgumentException("config");
-            }
-
-            EvolutionConfiguration configuration = ConfigurationParser.parse(cmd.getOptionValue("config"));
-
-            EvolutionRunner runner = EvolutionRunnerFactory.fromConfiguration(configuration);
             runner.execute();
 
         } catch (ParseException | IOException | GitAPIException e) {
@@ -36,5 +25,20 @@ public class EvolutionAnalysis {
         }
 
         logger.info("Finished without error");
+    }
+
+    private static EvolutionConfiguration getConfiguration(String[] args) throws ParseException, IOException {
+        Options options = new Options();
+
+        options.addOption("config", true, "path to the json configuration file");
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+
+        if(!cmd.hasOption("config")){
+            throw new MissingArgumentException("config");
+        }
+
+        return ConfigurationParser.parse(cmd.getOptionValue("config"));
     }
 }
