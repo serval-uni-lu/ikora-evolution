@@ -8,6 +8,7 @@ import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.versions.FolderProvider;
 import tech.ikora.evolution.versions.GitProvider;
 import tech.ikora.evolution.versions.VersionProvider;
+import tech.ikora.gitloader.git.CommitCollector;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
 import tech.ikora.gitloader.git.LocalRepository;
@@ -76,15 +77,16 @@ public class EvolutionRunnerFactory {
                     configuration.getBranch()
             );
 
-            List<GitCommit> commits = GitUtils.getCommits(localRepository.getGit(),
-                    configuration.getStartDate(),
-                    configuration.getEndDate(),
-                    configuration.getBranch()
-            );
+            List<GitCommit> commits = new CommitCollector()
+                    .forGit(localRepository.getGit())
+                    .onBranch(configuration.getBranch())
+                    .from(configuration.getStartDate())
+                    .to(configuration.getEndDate())
+                    .ignoring(configuration.getIgnoreCommits())
+                    .every(configuration.getFrequency())
+                    .limit(configuration.getMaximumCommitsNumber())
+                    .collect();
 
-            commits = Utils.removeIgnoredCommit(commits, configuration.getIgnoreCommits());
-            commits = Utils.filterCommitsByFrequency(commits, configuration.getFrequency());
-            commits = Utils.truncateCommits(commits, configuration.getMaximumCommitsNumber());
             commits = Utils.removeCommitsWithNoFileChanged(commits, location.getProjectFolders());
 
             provider.addRepository(localRepository, commits, location.getProjectFolders());

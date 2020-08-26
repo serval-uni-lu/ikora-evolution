@@ -8,6 +8,7 @@ import tech.ikora.BuildConfiguration;
 import tech.ikora.builder.BuildResult;
 import tech.ikora.builder.Builder;
 import tech.ikora.evolution.Utils;
+import tech.ikora.gitloader.git.Frequency;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
 import tech.ikora.gitloader.git.LocalRepository;
@@ -143,7 +144,7 @@ public class GitProvider implements VersionProvider {
                 }
 
                 allCommits = allCommits.stream().sorted(Comparator.comparing(GitCommit::getDate)).collect(Collectors.toList());
-                allCommits = Utils.filterCommitsByFrequency(allCommits, frequency);
+                allCommits = GitUtils.filterCommitsByFrequency(allCommits, frequency);
 
                 return allCommits.stream()
                         .map(GitCommit::getDate)
