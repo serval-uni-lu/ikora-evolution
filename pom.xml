@@ -73,6 +73,12 @@
         </dependency>
 
         <dependency>
+            <groupId>tech.ikora</groupId>
+            <artifactId>git-loader</artifactId>
+            <version>0.1.3-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>2.0.1</version>
@@ -90,11 +96,6 @@
             <version>2.11.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>tech.ikora</groupId>
-            <artifactId>git-loader</artifactId>
-            <version>0.1.0</version>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

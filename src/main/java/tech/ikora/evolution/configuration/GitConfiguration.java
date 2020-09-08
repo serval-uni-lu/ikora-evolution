@@ -4,13 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import tech.ikora.gitloader.git.Frequency;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 public class GitConfiguration {
+    private String url;
+    private String group;
     @JsonProperty(value = "locations", required = true)
     private Set<GitLocation> locations;
-    @JsonProperty(value = "branch", defaultValue = "master")
-    private String branch = "master";
+    @JsonProperty(value = "default branch", defaultValue = "master")
+    private String defaultBranch = "master";
+    @JsonProperty("branch exceptions")
+    private Map<String, String> branchExceptions;
     @JsonProperty(value = "token", required = true)
     private String token;
     @JsonProperty(value = "start date")
@@ -24,6 +29,22 @@ public class GitConfiguration {
     @JsonProperty(value = "frequency", defaultValue = "UNIQUE")
     private Frequency frequency = Frequency.UNIQUE;
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
     public Set<GitLocation> getLocations() {
         return locations;
     }
@@ -32,12 +53,20 @@ public class GitConfiguration {
         this.locations = locations;
     }
 
-    public String getBranch() {
-        return branch;
+    public String getDefaultBranch() {
+        return defaultBranch;
     }
 
-    public void setBranch(String branch) {
-        this.branch = branch;
+    public void setDefaultBranch(String defaultBranch) {
+        this.defaultBranch = defaultBranch;
+    }
+
+    public Map<String, String> getBranchExceptions() {
+        return branchExceptions;
+    }
+
+    public void setBranchExceptions(Map<String, String> branchExceptions) {
+        this.branchExceptions = branchExceptions;
     }
 
     public String getToken() {

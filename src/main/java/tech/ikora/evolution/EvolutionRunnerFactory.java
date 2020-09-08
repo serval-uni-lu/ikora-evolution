@@ -8,6 +8,9 @@ import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.versions.FolderProvider;
 import tech.ikora.evolution.versions.GitProvider;
 import tech.ikora.evolution.versions.VersionProvider;
+import tech.ikora.gitloader.Api;
+import tech.ikora.gitloader.GitEngine;
+import tech.ikora.gitloader.GitEngineFactory;
 import tech.ikora.gitloader.git.CommitCollector;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
@@ -67,31 +70,67 @@ public class EvolutionRunnerFactory {
     private static VersionProvider createGitProvider(GitConfiguration configuration) throws IOException, GitAPIException {
         final GitProvider provider = new GitProvider(configuration.getFrequency());
 
-        for(GitLocation location: configuration.getLocations()){
-            final File repositoryFolder = new File(provider.getRootFolder(), FilenameUtils.getBaseName(location.getUrl()));
+        for(LocalRepository localRepository: getLocalRepositories(provider.getRootFolder(), configuration)){
+            final String branch = configuration.getBranchExceptions().getOrDefault(localRepository.getRemoteUrl(), configuration.getDefaultBranch());
 
-            final LocalRepository localRepository = GitUtils.loadCurrentRepository(
-                    location.getUrl(),
-                    configuration.getToken(),
-                    repositoryFolder,
-                    configuration.getBranch()
-            );
+            final Set<String> projectFolders = configuration.getLocations().stream()
+                    .filter(l -> l.getUrl().equalsIgnoreCase(localRepository.getRemoteUrl()))
+                    .findFirst()
+                    .map(GitLocation::getProjectFolders)
+                    .orElse(Collections.emptySet());
 
             List<GitCommit> commits = new CommitCollector()
                     .forGit(localRepository.getGit())
-                    .onBranch(configuration.getBranch())
+                    .onBranch(branch)
                     .from(configuration.getStartDate())
                     .to(configuration.getEndDate())
                     .ignoring(configuration.getIgnoreCommits())
+                    .filterNoChangeIn(projectFolders)
                     .every(configuration.getFrequency())
                     .limit(configuration.getMaximumCommitsNumber())
                     .collect();
 
-            commits = Utils.removeCommitsWithNoFileChanged(commits, location.getProjectFolders());
-
-            provider.addRepository(localRepository, commits, location.getProjectFolders());
+            provider.addRepository(localRepository, commits, projectFolders);
         }
 
         return provider;
+    }
+
+    private static Set<LocalRepository> getLocalRepositories(File rootFolder, GitConfiguration configuration) throws GitAPIException, IOException {
+        Set<LocalRepository> localRepositories = new HashSet<>();
+
+        if(configuration.getGroup() != null && !configuration.getGroup().isEmpty()){
+            final GitEngine git = GitEngineFactory.create(Api.Gitlab);
+
+            git.setToken(configuration.getToken());
+            git.setUrl(configuration.getUrl());
+            git.setCloneFolder(rootFolder.getAbsolutePath());
+
+            if(configuration.getDefaultBranch() != null){
+                git.setDefaultBranch(configuration.getDefaultBranch());
+            }
+
+            if(configuration.getBranchExceptions() != null){
+                for (Map.Entry<String, String> entry: configuration.getBranchExceptions().entrySet()){
+                    git.setBranchForProject(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        else{
+            for(GitLocation location: configuration.getLocations()) {
+                final File repositoryFolder = new File(rootFolder, FilenameUtils.getBaseName(location.getUrl()));
+
+                final LocalRepository localRepository = GitUtils.loadCurrentRepository(
+                        location.getUrl(),
+                        configuration.getToken(),
+                        repositoryFolder,
+                        configuration.getDefaultBranch()
+                );
+
+                localRepositories.add(localRepository);
+            }
+        }
+
+        return localRepositories;
     }
 }

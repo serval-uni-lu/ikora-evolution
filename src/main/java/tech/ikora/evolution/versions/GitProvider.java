@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import tech.ikora.BuildConfiguration;
 import tech.ikora.builder.BuildResult;
 import tech.ikora.builder.Builder;
-import tech.ikora.evolution.Utils;
 import tech.ikora.gitloader.git.Frequency;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
@@ -78,8 +77,7 @@ public class GitProvider implements VersionProvider {
             }
 
             if(!this.rootFolder.mkdir()){
-                throw new IOException(String.format("Failed to create directory: %s",
-                        this.rootFolder.getAbsolutePath()));
+                throw new IOException(String.format("Failed to create directory: %s", this.rootFolder.getAbsolutePath()));
             }
         }
 
@@ -129,7 +127,7 @@ public class GitProvider implements VersionProvider {
                 Map<LocalRepository, GitCommit> lastCommits = new HashMap<>(repositories.size());
 
                 for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
-                    GitCommit commit = Utils.lastCommitBeforeDate(entry.getValue(), date);
+                    GitCommit commit = lastCommitBeforeDate(entry.getValue(), date);
                     lastCommits.put(entry.getKey(), commit);
                 }
 
@@ -154,13 +152,34 @@ public class GitProvider implements VersionProvider {
 
             private boolean isDateValid(Date date){
                 for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
-                    GitCommit commit = Utils.lastCommitBeforeDate(entry.getValue(), date);
+                    GitCommit commit = lastCommitBeforeDate(entry.getValue(), date);
                     if(commit == null){
                         return false;
                     }
                 }
 
                 return true;
+            }
+
+            private GitCommit lastCommitBeforeDate(List<GitCommit> commits, Date date){
+                GitCommit commit = null;
+
+                for(GitCommit current: commits){
+                    if(current.getDate().after(date)){
+                        break;
+                    }
+
+                    if(commit == null){
+                        commit = current;
+                        continue;
+                    }
+
+                    if(current.getDate().after(commit.getDate())){
+                        commit = current;
+                    }
+                }
+
+                return commit;
             }
         };
     }
