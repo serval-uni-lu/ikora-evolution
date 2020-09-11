@@ -79,7 +79,7 @@ public class EvolutionRunnerFactory {
                     .map(GitLocation::getProjectFolders)
                     .orElse(Collections.emptySet());
 
-            List<GitCommit> commits = new CommitCollector()
+            final List<GitCommit> commits = new CommitCollector()
                     .forGit(localRepository.getGit())
                     .onBranch(branch)
                     .from(configuration.getStartDate())
@@ -115,6 +115,8 @@ public class EvolutionRunnerFactory {
                     git.setBranchForProject(entry.getKey(), entry.getValue());
                 }
             }
+
+            localRepositories.addAll(git.cloneProjectsFromGroup(configuration.getGroup()));
         }
         else{
             for(GitLocation location: configuration.getLocations()) {

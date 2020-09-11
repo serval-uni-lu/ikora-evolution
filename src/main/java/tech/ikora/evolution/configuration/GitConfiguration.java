@@ -3,6 +3,7 @@ package tech.ikora.evolution.configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import tech.ikora.gitloader.git.Frequency;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -11,7 +12,7 @@ public class GitConfiguration {
     private String url;
     private String group;
     @JsonProperty(value = "locations", required = true)
-    private Set<GitLocation> locations;
+    private Set<GitLocation> locations = Collections.emptySet();
     @JsonProperty(value = "default branch", defaultValue = "master")
     private String defaultBranch = "master";
     @JsonProperty("branch exceptions")
