@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import tech.ikora.evolution.configuration.ConfigurationParser;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
+import tech.ikora.gitloader.exception.InvalidGitRepositoryException;
 
 import java.io.*;
 
@@ -19,7 +20,7 @@ public class EvolutionAnalysis {
 
             runner.execute();
 
-        } catch (ParseException | IOException | GitAPIException e) {
+        } catch (ParseException | IOException | GitAPIException | InvalidGitRepositoryException e) {
             logger.error(String.format("Exit with error: %s", e.getMessage()));
             System.exit(1);
         }

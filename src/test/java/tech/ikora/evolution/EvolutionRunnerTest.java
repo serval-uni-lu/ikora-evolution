@@ -7,6 +7,7 @@ import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.export.Exporter;
 import tech.ikora.evolution.export.InMemoryExporter;
 import tech.ikora.evolution.results.SmellRecord;
+import tech.ikora.gitloader.exception.InvalidGitRepositoryException;
 import tech.ikora.smells.SmellMetric;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EvolutionRunnerTest {
     @Test
-    void testHardCodedValuesAnalysis() throws GitAPIException, IOException {
+    void testHardCodedValuesAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("hard-coded-values").stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.HARD_CODED_VALUES.name()))
                 .collect(Collectors.toList());
@@ -31,7 +32,7 @@ class EvolutionRunnerTest {
     }
 
     @Test
-    void testConditionalAssertionAnalysis() throws GitAPIException, IOException {
+    void testConditionalAssertionAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("conditional-assertion").stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.CONDITIONAL_ASSERTION.name()))
                 .collect(Collectors.toList());
@@ -42,7 +43,7 @@ class EvolutionRunnerTest {
     }
 
     @Test
-    void testComplexLocatorAnalysis() throws GitAPIException, IOException {
+    void testComplexLocatorAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("complex-locator").stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.COMPLEX_LOCATORS.name()))
                 .collect(Collectors.toList());
@@ -53,7 +54,7 @@ class EvolutionRunnerTest {
     }
 
     @Test
-    void testLackOfEncapsulationAnalysis() throws GitAPIException, IOException {
+    void testLackOfEncapsulationAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("lack-of-encapsulation").stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.LACK_OF_ENCAPSULATION.name()))
                 .collect(Collectors.toList());
@@ -66,7 +67,7 @@ class EvolutionRunnerTest {
     }
 
     @Test
-    void testCloneAnalysis() throws GitAPIException, IOException {
+    void testCloneAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("clones").stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.TEST_CLONES.name()))
                 .collect(Collectors.toList());
@@ -79,7 +80,7 @@ class EvolutionRunnerTest {
     }
 
     @Test
-    void testMiddleManAnalysis() throws GitAPIException, IOException {
+    void testMiddleManAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("middle-man").stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.MIDDLE_MAN.name()))
                 .collect(Collectors.toList());
@@ -91,7 +92,7 @@ class EvolutionRunnerTest {
         assertEquals(0., records.get(1).getSmellMetricValue(), 0.0001);
     }
 
-    private List<SmellRecord> executeAnalysis(String resourcesPath) throws GitAPIException, IOException {
+    private List<SmellRecord> executeAnalysis(String resourcesPath) throws GitAPIException, IOException, InvalidGitRepositoryException {
         final EvolutionConfiguration conditionalAssertion = Helpers.createConfiguration(resourcesPath);
         final EvolutionRunner evolutionRunner = EvolutionRunnerFactory.fromConfiguration(conditionalAssertion);
 

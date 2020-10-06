@@ -11,6 +11,7 @@ import tech.ikora.evolution.versions.VersionProvider;
 import tech.ikora.gitloader.Api;
 import tech.ikora.gitloader.GitEngine;
 import tech.ikora.gitloader.GitEngineFactory;
+import tech.ikora.gitloader.exception.InvalidGitRepositoryException;
 import tech.ikora.gitloader.git.CommitCollector;
 import tech.ikora.gitloader.git.GitCommit;
 import tech.ikora.gitloader.git.GitUtils;
@@ -22,7 +23,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class EvolutionRunnerFactory {
-    public static EvolutionRunner fromConfiguration(EvolutionConfiguration configuration) throws GitAPIException, IOException {
+    public static EvolutionRunner fromConfiguration(EvolutionConfiguration configuration) throws GitAPIException, IOException, InvalidGitRepositoryException {
         final EvolutionExport exporter = createExporter(configuration.getOutputConfiguration());
         final VersionProvider provider = createVersionProvider(configuration);
         final SmellConfiguration smellConfiguration = new SmellConfiguration();
@@ -31,7 +32,7 @@ public class EvolutionRunnerFactory {
         return new EvolutionRunner(provider, exporter, smellConfiguration);
     }
 
-    private static VersionProvider createVersionProvider(EvolutionConfiguration configuration) throws GitAPIException, IOException {
+    private static VersionProvider createVersionProvider(EvolutionConfiguration configuration) throws GitAPIException, IOException, InvalidGitRepositoryException {
         VersionProvider provider;
 
         if(configuration.getFolderConfiguration() != null){
@@ -67,7 +68,7 @@ public class EvolutionRunnerFactory {
         return new FolderProvider(configuration.getRootFolder(), configuration.getNameFormat(), configuration.getDateFormat());
     }
 
-    private static VersionProvider createGitProvider(GitConfiguration configuration) throws IOException, GitAPIException {
+    private static VersionProvider createGitProvider(GitConfiguration configuration) throws IOException, InvalidGitRepositoryException {
         final GitProvider provider = new GitProvider(configuration.getFrequency());
 
         for(LocalRepository localRepository: getLocalRepositories(provider.getRootFolder(), configuration)){
@@ -96,7 +97,7 @@ public class EvolutionRunnerFactory {
         return provider;
     }
 
-    private static Set<LocalRepository> getLocalRepositories(File rootFolder, GitConfiguration configuration) throws GitAPIException, IOException {
+    private static Set<LocalRepository> getLocalRepositories(File rootFolder, GitConfiguration configuration) throws IOException, InvalidGitRepositoryException {
         Set<LocalRepository> localRepositories = new HashSet<>();
 
         if(configuration.getGroup() != null && !configuration.getGroup().isEmpty()){
