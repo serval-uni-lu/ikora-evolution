@@ -109,13 +109,15 @@ public class GitProvider implements VersionProvider {
                 Projects projects = new Projects();
 
                 try {
-                    for(Map.Entry<LocalRepository, GitCommit> entry: getLastCommits(dateIterator.next()).entrySet()){
+                    final Date date = dateIterator.next();
+
+                    for(Map.Entry<LocalRepository, GitCommit> entry: getLastCommits(date).entrySet()){
                         GitUtils.checkout(entry.getKey().getGit(), entry.getValue().getId());
                         final BuildResult build = Builder.build(getProjectFolders(entry.getKey()), new BuildConfiguration(), true);
                         projects.addProjects(build.getProjects());
-                        projects.setDate(entry.getValue().getDate());
+                        projects.setDate(date);
                     }
-                } catch (GitAPIException e) {
+                } catch (GitAPIException | IOException e) {
                     logger.error(String.format("Git API error (this iteration will be ignored): %s", e.getMessage()));
                     projects = next();
                 }
@@ -146,30 +148,18 @@ public class GitProvider implements VersionProvider {
 
                 return allCommits.stream()
                         .map(GitCommit::getDate)
-                        .filter(this::isDateValid)
                         .collect(Collectors.toList());
             }
 
-            private boolean isDateValid(Date date){
-                for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
-                    GitCommit commit = lastCommitBeforeDate(entry.getValue(), date);
-                    if(commit == null){
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
             private GitCommit lastCommitBeforeDate(List<GitCommit> commits, Date date){
-                GitCommit commit = null;
+                GitCommit commit = GitCommit.none();
 
                 for(GitCommit current: commits){
                     if(current.getDate().after(date)){
                         break;
                     }
 
-                    if(commit == null){
+                    if(commit == GitCommit.none()){
                         commit = current;
                         continue;
                     }
