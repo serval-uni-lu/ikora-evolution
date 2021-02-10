@@ -1,12 +1,12 @@
 package tech.ikora.evolution;
 
+import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import tech.ikora.evolution.configuration.ConfigurationParser;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
-import tech.ikora.gitloader.exception.InvalidGitRepositoryException;
 
 import java.io.*;
 

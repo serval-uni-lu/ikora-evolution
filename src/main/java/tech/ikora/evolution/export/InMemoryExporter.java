@@ -25,7 +25,7 @@ public class InMemoryExporter implements Exporter {
     }
 
     @Override
-    public void finalize() throws IOException {
+    public void close() throws IOException {
         //nothing to do;
     }
 

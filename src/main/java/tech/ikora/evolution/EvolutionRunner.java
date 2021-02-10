@@ -50,6 +50,7 @@ public class EvolutionRunner {
             previousVersion = version;
         }
 
+        exporter.close();
         versionProvider.clean();
     }
 

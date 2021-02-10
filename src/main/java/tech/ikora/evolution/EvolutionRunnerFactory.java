@@ -1,5 +1,13 @@
 package tech.ikora.evolution;
 
+import lu.uni.serval.commons.git.api.Api;
+import lu.uni.serval.commons.git.api.GitEngine;
+import lu.uni.serval.commons.git.api.GitEngineFactory;
+import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
+import lu.uni.serval.commons.git.utils.CommitCollector;
+import lu.uni.serval.commons.git.utils.GitCommit;
+import lu.uni.serval.commons.git.utils.GitUtils;
+import lu.uni.serval.commons.git.utils.LocalRepository;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
@@ -8,14 +16,6 @@ import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.versions.FolderProvider;
 import tech.ikora.evolution.versions.GitProvider;
 import tech.ikora.evolution.versions.VersionProvider;
-import tech.ikora.gitloader.Api;
-import tech.ikora.gitloader.GitEngine;
-import tech.ikora.gitloader.GitEngineFactory;
-import tech.ikora.gitloader.exception.InvalidGitRepositoryException;
-import tech.ikora.gitloader.git.CommitCollector;
-import tech.ikora.gitloader.git.GitCommit;
-import tech.ikora.gitloader.git.GitUtils;
-import tech.ikora.gitloader.git.LocalRepository;
 import tech.ikora.smells.SmellConfiguration;
 
 import java.io.File;

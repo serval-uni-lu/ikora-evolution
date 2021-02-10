@@ -1,7 +1,7 @@
 package tech.ikora.evolution.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import tech.ikora.gitloader.git.Frequency;
+import lu.uni.serval.commons.git.utils.Frequency;
 
 import java.util.Collections;
 import java.util.Date;

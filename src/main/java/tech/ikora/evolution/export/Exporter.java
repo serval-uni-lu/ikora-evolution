@@ -13,5 +13,5 @@ public interface Exporter {
 
     void addRecord(Record record) throws IOException;
     void addRecords(List<Record> records) throws IOException;
-    void finalize() throws IOException;
+    void close() throws IOException;
 }

@@ -1,5 +1,6 @@
 package tech.ikora.evolution;
 
+import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
 import tech.ikora.evolution.configuration.EvolutionConfiguration;
@@ -7,7 +8,6 @@ import tech.ikora.evolution.export.EvolutionExport;
 import tech.ikora.evolution.export.Exporter;
 import tech.ikora.evolution.export.InMemoryExporter;
 import tech.ikora.evolution.results.SmellRecord;
-import tech.ikora.gitloader.exception.InvalidGitRepositoryException;
 import tech.ikora.smells.SmellMetric;
 
 import java.io.IOException;

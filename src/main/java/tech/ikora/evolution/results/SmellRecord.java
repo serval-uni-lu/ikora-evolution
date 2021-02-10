@@ -1,9 +1,17 @@
 package tech.ikora.evolution.results;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.ikora.analytics.KeywordStatistics;
 import tech.ikora.model.TestCase;
 
+import javax.xml.bind.DatatypeConverter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class SmellRecord implements Record {
+    private static final Logger logger = LogManager.getLogger(SmellRecord.class);
+
     private final String version;
     private final String testCaseName;
     private final int testCaseSize;
@@ -12,6 +20,15 @@ public class SmellRecord implements Record {
     private final String smellMetricName;
     private final double smellMetricValue;
     private final long fixesCount;
+    private static MessageDigest md;
+
+    static {
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Failed to generate MD5 hash generator");
+        }
+    }
 
     public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricValue, long fixesCount) {
         this.version = version;
@@ -60,7 +77,7 @@ public class SmellRecord implements Record {
     public Object[] getValues(){
         return new Object[] {
                 this.getVersion(),
-                this.getTestCaseName(),
+                hash(this.getTestCaseName()),
                 String.valueOf(this.getTestCaseSize()),
                 String.valueOf(this.getTestCaseSequence()),
                 String.valueOf(this.getTestCaseLevel()),
@@ -82,5 +99,10 @@ public class SmellRecord implements Record {
                 "smell_metric",
                 "fixes"
         };
+    }
+
+    public static String hash(String text){
+        md.update(text.getBytes());
+        return DatatypeConverter.printHexBinary(md.digest());
     }
 }

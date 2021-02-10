@@ -67,11 +67,10 @@ public class EvolutionExport {
         }
     }
 
-    @Override
-    public void finalize() throws IOException {
+    public void close() throws IOException {
         for(Exporter exporter: exporterMap.values()){
             if(exporter != null){
-                exporter.finalize();
+                exporter.close();
             }
         }
     }

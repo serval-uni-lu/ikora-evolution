@@ -78,7 +78,7 @@ public class CsvExporter implements Exporter {
     }
 
     @Override
-    public void finalize() throws IOException {
+    public void close() throws IOException {
         this.printer.flush();
         this.printer.close();
     }
