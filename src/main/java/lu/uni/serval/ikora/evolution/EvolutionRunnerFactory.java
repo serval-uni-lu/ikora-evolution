@@ -60,6 +60,11 @@ public class EvolutionRunnerFactory {
             outputFiles.put(EvolutionExport.Statistics.PROJECT, projectsCsvFile);
         }
 
+        File variableChangesCsVFile = configuration.getVariableChangesCsvFile();
+        if(projectsCsvFile != null){
+            outputFiles.put(EvolutionExport.Statistics.VARIABLE_CHANGES, variableChangesCsVFile);
+        }
+
         return new EvolutionExport(configuration.getStrategy(), outputFiles);
     }
 

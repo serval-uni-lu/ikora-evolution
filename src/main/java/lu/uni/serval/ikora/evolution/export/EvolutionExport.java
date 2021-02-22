@@ -42,8 +42,8 @@ public class EvolutionExport {
     private void initializeExporter(Statistics statistic, File location){
         if(location != null){
             try {
-                Exporter smellExporter = ExporterFactory.create(this.strategy, location.getAbsolutePath());
-                this.exporterMap.put(statistic, smellExporter);
+                final Exporter exporter = ExporterFactory.create(this.strategy, location.getAbsolutePath());
+                this.exporterMap.put(statistic, exporter);
             } catch (IOException e) {
                 logger.error(String.format("Failed to create csv writer for %s at location '%s'",
                         statistic.name(),

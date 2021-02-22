@@ -28,6 +28,38 @@ public class VariableChangeRecord implements Record {
         this.afterType = ArgumentUtils.getArgumentType(after).getSimpleName();
     }
 
+    public String getBeforeCall() {
+        return beforeCall;
+    }
+
+    public String getBeforeName() {
+        return beforeName;
+    }
+
+    public String getBeforeType() {
+        return beforeType;
+    }
+
+    public String getBeforeValues() {
+        return beforeValues;
+    }
+
+    public String getAfterCall() {
+        return afterCall;
+    }
+
+    public String getAfterName() {
+        return afterName;
+    }
+
+    public String getAfterType() {
+        return afterType;
+    }
+
+    public String getAfterValues() {
+        return afterValues;
+    }
+
     @Override
     public String[] getKeys() {
         return new String[] {
