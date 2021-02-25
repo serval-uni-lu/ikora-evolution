@@ -6,11 +6,11 @@ import lu.uni.serval.ikora.evolution.export.Exporter;
 import java.io.File;
 
 public class OutputConfiguration {
-    @JsonProperty(value = "smells csv file")
+    @JsonProperty(value = "smells")
     private File smellsCsvFile;
-    @JsonProperty(value = "projects csv file")
+    @JsonProperty(value = "projects")
     private File projectsCsvFile;
-    @JsonProperty(value = "variable changes csv file")
+    @JsonProperty(value = "variables changes")
     private File variableChangesCsvFile;
     @JsonProperty(value = "strategy")
     private Exporter.Strategy strategy = Exporter.Strategy.CSV;
