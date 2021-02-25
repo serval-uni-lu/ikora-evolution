@@ -3,10 +3,9 @@ package lu.uni.serval.ikora.evolution.results;
 import lu.uni.serval.ikora.model.Projects;
 
 import java.time.Instant;
-import java.util.Date;
 
 public class VersionRecord implements Record {
-    private final Date date;
+    private final Instant date;
     private final int projects;
     private final int testCases;
     private final int userKeywords;
@@ -14,7 +13,7 @@ public class VersionRecord implements Record {
     private final int lines;
 
     public VersionRecord(Projects version){
-        this.date = version.getDate() == null ? Date.from(Instant.now()) : version.getDate();
+        this.date = version.getDate() == null ? Instant.now() : version.getDate();
         this.projects = version.size();
         this.testCases = version.getTestCases().size();
         this.userKeywords = version.getUserKeywords().size();
@@ -22,7 +21,7 @@ public class VersionRecord implements Record {
         this.lines = version.getLoc();
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 

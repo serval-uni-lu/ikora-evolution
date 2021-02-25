@@ -73,12 +73,15 @@ public class CsvExporter implements Exporter {
             this.printer.flush();
         } catch (IOException e) {
             this.printer.close();
+            this.printer = null;
         }
     }
 
     @Override
     public void close() throws IOException {
-        this.printer.flush();
-        this.printer.close();
+        if(this.printer != null){
+            this.printer.flush();
+            this.printer.close();
+        }
     }
 }

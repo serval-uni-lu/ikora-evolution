@@ -21,11 +21,11 @@ public class EvolutionAnalysis {
             runner.execute();
 
         } catch (ParseException | IOException | GitAPIException | InvalidGitRepositoryException e) {
-            logger.error(String.format("Exit with error: %s", e.getMessage()));
+            logger.error(String.format("Exit with error code 1: %s", e.getMessage()));
             System.exit(1);
         }
 
-        logger.info("Finished without error");
+        logger.info("Finished with error code 0");
     }
 
     private static EvolutionConfiguration getConfiguration(String[] args) throws ParseException, IOException {

@@ -20,12 +20,16 @@ import lu.uni.serval.ikora.smells.SmellDetector;
 import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.SmellResults;
 import lu.uni.serval.ikora.utils.LevenshteinDistance;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class EvolutionRunner {
+    private static final Logger logger = LogManager.getLogger(EvolutionRunner.class);
+
     private final VersionProvider versionProvider;
     private final EvolutionExport exporter;
     private final SmellConfiguration smellConfiguration;
@@ -45,11 +49,13 @@ public class EvolutionRunner {
         SmellRecordAccumulator previousRecords = null;
 
         for(Projects version: versionProvider){
+            logger.info(String.format("Starting analysis for version %s...", version.getVersionId()));
+
             computeVersionStatistics(version);
-
             previousRecords = computeSmells(previousVersion, version, previousRecords == null ? null : previousRecords.getNodes());
-
             previousVersion = version;
+
+            logger.info(String.format("Analysis for version %s done.", version.getVersionId()));
         }
 
         exporter.close();

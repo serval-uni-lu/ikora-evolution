@@ -12,13 +12,14 @@ public class ConfigurationParser {
     private static final Logger logger = LogManager.getLogger(ConfigurationParser.class);
 
     public static EvolutionConfiguration parse(String config) throws IOException {
+        logger.info(String.format("Loading configuration from '%s'...", config));
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
 
         File file = new File(config);
 
         final EvolutionConfiguration configuration = mapper.readValue(file, EvolutionConfiguration.class);
-        logger.info("Configuration loaded from " + config);
+        logger.info("Configuration loaded.");
 
         return configuration;
     }

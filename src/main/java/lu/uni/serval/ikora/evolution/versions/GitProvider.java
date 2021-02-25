@@ -15,6 +15,7 @@ import lu.uni.serval.ikora.model.Projects;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,8 +97,8 @@ public class GitProvider implements VersionProvider {
     @Override
     public Iterator<Projects> iterator() {
         return new Iterator<Projects>() {
-            private final List<Date> dates = getDates();
-            private final Iterator<Date> dateIterator = dates.iterator();
+            private final List<Instant> dates = getDates();
+            private final Iterator<Instant> dateIterator = dates.iterator();
 
             @Override
             public boolean hasNext() {
@@ -109,7 +110,7 @@ public class GitProvider implements VersionProvider {
                 Projects projects = new Projects();
 
                 try {
-                    final Date date = dateIterator.next();
+                    final Instant date = dateIterator.next();
 
                     for(Map.Entry<LocalRepository, GitCommit> entry: getLastCommits(date).entrySet()){
                         GitUtils.checkout(entry.getKey().getGit(), entry.getValue().getId());
@@ -125,7 +126,7 @@ public class GitProvider implements VersionProvider {
                 return projects;
             }
 
-            private Map<LocalRepository, GitCommit> getLastCommits(Date date){
+            private Map<LocalRepository, GitCommit> getLastCommits(Instant date){
                 Map<LocalRepository, GitCommit> lastCommits = new HashMap<>(repositories.size());
 
                 for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
@@ -136,7 +137,7 @@ public class GitProvider implements VersionProvider {
                 return lastCommits;
             }
 
-            private List<Date> getDates(){
+            private List<Instant> getDates(){
                 List<GitCommit> allCommits = new ArrayList<>();
 
                 for(List<GitCommit> commits: repositories.values()){
@@ -151,11 +152,11 @@ public class GitProvider implements VersionProvider {
                         .collect(Collectors.toList());
             }
 
-            private GitCommit lastCommitBeforeDate(List<GitCommit> commits, Date date){
+            private GitCommit lastCommitBeforeDate(List<GitCommit> commits, Instant date){
                 GitCommit commit = GitCommit.none();
 
                 for(GitCommit current: commits){
-                    if(current.getDate().after(date)){
+                    if(current.getDate().isAfter(date)){
                         break;
                     }
 
@@ -164,7 +165,7 @@ public class GitProvider implements VersionProvider {
                         continue;
                     }
 
-                    if(current.getDate().after(commit.getDate())){
+                    if(current.getDate().isAfter(commit.getDate())){
                         commit = current;
                     }
                 }

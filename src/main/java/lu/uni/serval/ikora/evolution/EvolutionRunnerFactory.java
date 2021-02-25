@@ -10,6 +10,9 @@ import lu.uni.serval.commons.git.utils.GitUtils;
 import lu.uni.serval.commons.git.utils.LocalRepository;
 import lu.uni.serval.ikora.evolution.configuration.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
 import lu.uni.serval.ikora.evolution.export.EvolutionExport;
@@ -23,6 +26,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class EvolutionRunnerFactory {
+    private static final Logger logger = LogManager.getLogger(EvolutionRunnerFactory.class);
+
     public static EvolutionRunner fromConfiguration(EvolutionConfiguration configuration) throws GitAPIException, IOException, InvalidGitRepositoryException {
         final EvolutionExport exporter = createExporter(configuration.getOutputConfiguration());
         final VersionProvider provider = createVersionProvider(configuration);
@@ -72,9 +77,10 @@ public class EvolutionRunnerFactory {
         return new FolderProvider(configuration.getRootFolder(), configuration.getNameFormat(), configuration.getDateFormat());
     }
 
-    private static VersionProvider createGitProvider(GitConfiguration configuration) throws IOException, InvalidGitRepositoryException {
+    private static VersionProvider createGitProvider(GitConfiguration configuration) throws IOException, InvalidGitRepositoryException, GitAPIException {
         final GitProvider provider = new GitProvider(configuration.getFrequency());
 
+        logger.info("Initializing repositories...");
         for(LocalRepository localRepository: getLocalRepositories(provider.getRootFolder(), configuration)){
             final String branch = configuration.getBranchExceptions().getOrDefault(localRepository.getRemoteUrl(), configuration.getDefaultBranch());
 
@@ -97,6 +103,7 @@ public class EvolutionRunnerFactory {
 
             provider.addRepository(localRepository, commits, projectFolders);
         }
+        logger.info("Repositories initialized.");
 
         return provider;
     }

@@ -3,8 +3,8 @@ package lu.uni.serval.ikora.evolution.configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lu.uni.serval.commons.git.utils.Frequency;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,13 +16,13 @@ public class GitConfiguration {
     @JsonProperty(value = "default branch", defaultValue = "master")
     private String defaultBranch = "master";
     @JsonProperty("branch exceptions")
-    private Map<String, String> branchExceptions;
+    private Map<String, String> branchExceptions = Collections.emptyMap();
     @JsonProperty(value = "token", required = true)
     private String token;
     @JsonProperty(value = "start date")
-    private Date startDate;
+    private Instant startDate;
     @JsonProperty(value = "end date")
-    private Date endDate;
+    private Instant endDate;
     @JsonProperty(value = "ignore commits")
     private Set<String> ignoreCommits;
     @JsonProperty(value = "maximum number of commits", defaultValue = "0")
@@ -78,19 +78,19 @@ public class GitConfiguration {
         this.token = token;
     }
 
-    public Date getStartDate() {
+    public Instant getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Instant startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Instant endDate) {
         this.endDate = endDate;
     }
 
