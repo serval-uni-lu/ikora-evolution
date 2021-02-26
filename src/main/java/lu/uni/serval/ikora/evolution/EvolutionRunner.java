@@ -1,25 +1,29 @@
 package lu.uni.serval.ikora.evolution;
 
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
-import lu.uni.serval.ikora.utils.ArgumentUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import lu.uni.serval.ikora.analytics.clones.KeywordCloneDetection;
-import lu.uni.serval.ikora.analytics.clones.Clones;
-import lu.uni.serval.ikora.analytics.difference.Difference;
-import lu.uni.serval.ikora.analytics.difference.Edit;
-import lu.uni.serval.ikora.analytics.difference.NodeMatcher;
 import lu.uni.serval.ikora.evolution.export.EvolutionExport;
 import lu.uni.serval.ikora.evolution.export.Exporter;
 import lu.uni.serval.ikora.evolution.results.SmellRecordAccumulator;
 import lu.uni.serval.ikora.evolution.results.VersionRecord;
 import lu.uni.serval.ikora.evolution.versions.FolderProvider;
 import lu.uni.serval.ikora.evolution.versions.VersionProvider;
-import lu.uni.serval.ikora.model.*;
+
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellDetector;
 import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.SmellResults;
-import lu.uni.serval.ikora.utils.LevenshteinDistance;
+
+import lu.uni.serval.ikora.core.model.*;
+import lu.uni.serval.ikora.core.utils.ArgumentUtils;
+import lu.uni.serval.ikora.core.utils.LevenshteinDistance;
+import lu.uni.serval.ikora.core.analytics.clones.KeywordCloneDetection;
+import lu.uni.serval.ikora.core.analytics.clones.Clones;
+import lu.uni.serval.ikora.core.analytics.difference.Difference;
+import lu.uni.serval.ikora.core.analytics.difference.Edit;
+import lu.uni.serval.ikora.core.analytics.difference.NodeMatcher;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

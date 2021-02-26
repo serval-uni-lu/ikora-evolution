@@ -16,7 +16,7 @@ public class Helpers {
     static EvolutionConfiguration createConfiguration(String resourcesPath, EvolutionExport.Statistics statistics) throws IOException {
         File projectFolder = null;
         try {
-            projectFolder = lu.uni.serval.ikora.utils.FileUtils.getResourceFile(resourcesPath);
+            projectFolder = lu.uni.serval.ikora.core.utils.FileUtils.getResourceFile(resourcesPath);
         } catch (Exception e) {
             fail(String.format("Failed to load '%s': %s", resourcesPath, e.getMessage()));
         }

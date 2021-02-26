@@ -8,10 +8,11 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import lu.uni.serval.ikora.BuildConfiguration;
-import lu.uni.serval.ikora.builder.BuildResult;
-import lu.uni.serval.ikora.builder.Builder;
-import lu.uni.serval.ikora.model.Projects;
+
+import lu.uni.serval.ikora.core.BuildConfiguration;
+import lu.uni.serval.ikora.core.builder.BuildResult;
+import lu.uni.serval.ikora.core.builder.Builder;
+import lu.uni.serval.ikora.core.model.Projects;
 
 import java.io.File;
 import java.io.IOException;

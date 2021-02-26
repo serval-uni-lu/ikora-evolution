@@ -1,11 +1,12 @@
 package lu.uni.serval.ikora.evolution.versions;
 
 import lu.uni.serval.ikora.evolution.configuration.FolderConfiguration;
-import lu.uni.serval.ikora.BuildConfiguration;
-import lu.uni.serval.ikora.builder.BuildResult;
-import lu.uni.serval.ikora.builder.Builder;
-import lu.uni.serval.ikora.model.Projects;
-import lu.uni.serval.ikora.utils.FileUtils;
+
+import lu.uni.serval.ikora.core.BuildConfiguration;
+import lu.uni.serval.ikora.core.builder.BuildResult;
+import lu.uni.serval.ikora.core.builder.Builder;
+import lu.uni.serval.ikora.core.model.Projects;
+import lu.uni.serval.ikora.core.utils.FileUtils;
 
 import java.io.File;
 import java.io.IOException;

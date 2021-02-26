@@ -29,8 +29,10 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
-        assertEquals(0.14285, records.get(0).getSmellMetricValue(), 0.0001);
-        assertEquals(0.0, records.get(1).getSmellMetricValue(), 0.0001);
+        assertEquals(0.14285, records.get(0).getSmellMetricNormalizedValue(), 0.0001);
+        assertEquals(1., records.get(0).getSmellMetricRawValue(), 0.0001);
+        assertEquals(0.0, records.get(1).getSmellMetricNormalizedValue(), 0.0001);
+        assertEquals(0.0, records.get(1).getSmellMetricRawValue(), 0.0001);
     }
 
     @Test
@@ -63,9 +65,11 @@ class EvolutionRunnerTest {
 
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
-        assertEquals(0.3333, records.get(0).getSmellMetricValue(), 0.0001);
+        assertEquals(0.3333, records.get(0).getSmellMetricNormalizedValue(), 0.0001);
+        assertEquals(1., records.get(0).getSmellMetricRawValue(), 0.0001);
         assertEquals(1, records.get(1).getFixesCount());
-        assertEquals(0., records.get(1).getSmellMetricValue(), 0.0001);
+        assertEquals(0., records.get(1).getSmellMetricNormalizedValue(), 0.0001);
+        assertEquals(0., records.get(1).getSmellMetricRawValue(), 0.0001);
     }
 
     @Test
@@ -76,9 +80,9 @@ class EvolutionRunnerTest {
 
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
-        assertEquals(0.4, records.get(0).getSmellMetricValue(), 0.0001);
+        assertEquals(0.4, records.get(0).getSmellMetricNormalizedValue(), 0.0001);
         assertEquals(2, records.get(1).getFixesCount());
-        assertEquals(0., records.get(1).getSmellMetricValue(), 0.0001);
+        assertEquals(0., records.get(1).getSmellMetricNormalizedValue(), 0.0001);
     }
 
     @Test
@@ -89,9 +93,9 @@ class EvolutionRunnerTest {
 
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
-        assertEquals(0.5, records.get(0).getSmellMetricValue(), 0.0001);
+        assertEquals(0.5, records.get(0).getSmellMetricNormalizedValue(), 0.0001);
         assertEquals(1, records.get(1).getFixesCount());
-        assertEquals(0., records.get(1).getSmellMetricValue(), 0.0001);
+        assertEquals(0., records.get(1).getSmellMetricNormalizedValue(), 0.0001);
     }
 
     @Test

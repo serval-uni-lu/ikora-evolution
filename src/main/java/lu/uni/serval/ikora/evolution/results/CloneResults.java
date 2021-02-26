@@ -1,8 +1,8 @@
 package lu.uni.serval.ikora.evolution.results;
 
-import lu.uni.serval.ikora.analytics.clones.Clones;
-import lu.uni.serval.ikora.analytics.clones.KeywordCloneDetection;
-import lu.uni.serval.ikora.model.*;
+import lu.uni.serval.ikora.core.analytics.clones.Clones;
+import lu.uni.serval.ikora.core.analytics.clones.KeywordCloneDetection;
+import lu.uni.serval.ikora.core.model.*;
 
 import java.util.HashMap;
 import java.util.Map;

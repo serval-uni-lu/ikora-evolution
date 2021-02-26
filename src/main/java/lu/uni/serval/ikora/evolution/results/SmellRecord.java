@@ -1,8 +1,9 @@
 package lu.uni.serval.ikora.evolution.results;
 
-import lu.uni.serval.ikora.analytics.KeywordStatistics;
 import lu.uni.serval.ikora.evolution.utils.Hash;
-import lu.uni.serval.ikora.model.TestCase;
+
+import lu.uni.serval.ikora.core.analytics.KeywordStatistics;
+import lu.uni.serval.ikora.core.model.TestCase;
 
 public class SmellRecord implements Record {
     private final String version;
@@ -11,17 +12,19 @@ public class SmellRecord implements Record {
     private final int testCaseSequence;
     private final int testCaseLevel;
     private final String smellMetricName;
-    private final double smellMetricValue;
+    private final double smellMetricRawValue;
+    private final double smellMetricNormalizedValue;
     private final long fixesCount;
 
-    public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricValue, long fixesCount) {
+    public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricRawValue, double smellMetricNormalizedValue, long fixesCount) {
         this.version = version;
         this.testCaseName = testCase.toString();
         this.testCaseSize = KeywordStatistics.getSize(testCase).getTestCaseSize();
         this.testCaseSequence = KeywordStatistics.getSequenceSize(testCase);
         this.testCaseLevel = KeywordStatistics.getLevel(testCase);
         this.smellMetricName = smellMetricName;
-        this.smellMetricValue = smellMetricValue;
+        this.smellMetricRawValue = smellMetricRawValue;
+        this.smellMetricNormalizedValue = smellMetricNormalizedValue;
         this.fixesCount = fixesCount;
     }
 
@@ -49,8 +52,12 @@ public class SmellRecord implements Record {
         return smellMetricName;
     }
 
-    public double getSmellMetricValue() {
-        return smellMetricValue;
+    public double getSmellMetricRawValue() {
+        return smellMetricRawValue;
+    }
+
+    public double getSmellMetricNormalizedValue() {
+        return smellMetricNormalizedValue;
     }
 
     public long getFixesCount() {
@@ -66,8 +73,9 @@ public class SmellRecord implements Record {
                 String.valueOf(this.getTestCaseSequence()),
                 String.valueOf(this.getTestCaseLevel()),
                 this.getSmellMetricName(),
-                String.valueOf(this.getSmellMetricValue()),
-                String.valueOf(this.fixesCount)
+                String.valueOf(this.getSmellMetricRawValue()),
+                String.valueOf(this.getSmellMetricNormalizedValue()),
+                String.valueOf(this.getFixesCount())
         };
     }
 
@@ -80,7 +88,8 @@ public class SmellRecord implements Record {
                 "test_case_sequence",
                 "test_case_level",
                 "smell_name",
-                "smell_metric",
+                "smell_raw_value",
+                "smell_normalized_value",
                 "fixes"
         };
     }
