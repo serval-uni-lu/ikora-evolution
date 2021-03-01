@@ -149,7 +149,9 @@ public class EvolutionRunner {
             return;
         }
 
-        final List<Pair<Step, Step>> stepPairs = LevenshteinDistance.getMapping(keyword1.getSteps(), keyword2.getSteps());
+        final List<Pair<Step, Step>> stepPairs = LevenshteinDistance.getMapping(keyword1.getSteps(), keyword2.getSteps()).stream()
+                .filter(pair -> isLibraryCall(pair.getRight()) && isLibraryCall(pair.getLeft()))
+                .collect(Collectors.toList());
 
         for(Pair<Step, Step> stepPair: stepPairs){
             final NodeList<Argument> beforeArguments = stepPair.getLeft().getArgumentList();
@@ -177,5 +179,21 @@ public class EvolutionRunner {
         }
 
         return null;
+    }
+
+    private boolean isLibraryCall(Step step){
+        final Optional<KeywordCall> call = step.getKeywordCall();
+
+        if(!call.isPresent()){
+            return false;
+        }
+
+        final Optional<Keyword> keyword = call.get().getKeyword();
+
+        if (!keyword.isPresent()){
+            return false;
+        }
+
+        return LibraryKeyword.class.isAssignableFrom(keyword.get().getClass());
     }
 }
