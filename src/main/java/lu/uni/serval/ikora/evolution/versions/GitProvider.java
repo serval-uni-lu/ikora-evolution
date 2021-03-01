@@ -85,9 +85,7 @@ public class GitProvider implements VersionProvider {
     @Override
     public void close() throws IOException {
         for(LocalRepository localRepository: repositories.keySet()){
-            final File directory = localRepository.getGit().getRepository().getDirectory();
             GitUtils.close(localRepository.getGit(), true);
-            FileUtils.forceDelete(directory);
         }
     }
 
