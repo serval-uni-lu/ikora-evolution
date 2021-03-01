@@ -4,7 +4,6 @@ import lu.uni.serval.commons.git.utils.Frequency;
 import lu.uni.serval.commons.git.utils.GitCommit;
 import lu.uni.serval.commons.git.utils.GitUtils;
 import lu.uni.serval.commons.git.utils.LocalRepository;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
