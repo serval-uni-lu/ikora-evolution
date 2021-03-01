@@ -14,13 +14,13 @@ public class Hash {
 
     static {
         try {
-            md = MessageDigest.getInstance("MD5");
+            md = MessageDigest.getInstance("SHA-512");
         } catch (NoSuchAlgorithmException e) {
-            logger.error("Failed to generate MD5 hash generator");
+            logger.error("Failed to generate SHA-512 hash generator");
         }
     }
 
-    public static String md5(String text){
+    public static String sha512(String text){
         md.update(text.getBytes());
         return DatatypeConverter.printHexBinary(md.digest());
     }

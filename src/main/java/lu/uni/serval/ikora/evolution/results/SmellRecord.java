@@ -68,7 +68,7 @@ public class SmellRecord implements Record {
     public Object[] getValues(){
         return new Object[] {
                 this.getVersion(),
-                Hash.md5(this.getTestCaseName()),
+                Hash.sha512(this.getTestCaseName()),
                 String.valueOf(this.getTestCaseSize()),
                 String.valueOf(this.getTestCaseSequence()),
                 String.valueOf(this.getTestCaseLevel()),
