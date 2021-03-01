@@ -49,21 +49,24 @@ public class EvolutionRunner {
     }
 
     public void execute() throws IOException {
-        Projects previousVersion = null;
-        SmellRecordAccumulator previousRecords = null;
+        try {
+            Projects previousVersion = null;
+            SmellRecordAccumulator previousRecords = null;
 
-        for(Projects version: versionProvider){
-            logger.info(String.format("Starting analysis for version %s...", version.getVersionId()));
+            for(Projects version: versionProvider){
+                logger.info(String.format("Starting analysis for version %s...", version.getVersionId()));
 
-            computeVersionStatistics(version);
-            previousRecords = computeSmells(previousVersion, version, previousRecords == null ? null : previousRecords.getNodes());
-            previousVersion = version;
+                computeVersionStatistics(version);
+                previousRecords = computeSmells(previousVersion, version, previousRecords == null ? null : previousRecords.getNodes());
+                previousVersion = version;
 
-            logger.info(String.format("Analysis for version %s done.", version.getVersionId()));
+                logger.info(String.format("Analysis for version %s done.", version.getVersionId()));
+            }
         }
-
-        exporter.close();
-        versionProvider.clean();
+        finally {
+            exporter.close();
+            versionProvider.close();
+        }
     }
 
     private void computeVersionStatistics(Projects version) throws IOException {
@@ -89,7 +92,7 @@ public class EvolutionRunner {
     }
 
     private SmellRecordAccumulator findSmells(Projects version, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes){
-        SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
+        final SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
 
         final SmellDetector detector = SmellDetector.all();
         final String versionId = version.getVersionId();

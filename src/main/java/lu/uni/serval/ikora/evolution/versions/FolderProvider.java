@@ -27,12 +27,12 @@ public class FolderProvider implements VersionProvider{
     }
 
     @Override
-    public File getRootFolder() throws IOException {
+    public File getRootFolder() {
         return this.rootFolder;
     }
 
     @Override
-    public void clean() throws IOException {
+    public void close() {
         //FolderProvider does not manage the folder, nothing to do.
     }
 

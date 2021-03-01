@@ -74,11 +74,7 @@ public class GitProvider implements VersionProvider {
         if(this.rootFolder == null){
             this.rootFolder = new File(System.getProperty("java.io.tmpdir"), "git-provider");
 
-            if(this.rootFolder.exists()){
-                FileUtils.deleteDirectory(this.rootFolder);
-            }
-
-            if(!this.rootFolder.mkdir()){
+            if(!this.rootFolder.exists() && !this.rootFolder.mkdir()){
                 throw new IOException(String.format("Failed to create directory: %s", this.rootFolder.getAbsolutePath()));
             }
         }
@@ -87,12 +83,12 @@ public class GitProvider implements VersionProvider {
     }
 
     @Override
-    public void clean() throws IOException {
+    public void close() throws IOException {
         for(LocalRepository localRepository: repositories.keySet()){
-            localRepository.getGit().getRepository().close();
+            final File directory = localRepository.getGit().getRepository().getDirectory();
+            GitUtils.close(localRepository.getGit(), true);
+            FileUtils.forceDelete(directory);
         }
-
-        FileUtils.forceDelete(this.rootFolder);
     }
 
     @Override
