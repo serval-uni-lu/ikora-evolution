@@ -1,9 +1,10 @@
 package lu.uni.serval.ikora.evolution.results;
 
-import lu.uni.serval.ikora.analytics.difference.Edit;
-import lu.uni.serval.ikora.model.SourceNode;
-import lu.uni.serval.ikora.model.TestCase;
 import lu.uni.serval.ikora.smells.*;
+
+import lu.uni.serval.ikora.core.analytics.difference.Edit;
+import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.core.model.TestCase;
 
 import java.util.*;
 
@@ -16,7 +17,7 @@ public class SmellRecordAccumulator {
 
         for(SmellResult smell: smells){
             long fixes = computeFixes(smell.getType(), edits, previousNodes, configuration);
-            records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getValue(), fixes));
+            records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getRawValue(), smell.getNormalizedValue(), fixes));
         }
     }
 

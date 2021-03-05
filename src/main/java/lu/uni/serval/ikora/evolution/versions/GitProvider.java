@@ -4,14 +4,14 @@ import lu.uni.serval.commons.git.utils.Frequency;
 import lu.uni.serval.commons.git.utils.GitCommit;
 import lu.uni.serval.commons.git.utils.GitUtils;
 import lu.uni.serval.commons.git.utils.LocalRepository;
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import lu.uni.serval.ikora.BuildConfiguration;
-import lu.uni.serval.ikora.builder.BuildResult;
-import lu.uni.serval.ikora.builder.Builder;
-import lu.uni.serval.ikora.model.Projects;
+
+import lu.uni.serval.ikora.core.BuildConfiguration;
+import lu.uni.serval.ikora.core.builder.BuildResult;
+import lu.uni.serval.ikora.core.builder.Builder;
+import lu.uni.serval.ikora.core.model.Projects;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,11 +73,7 @@ public class GitProvider implements VersionProvider {
         if(this.rootFolder == null){
             this.rootFolder = new File(System.getProperty("java.io.tmpdir"), "git-provider");
 
-            if(this.rootFolder.exists()){
-                FileUtils.deleteDirectory(this.rootFolder);
-            }
-
-            if(!this.rootFolder.mkdir()){
+            if(!this.rootFolder.exists() && !this.rootFolder.mkdir()){
                 throw new IOException(String.format("Failed to create directory: %s", this.rootFolder.getAbsolutePath()));
             }
         }
@@ -86,12 +82,10 @@ public class GitProvider implements VersionProvider {
     }
 
     @Override
-    public void clean() throws IOException {
+    public void close() throws IOException {
         for(LocalRepository localRepository: repositories.keySet()){
-            localRepository.getGit().getRepository().close();
+            GitUtils.close(localRepository.getGit(), true);
         }
-
-        FileUtils.forceDelete(this.rootFolder);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package lu.uni.serval.ikora.evolution.results;
 
-import lu.uni.serval.ikora.model.Argument;
-import lu.uni.serval.ikora.utils.ArgumentUtils;
+import lu.uni.serval.ikora.core.model.Argument;
+import lu.uni.serval.ikora.core.utils.ArgumentUtils;
 
 import java.util.List;
 

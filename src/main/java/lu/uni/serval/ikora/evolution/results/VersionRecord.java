@@ -1,6 +1,6 @@
 package lu.uni.serval.ikora.evolution.results;
 
-import lu.uni.serval.ikora.model.Projects;
+import lu.uni.serval.ikora.core.model.Projects;
 
 import java.time.Instant;
 

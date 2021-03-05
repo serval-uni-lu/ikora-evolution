@@ -1,25 +1,29 @@
 package lu.uni.serval.ikora.evolution;
 
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
-import lu.uni.serval.ikora.utils.ArgumentUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import lu.uni.serval.ikora.analytics.clones.KeywordCloneDetection;
-import lu.uni.serval.ikora.analytics.clones.Clones;
-import lu.uni.serval.ikora.analytics.difference.Difference;
-import lu.uni.serval.ikora.analytics.difference.Edit;
-import lu.uni.serval.ikora.analytics.difference.NodeMatcher;
 import lu.uni.serval.ikora.evolution.export.EvolutionExport;
 import lu.uni.serval.ikora.evolution.export.Exporter;
 import lu.uni.serval.ikora.evolution.results.SmellRecordAccumulator;
 import lu.uni.serval.ikora.evolution.results.VersionRecord;
 import lu.uni.serval.ikora.evolution.versions.FolderProvider;
 import lu.uni.serval.ikora.evolution.versions.VersionProvider;
-import lu.uni.serval.ikora.model.*;
+
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellDetector;
 import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.SmellResults;
-import lu.uni.serval.ikora.utils.LevenshteinDistance;
+
+import lu.uni.serval.ikora.core.model.*;
+import lu.uni.serval.ikora.core.utils.ArgumentUtils;
+import lu.uni.serval.ikora.core.utils.LevenshteinDistance;
+import lu.uni.serval.ikora.core.analytics.clones.KeywordCloneDetection;
+import lu.uni.serval.ikora.core.analytics.clones.Clones;
+import lu.uni.serval.ikora.core.analytics.difference.Difference;
+import lu.uni.serval.ikora.core.analytics.difference.Edit;
+import lu.uni.serval.ikora.core.analytics.difference.NodeMatcher;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,21 +49,24 @@ public class EvolutionRunner {
     }
 
     public void execute() throws IOException {
-        Projects previousVersion = null;
-        SmellRecordAccumulator previousRecords = null;
+        try {
+            Projects previousVersion = null;
+            SmellRecordAccumulator previousRecords = null;
 
-        for(Projects version: versionProvider){
-            logger.info(String.format("Starting analysis for version %s...", version.getVersionId()));
+            for(Projects version: versionProvider){
+                logger.info(String.format("Starting analysis for version %s...", version.getVersionId()));
 
-            computeVersionStatistics(version);
-            previousRecords = computeSmells(previousVersion, version, previousRecords == null ? null : previousRecords.getNodes());
-            previousVersion = version;
+                computeVersionStatistics(version);
+                previousRecords = computeSmells(previousVersion, version, previousRecords == null ? null : previousRecords.getNodes());
+                previousVersion = version;
 
-            logger.info(String.format("Analysis for version %s done.", version.getVersionId()));
+                logger.info(String.format("Analysis for version %s done.", version.getVersionId()));
+            }
         }
-
-        exporter.close();
-        versionProvider.clean();
+        finally {
+            exporter.close();
+            versionProvider.close();
+        }
     }
 
     private void computeVersionStatistics(Projects version) throws IOException {
@@ -85,7 +92,7 @@ public class EvolutionRunner {
     }
 
     private SmellRecordAccumulator findSmells(Projects version, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes){
-        SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
+        final SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
 
         final SmellDetector detector = SmellDetector.all();
         final String versionId = version.getVersionId();
@@ -145,7 +152,9 @@ public class EvolutionRunner {
             return;
         }
 
-        final List<Pair<Step, Step>> stepPairs = LevenshteinDistance.getMapping(keyword1.getSteps(), keyword2.getSteps());
+        final List<Pair<Step, Step>> stepPairs = LevenshteinDistance.getMapping(keyword1.getSteps(), keyword2.getSteps()).stream()
+                .filter(pair -> isLibraryCall(pair.getRight()) && isLibraryCall(pair.getLeft()))
+                .collect(Collectors.toList());
 
         for(Pair<Step, Step> stepPair: stepPairs){
             final NodeList<Argument> beforeArguments = stepPair.getLeft().getArgumentList();
@@ -173,5 +182,21 @@ public class EvolutionRunner {
         }
 
         return null;
+    }
+
+    private boolean isLibraryCall(Step step){
+        final Optional<KeywordCall> call = step.getKeywordCall();
+
+        if(!call.isPresent()){
+            return false;
+        }
+
+        final Optional<Keyword> keyword = call.get().getKeyword();
+
+        if (!keyword.isPresent()){
+            return false;
+        }
+
+        return LibraryKeyword.class.isAssignableFrom(keyword.get().getClass());
     }
 }
