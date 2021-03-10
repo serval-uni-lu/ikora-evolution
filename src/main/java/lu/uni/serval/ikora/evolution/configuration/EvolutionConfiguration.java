@@ -11,7 +11,7 @@ public class EvolutionConfiguration {
     @JsonProperty(value = "output", required = true)
     private OutputConfiguration outputConfiguration;
     @JsonProperty(value= "smells")
-    private SmellConfiguration smellConfiguration;
+    private SmellConfiguration smellConfiguration = new SmellConfiguration();
 
     @JsonProperty(value = "git")
     public GitConfiguration getGitConfiguration() {

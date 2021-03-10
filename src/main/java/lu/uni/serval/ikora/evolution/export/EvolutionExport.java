@@ -4,13 +4,14 @@ import lu.uni.serval.ikora.evolution.results.Record;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EvolutionExport {
+public class EvolutionExport implements Closeable {
     private static final Logger logger = LogManager.getLogger(EvolutionExport.class);
 
     public enum Statistics{
@@ -68,6 +69,7 @@ public class EvolutionExport {
         }
     }
 
+    @Override
     public void close() throws IOException {
         for(Exporter exporter: exporterMap.values()){
             if(exporter != null){

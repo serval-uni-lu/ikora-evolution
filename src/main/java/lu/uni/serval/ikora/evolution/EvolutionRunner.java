@@ -1,13 +1,15 @@
 package lu.uni.serval.ikora.evolution;
 
+import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
+import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
 import lu.uni.serval.ikora.evolution.export.EvolutionExport;
-import lu.uni.serval.ikora.evolution.export.Exporter;
 import lu.uni.serval.ikora.evolution.results.SmellRecordAccumulator;
 import lu.uni.serval.ikora.evolution.results.VersionRecord;
 import lu.uni.serval.ikora.evolution.versions.FolderProvider;
 import lu.uni.serval.ikora.evolution.versions.VersionProvider;
 
+import lu.uni.serval.ikora.evolution.versions.VersionProviderFactory;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellDetector;
 import lu.uni.serval.ikora.smells.SmellMetric;
@@ -26,6 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.IOException;
 import java.util.*;
@@ -34,22 +37,16 @@ import java.util.stream.Collectors;
 public class EvolutionRunner {
     private static final Logger logger = LogManager.getLogger(EvolutionRunner.class);
 
-    private final VersionProvider versionProvider;
     private final EvolutionExport exporter;
-    private final SmellConfiguration smellConfiguration;
+    private final EvolutionConfiguration configuration;
 
-    public EvolutionRunner(VersionProvider versionProvider, EvolutionExport exporter, SmellConfiguration smellConfiguration){
-        this.versionProvider = versionProvider;
+    public EvolutionRunner(EvolutionExport exporter, EvolutionConfiguration configuration){
         this.exporter = exporter;
-        this.smellConfiguration = smellConfiguration;
+        this.configuration = configuration;
     }
 
-    public Map<EvolutionExport.Statistics, Exporter> getExporter() {
-        return exporter.getExporters();
-    }
-
-    public void execute() throws IOException {
-        try {
+    public void execute() throws IOException, GitAPIException, InvalidGitRepositoryException {
+        try (VersionProvider versionProvider = VersionProviderFactory.fromConfiguration(configuration)) {
             Projects previousVersion = null;
             SmellRecordAccumulator previousRecords = null;
 
@@ -57,15 +54,11 @@ public class EvolutionRunner {
                 logger.info(String.format("Starting analysis for version %s...", version.getVersionId()));
 
                 computeVersionStatistics(version);
-                previousRecords = computeSmells(previousVersion, version, previousRecords == null ? null : previousRecords.getNodes());
+                previousRecords = computeSmells(previousVersion, version, previousRecords == null ? null : previousRecords.getNodes(), versionProvider instanceof FolderProvider);
                 previousVersion = version;
 
                 logger.info(String.format("Analysis for version %s done.", version.getVersionId()));
             }
-        }
-        finally {
-            exporter.close();
-            versionProvider.close();
         }
     }
 
@@ -77,12 +70,10 @@ public class EvolutionRunner {
         this.exporter.export(EvolutionExport.Statistics.PROJECT, new VersionRecord(version));
     }
 
-    private SmellRecordAccumulator computeSmells(Projects previousVersion, Projects version, Map<SmellMetric.Type, Set<SourceNode>> previousNodes) throws IOException {
+    private SmellRecordAccumulator computeSmells(Projects previousVersion, Projects version, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, boolean ignoreProjectName) throws IOException {
         if(!this.exporter.contains(EvolutionExport.Statistics.SMELL)){
             return new SmellRecordAccumulator();
         }
-
-        boolean ignoreProjectName = versionProvider instanceof FolderProvider;
 
         Set<Edit> edits = findEdits(previousVersion, version, ignoreProjectName);
         SmellRecordAccumulator smellRecordAccumulator = findSmells(version, edits, previousNodes);
@@ -92,18 +83,19 @@ public class EvolutionRunner {
     }
 
     private SmellRecordAccumulator findSmells(Projects version, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes){
+        final SmellConfiguration smellConfiguration = this.configuration.getSmellConfiguration();
         final SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
 
         final SmellDetector detector = SmellDetector.all();
         final String versionId = version.getVersionId();
         final Clones<KeywordDefinition> clones = KeywordCloneDetection.findClones(version);
 
-        this.smellConfiguration.setClones(clones);
+        smellConfiguration.setClones(clones);
 
         for(Project project: version){
             for(TestCase testCase: project.getTestCases()){
-                final SmellResults smellResults = detector.computeMetrics(testCase, this.smellConfiguration);
-                smellRecordAccumulator.addTestCase(versionId, testCase, smellResults, edits, previousNodes, this.smellConfiguration);
+                final SmellResults smellResults = detector.computeMetrics(testCase, smellConfiguration);
+                smellRecordAccumulator.addTestCase(versionId, testCase, smellResults, edits, previousNodes, smellConfiguration);
             }
         }
 
@@ -185,18 +177,10 @@ public class EvolutionRunner {
     }
 
     private boolean isLibraryCall(Step step){
-        final Optional<KeywordCall> call = step.getKeywordCall();
-
-        if(!call.isPresent()){
-            return false;
-        }
-
-        final Optional<Keyword> keyword = call.get().getKeyword();
-
-        if (!keyword.isPresent()){
-            return false;
-        }
-
-        return LibraryKeyword.class.isAssignableFrom(keyword.get().getClass());
+        return step.getKeywordCall().map(
+                keywordCall -> keywordCall.getKeyword()
+                        .filter(value -> LibraryKeyword.class.isAssignableFrom(value.getClass()))
+                        .isPresent()
+        ).orElse(false);
     }
 }

@@ -1,4 +1,4 @@
-package lu.uni.serval.ikora.evolution;
+package lu.uni.serval.ikora.evolution.versions;
 
 import lu.uni.serval.commons.git.api.Api;
 import lu.uni.serval.commons.git.api.GitEngine;
@@ -8,35 +8,26 @@ import lu.uni.serval.commons.git.utils.CommitCollector;
 import lu.uni.serval.commons.git.utils.GitCommit;
 import lu.uni.serval.commons.git.utils.GitUtils;
 import lu.uni.serval.commons.git.utils.LocalRepository;
-import lu.uni.serval.ikora.evolution.configuration.*;
+import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
+import lu.uni.serval.ikora.evolution.configuration.FolderConfiguration;
+import lu.uni.serval.ikora.evolution.configuration.GitConfiguration;
+import lu.uni.serval.ikora.evolution.configuration.GitLocation;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidConfigurationException;
-import lu.uni.serval.ikora.evolution.export.EvolutionExport;
-import lu.uni.serval.ikora.evolution.versions.FolderProvider;
-import lu.uni.serval.ikora.evolution.versions.GitProvider;
-import lu.uni.serval.ikora.evolution.versions.VersionProvider;
-import lu.uni.serval.ikora.smells.SmellConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class EvolutionRunnerFactory {
-    private static final Logger logger = LogManager.getLogger(EvolutionRunnerFactory.class);
+public class VersionProviderFactory {
+    private static final Logger logger = LogManager.getLogger(VersionProviderFactory.class);
 
-    public static EvolutionRunner fromConfiguration(EvolutionConfiguration configuration) throws GitAPIException, IOException, InvalidGitRepositoryException {
-        final EvolutionExport exporter = createExporter(configuration.getOutputConfiguration());
-        final VersionProvider provider = createVersionProvider(configuration);
-        final SmellConfiguration smellConfiguration = new SmellConfiguration();
+    private VersionProviderFactory() {}
 
-        return new EvolutionRunner(provider, exporter, smellConfiguration);
-    }
-
-    private static VersionProvider createVersionProvider(EvolutionConfiguration configuration) throws GitAPIException, IOException, InvalidGitRepositoryException {
+    public static VersionProvider fromConfiguration(EvolutionConfiguration configuration) throws GitAPIException, IOException, InvalidGitRepositoryException {
         VersionProvider provider;
 
         if(configuration.getFolderConfiguration() != null){
@@ -50,27 +41,6 @@ public class EvolutionRunnerFactory {
         }
 
         return provider;
-    }
-
-    private static EvolutionExport createExporter(OutputConfiguration configuration){
-        Map<EvolutionExport.Statistics, File> outputFiles = new HashMap<>();
-
-        File smellsCsvFile = configuration.getSmellsCsvFile();
-        if(smellsCsvFile != null){
-            outputFiles.put(EvolutionExport.Statistics.SMELL, smellsCsvFile);
-        }
-
-        File projectsCsvFile = configuration.getProjectsCsvFile();
-        if(projectsCsvFile != null){
-            outputFiles.put(EvolutionExport.Statistics.PROJECT, projectsCsvFile);
-        }
-
-        File variableChangesCsVFile = configuration.getVariableChangesCsvFile();
-        if(projectsCsvFile != null){
-            outputFiles.put(EvolutionExport.Statistics.VARIABLE_CHANGES, variableChangesCsVFile);
-        }
-
-        return new EvolutionExport(configuration.getStrategy(), outputFiles);
     }
 
     private static VersionProvider createFolderProvider(FolderConfiguration configuration){

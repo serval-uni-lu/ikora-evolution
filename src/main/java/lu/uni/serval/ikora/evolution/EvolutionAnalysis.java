@@ -2,6 +2,8 @@ package lu.uni.serval.ikora.evolution;
 
 import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
 import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
+import lu.uni.serval.ikora.evolution.export.EvolutionExport;
+import lu.uni.serval.ikora.evolution.export.ExporterFactory;
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,9 +18,11 @@ public class EvolutionAnalysis {
     public static void main(String[] args) {
         try{
             final EvolutionConfiguration configuration = getConfiguration(args);
-            final EvolutionRunner runner = EvolutionRunnerFactory.fromConfiguration(configuration);
 
-            runner.execute();
+            try(EvolutionExport exporter = ExporterFactory.fromConfiguration(configuration)){
+                final EvolutionRunner runner = new EvolutionRunner(exporter, configuration);
+                runner.execute();
+            }
 
         } catch (ParseException | IOException | InvalidGitRepositoryException | GitAPIException e) {
             logger.error(String.format("Exit with error code 1: %s", e.getMessage()));

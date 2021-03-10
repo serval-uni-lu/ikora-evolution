@@ -3,7 +3,6 @@ package lu.uni.serval.ikora.evolution.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +16,6 @@ public class ConfigurationParser {
         logger.info(String.format("Loading configuration from '%s'...", config));
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
-        mapper.registerModule(new JavaTimeModule());
 
         File file = new File(config);
 

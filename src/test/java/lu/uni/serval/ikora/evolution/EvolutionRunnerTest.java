@@ -1,20 +1,19 @@
 package lu.uni.serval.ikora.evolution;
 
 import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
+import lu.uni.serval.ikora.evolution.export.ExporterFactory;
 import lu.uni.serval.ikora.evolution.results.Record;
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
 import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
 import lu.uni.serval.ikora.evolution.export.EvolutionExport;
-import lu.uni.serval.ikora.evolution.export.Exporter;
 import lu.uni.serval.ikora.evolution.export.InMemoryExporter;
 import lu.uni.serval.ikora.evolution.results.SmellRecord;
 import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -113,17 +112,18 @@ class EvolutionRunnerTest {
     }
 
     private <T extends Record> List<T> executeAnalysis(String resourcesPath, EvolutionExport.Statistics statistics, Class<T> type) throws GitAPIException, IOException, InvalidGitRepositoryException {
-        final EvolutionConfiguration conditionalAssertion = Helpers.createConfiguration(resourcesPath, statistics);
-        final EvolutionRunner evolutionRunner = EvolutionRunnerFactory.fromConfiguration(conditionalAssertion);
+        final EvolutionConfiguration configuration = Helpers.createConfiguration(resourcesPath, statistics);
 
-        evolutionRunner.execute();
 
-        final Map<EvolutionExport.Statistics, Exporter> exporters = evolutionRunner.getExporter();
-        final InMemoryExporter exporter = (InMemoryExporter)exporters.get(statistics);
+        try(EvolutionExport exporter = ExporterFactory.fromConfiguration(configuration)){
+            final EvolutionRunner evolutionRunner = new EvolutionRunner(exporter, configuration);
+            evolutionRunner.execute();
 
-        return exporter.getRecords().stream()
-                .filter(r -> type.isAssignableFrom(r.getClass()))
-                .map(r -> (T)r)
-                .collect(Collectors.toList());
+            return ((InMemoryExporter)exporter.getExporters().get(statistics)).getRecords().stream()
+                    .filter(r -> type.isAssignableFrom(r.getClass()))
+                    .map(r -> (T)r)
+                    .collect(Collectors.toList());
+        }
+
     }
 }
