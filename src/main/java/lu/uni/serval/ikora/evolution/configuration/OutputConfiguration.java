@@ -10,6 +10,8 @@ public class OutputConfiguration {
     private File smellsCsvFile;
     @JsonProperty(value = "projects")
     private File projectsCsvFile;
+    @JsonProperty(value = "tests")
+    private File testCsvFile;
     @JsonProperty(value = "variables changes")
     private File variableChangesCsvFile;
     @JsonProperty(value = "strategy")
@@ -29,6 +31,14 @@ public class OutputConfiguration {
 
     public void setProjectsCsvFile(File projectsCsvFile) {
         this.projectsCsvFile = projectsCsvFile;
+    }
+
+    public File getTestCsvFile() {
+        return testCsvFile;
+    }
+
+    public void setTestCsvFile(File testCsvFile) {
+        this.testCsvFile = testCsvFile;
     }
 
     public File getVariableChangesCsvFile() {

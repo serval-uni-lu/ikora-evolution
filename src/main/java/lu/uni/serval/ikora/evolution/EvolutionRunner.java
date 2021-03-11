@@ -2,6 +2,7 @@ package lu.uni.serval.ikora.evolution;
 
 import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
 import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
+import lu.uni.serval.ikora.evolution.results.TestRecord;
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
 import lu.uni.serval.ikora.evolution.export.EvolutionExport;
 import lu.uni.serval.ikora.evolution.results.SmellRecordAccumulator;
@@ -40,6 +41,9 @@ public class EvolutionRunner {
     private final EvolutionExport exporter;
     private final EvolutionConfiguration configuration;
 
+    private Set<Edit> edits = null;
+    private Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs = null;
+
     public EvolutionRunner(EvolutionExport exporter, EvolutionConfiguration configuration){
         this.exporter = exporter;
         this.configuration = configuration;
@@ -47,19 +51,29 @@ public class EvolutionRunner {
 
     public void execute() throws IOException, GitAPIException, InvalidGitRepositoryException {
         try (VersionProvider versionProvider = VersionProviderFactory.fromConfiguration(configuration)) {
-            Projects previousVersion = null;
             SmellRecordAccumulator previousRecords = null;
+            Projects previousVersion = null;
 
             for(Projects version: versionProvider){
                 logger.info(String.format("Starting analysis for version %s...", version.getVersionId()));
+                reset(previousVersion, version, versionProvider instanceof FolderProvider);
 
                 computeVersionStatistics(version);
-                previousRecords = computeSmells(previousVersion, version, previousRecords == null ? null : previousRecords.getNodes(), versionProvider instanceof FolderProvider);
+                computeTestStatistics(version);
+
+                previousRecords = computeSmells(version, previousRecords);
                 previousVersion = version;
+
+                computeVariableChanges();
 
                 logger.info(String.format("Analysis for version %s done.", version.getVersionId()));
             }
         }
+    }
+
+    private void reset(Projects version1, Projects version2, boolean ignoreProjectName){
+        pairs = findPairs(version1, version2, ignoreProjectName);
+        edits = null;
     }
 
     private void computeVersionStatistics(Projects version) throws IOException {
@@ -70,22 +84,48 @@ public class EvolutionRunner {
         this.exporter.export(EvolutionExport.Statistics.PROJECT, new VersionRecord(version));
     }
 
-    private SmellRecordAccumulator computeSmells(Projects previousVersion, Projects version, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, boolean ignoreProjectName) throws IOException {
+    private SmellRecordAccumulator computeSmells(Projects version, SmellRecordAccumulator previousRecords) throws IOException {
         if(!this.exporter.contains(EvolutionExport.Statistics.SMELL)){
             return new SmellRecordAccumulator();
         }
 
-        Set<Edit> edits = findEdits(previousVersion, version, ignoreProjectName);
-        SmellRecordAccumulator smellRecordAccumulator = findSmells(version, edits, previousNodes);
+        SmellRecordAccumulator smellRecordAccumulator = findSmells(version, getEdits(), previousRecords);
         this.exporter.export(EvolutionExport.Statistics.SMELL, smellRecordAccumulator.getRecords());
 
         return smellRecordAccumulator;
     }
 
-    private SmellRecordAccumulator findSmells(Projects version, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes){
+    private void computeTestStatistics(Projects version) throws IOException {
+        if(!this.exporter.contains(EvolutionExport.Statistics.TEST)){
+            return;
+        }
+
+        for(TestCase testCase: version.getTestCases()){
+            logger.info("test case: " + testCase.getName());
+            this.exporter.export(EvolutionExport.Statistics.TEST, new TestRecord(testCase));
+        }
+    }
+
+    private void computeVariableChanges() throws IOException {
+        if(!this.exporter.contains(EvolutionExport.Statistics.VARIABLE_CHANGES)){
+            return;
+        }
+
+        final Set<Pair<KeywordDefinition, KeywordDefinition>> keywordPairs = this.pairs.stream()
+                .filter(p -> p.getLeft() != null && KeywordDefinition.class.isAssignableFrom(p.getLeft().getClass())
+                        && p.getRight() != null && KeywordDefinition.class.isAssignableFrom(p.getRight().getClass()))
+                .map(p -> (Pair<KeywordDefinition, KeywordDefinition>) p)
+                .collect(Collectors.toSet());
+
+        for(Pair<KeywordDefinition, KeywordDefinition> keywordPair: keywordPairs){
+            storeValueEdits(keywordPair);
+        }
+    }
+
+    private SmellRecordAccumulator findSmells(Projects version, Set<Edit> edits, SmellRecordAccumulator previousRecords){
         final SmellConfiguration smellConfiguration = this.configuration.getSmellConfiguration();
         final SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
-
+        final Map<SmellMetric.Type, Set<SourceNode>> previousNodes = previousRecords != null ? previousRecords.getNodes() : null;
         final SmellDetector detector = SmellDetector.all();
         final String versionId = version.getVersionId();
         final Clones<KeywordDefinition> clones = KeywordCloneDetection.findClones(version);
@@ -102,49 +142,40 @@ public class EvolutionRunner {
         return smellRecordAccumulator;
     }
 
-    private Set<Edit> findEdits(Projects version1, Projects version2, boolean ignoreProjectName) throws IOException {
-        Set<Edit> results = new HashSet<>();
+    private Set<Pair<? extends SourceNode, ? extends SourceNode>> findPairs(Projects version1, Projects version2, boolean ignoreProjectName){
+        final Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs = new HashSet<>();
 
         if(version1 == null || version2 == null){
-            return results;
+            return pairs;
         }
 
         if(version1.isEmpty() || version2.isEmpty()){
-            return results;
+            return pairs;
         }
 
-        for(Pair<UserKeyword,UserKeyword> keywordPair: NodeMatcher.getPairs(version1.getUserKeywords(), version2.getUserKeywords(), ignoreProjectName)){
-            UserKeyword keyword1 = getElement(keywordPair, version1);
-            UserKeyword keyword2 = getElement(keywordPair, version2);
+        pairs.addAll(NodeMatcher.getPairs(version1.getTestCases(), version2.getTestCases(), ignoreProjectName));
+        pairs.addAll(NodeMatcher.getPairs(version1.getUserKeywords(), version2.getUserKeywords(), ignoreProjectName));
+        pairs.addAll(NodeMatcher.getPairs(version1.getVariableAssignments(), version2.getVariableAssignments(), ignoreProjectName));
 
-            results.addAll(Difference.of(keyword1, keyword2).getEdits());
-            storeValueEdits(keyword1, keyword2);
-        }
-
-        for(Pair<TestCase,TestCase> testCasePair: NodeMatcher.getPairs(version1.getTestCases(), version2.getTestCases(), ignoreProjectName)) {
-            TestCase testCase1 = getElement(testCasePair, version1);
-            TestCase testCase2 = getElement(testCasePair, version2);
-
-            results.addAll(Difference.of(testCase1, testCase2).getEdits());
-            storeValueEdits(testCase1, testCase2);
-        }
-
-        for(Pair<VariableAssignment,VariableAssignment> variablePair: NodeMatcher.getPairs(version1.getVariableAssignments(), version2.getVariableAssignments(), ignoreProjectName)) {
-            VariableAssignment variable1 = getElement(variablePair, version1);
-            VariableAssignment variable2 = getElement(variablePair, version2);
-
-            results.addAll(Difference.of(variable1, variable2).getEdits());
-        }
-
-        return results;
+        return pairs;
     }
 
-    private void storeValueEdits(KeywordDefinition keyword1, KeywordDefinition keyword2) throws IOException {
-        if(keyword1 == null || keyword2 == null){
+    private Set<Edit> getEdits() {
+        if(this.edits == null){
+            this.edits = pairs.stream()
+                    .flatMap(p -> Difference.of(p.getLeft(), p.getRight()).getEdits().stream())
+                    .collect(Collectors.toSet());
+        }
+
+        return this.edits;
+    }
+
+    private void storeValueEdits(Pair<KeywordDefinition, KeywordDefinition> keywordPair) throws IOException {
+        if(keywordPair.getLeft() == null || keywordPair.getRight() == null){
             return;
         }
 
-        final List<Pair<Step, Step>> stepPairs = LevenshteinDistance.getMapping(keyword1.getSteps(), keyword2.getSteps()).stream()
+        final List<Pair<Step, Step>> stepPairs = LevenshteinDistance.getMapping(keywordPair.getLeft().getSteps(), keywordPair.getRight().getSteps()).stream()
                 .filter(pair -> isLibraryCall(pair.getRight()) && isLibraryCall(pair.getLeft()))
                 .collect(Collectors.toList());
 
@@ -163,17 +194,6 @@ public class EvolutionRunner {
                 }
             }
         }
-    }
-
-    private <T extends SourceNode> T getElement(Pair<T,T> pair, Projects version){
-        if(pair.getRight() != null && version.contains(pair.getRight().getProject())) {
-            return pair.getRight();
-        }
-        else if(pair.getLeft() != null && version.contains(pair.getLeft().getProject())){
-            return pair.getLeft();
-        }
-
-        return null;
     }
 
     private boolean isLibraryCall(Step step){

@@ -16,6 +16,7 @@ public class EvolutionExport implements Closeable {
 
     public enum Statistics{
         PROJECT,
+        TEST,
         SMELL,
         VARIABLE_CHANGES
     }

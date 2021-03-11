@@ -23,6 +23,11 @@ public class ExporterFactory {
             outputFiles.put(EvolutionExport.Statistics.PROJECT, projectsCsvFile);
         }
 
+        File testsCsvFile = outputConfiguration.getTestCsvFile();
+        if(testsCsvFile != null){
+            outputFiles.put(EvolutionExport.Statistics.TEST, testsCsvFile);
+        }
+
         File variableChangesCsVFile = outputConfiguration.getVariableChangesCsvFile();
         if(projectsCsvFile != null){
             outputFiles.put(EvolutionExport.Statistics.VARIABLE_CHANGES, variableChangesCsVFile);
