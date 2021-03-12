@@ -12,6 +12,8 @@ import java.io.IOException;
 public class ConfigurationParser {
     private static final Logger logger = LogManager.getLogger(ConfigurationParser.class);
 
+    private ConfigurationParser() {}
+
     public static EvolutionConfiguration parse(String config) throws IOException {
         logger.info(String.format("Loading configuration from '%s'...", config));
         ObjectMapper mapper = new ObjectMapper();

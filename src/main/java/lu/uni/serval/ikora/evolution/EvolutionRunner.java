@@ -40,13 +40,15 @@ public class EvolutionRunner {
 
     private final EvolutionExport exporter;
     private final EvolutionConfiguration configuration;
+    private final Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs;
 
-    private Set<Edit> edits = null;
-    private Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs = null;
+    private Set<Edit> edits;
 
     public EvolutionRunner(EvolutionExport exporter, EvolutionConfiguration configuration){
         this.exporter = exporter;
         this.configuration = configuration;
+        this.pairs = new HashSet<>();
+        this.edits = null;
     }
 
     public void execute() throws IOException, GitAPIException, InvalidGitRepositoryException {
@@ -72,7 +74,7 @@ public class EvolutionRunner {
     }
 
     private void reset(Projects version1, Projects version2, boolean ignoreProjectName){
-        pairs = findPairs(version1, version2, ignoreProjectName);
+        setPairs(version1, version2, ignoreProjectName);
         edits = null;
     }
 
@@ -101,7 +103,6 @@ public class EvolutionRunner {
         }
 
         for(TestCase testCase: version.getTestCases()){
-            logger.info("test case: " + testCase.getName());
             this.exporter.export(EvolutionExport.Statistics.TEST, new TestRecord(testCase));
         }
     }
@@ -142,22 +143,20 @@ public class EvolutionRunner {
         return smellRecordAccumulator;
     }
 
-    private Set<Pair<? extends SourceNode, ? extends SourceNode>> findPairs(Projects version1, Projects version2, boolean ignoreProjectName){
-        final Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs = new HashSet<>();
+    private void setPairs(Projects version1, Projects version2, boolean ignoreProjectName){
+        this.pairs.clear();
 
         if(version1 == null || version2 == null){
-            return pairs;
+            return;
         }
 
         if(version1.isEmpty() || version2.isEmpty()){
-            return pairs;
+            return;
         }
 
         pairs.addAll(NodeMatcher.getPairs(version1.getTestCases(), version2.getTestCases(), ignoreProjectName));
         pairs.addAll(NodeMatcher.getPairs(version1.getUserKeywords(), version2.getUserKeywords(), ignoreProjectName));
         pairs.addAll(NodeMatcher.getPairs(version1.getVariableAssignments(), version2.getVariableAssignments(), ignoreProjectName));
-
-        return pairs;
     }
 
     private Set<Edit> getEdits() {
