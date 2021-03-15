@@ -82,7 +82,7 @@ public class VersionProviderFactory {
         Set<LocalRepository> localRepositories = new HashSet<>();
 
         if(configuration.getGroup() != null && !configuration.getGroup().isEmpty()){
-            final GitEngine git = GitEngineFactory.create(Api.Gitlab);
+            final GitEngine git = GitEngineFactory.create(Api.GITLAB);
 
             git.setToken(configuration.getToken());
             git.setUrl(configuration.getUrl());

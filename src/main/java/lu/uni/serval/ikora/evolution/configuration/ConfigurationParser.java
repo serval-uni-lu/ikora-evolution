@@ -3,6 +3,7 @@ package lu.uni.serval.ikora.evolution.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,13 +16,26 @@ public class ConfigurationParser {
     private ConfigurationParser() {}
 
     public static EvolutionConfiguration parse(String config) throws IOException {
-        logger.info(String.format("Loading configuration from '%s'...", config));
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
+        mapper.registerModule(new JavaTimeModule());
 
-        File file = new File(config);
+        EvolutionConfiguration configuration;
 
-        final EvolutionConfiguration configuration = mapper.readValue(file, EvolutionConfiguration.class);
+        final File file = new File(config);
+
+        if(file.exists()){
+            logger.info(String.format("Loading configuration from '%s'...", config));
+            configuration = mapper.readValue(file, EvolutionConfiguration.class);
+        }
+        else if(config.trim().startsWith("{")){
+            logger.info("Loading configuration from content string...");
+            configuration = mapper.readValue(config, EvolutionConfiguration.class);
+        }
+        else{
+            throw new IOException(String.format("Failed to read configuration file provide a valid path or a valid json file:\n%s", config));
+        }
+
         logger.info("Configuration loaded.");
 
         return configuration;

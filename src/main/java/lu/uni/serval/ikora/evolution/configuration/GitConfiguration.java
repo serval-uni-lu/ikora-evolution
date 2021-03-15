@@ -17,7 +17,7 @@ public class GitConfiguration {
     private String defaultBranch = "master";
     @JsonProperty("branch exceptions")
     private Map<String, String> branchExceptions = Collections.emptyMap();
-    @JsonProperty(value = "token", required = true)
+    @JsonProperty(value = "token")
     private String token;
     @JsonProperty(value = "start date")
     private Instant startDate;
