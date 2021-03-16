@@ -46,7 +46,7 @@ public class EvolutionExport implements Closeable {
     private void initializeExporter(Statistics statistic, File location){
         if(location != null){
             try {
-                final Exporter exporter = ExporterFactory.create(this.strategy, location.getAbsolutePath());
+                final Exporter exporter = ExporterFactory.create(this.strategy, location.getAbsolutePath(), isHashNames);
                 this.exporterMap.put(statistic, exporter);
             } catch (IOException e) {
                 logger.error(String.format("Failed to create csv writer for %s at location '%s'",
