@@ -33,13 +33,13 @@ public class ExporterFactory {
             outputFiles.put(EvolutionExport.Statistics.VARIABLE_CHANGES, variableChangesCsVFile);
         }
 
-        return new EvolutionExport(outputConfiguration.getStrategy(), outputFiles);
+        return new EvolutionExport(outputConfiguration.getStrategy(), outputFiles, outputConfiguration.isHashNames());
     }
 
-    public static Exporter create(Exporter.Strategy strategy, String absolutePath) throws IOException {
+    public static Exporter create(Exporter.Strategy strategy, String absolutePath, boolean isHashNames) throws IOException {
         switch (strategy){
-            case IN_MEMORY: return new InMemoryExporter(absolutePath);
-            case CSV: return new CsvExporter(absolutePath);
+            case IN_MEMORY: return new InMemoryExporter(absolutePath, isHashNames);
+            case CSV: return new CsvExporter(absolutePath, isHashNames);
         }
 
         return null;

@@ -8,9 +8,11 @@ import java.util.List;
 
 public class InMemoryExporter implements Exporter {
     private final String absolutePath;
+    private final boolean isHashNames;
     private final List<Record> records = new ArrayList<>();
 
-    public InMemoryExporter(String absolutePath) {
+    public InMemoryExporter(String absolutePath, boolean isHashNames) {
+        this.isHashNames = isHashNames;
         this.absolutePath = absolutePath;
     }
 
@@ -31,5 +33,13 @@ public class InMemoryExporter implements Exporter {
 
     public List<Record> getRecords() {
         return records;
+    }
+
+    public String getAbsolutePath() {
+        return absolutePath;
+    }
+
+    public boolean isHashNames() {
+        return isHashNames;
     }
 }

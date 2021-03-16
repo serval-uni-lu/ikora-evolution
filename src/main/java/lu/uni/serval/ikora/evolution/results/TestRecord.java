@@ -2,6 +2,7 @@ package lu.uni.serval.ikora.evolution.results;
 
 import lu.uni.serval.ikora.core.analytics.KeywordStatistics;
 import lu.uni.serval.ikora.core.model.TestCase;
+import lu.uni.serval.ikora.evolution.utils.Hash;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,11 +42,11 @@ public class TestRecord implements Record{
     }
 
     @Override
-    public Object[] getValues() {
+    public Object[] getValues(boolean isHashNames) {
         return new Object[]{
-                this.project,
-                this.suite,
-                this.name,
+                isHashNames ? Hash.sha512(this.project) : this.project ,
+                isHashNames ? Hash.sha512(this.suite) : this.suite,
+                isHashNames ? Hash.sha512(this.name) : this.name,
                 this.level,
                 this.statementCount,
                 this.sequence,

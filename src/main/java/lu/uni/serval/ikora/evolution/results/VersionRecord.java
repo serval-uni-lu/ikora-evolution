@@ -58,7 +58,7 @@ public class VersionRecord implements Record {
     }
 
     @Override
-    public Object[] getValues() {
+    public Object[] getValues(boolean isHashNames) {
         return new Object[]{
                 this.getDate().toString(),
                 this.getProjects(),

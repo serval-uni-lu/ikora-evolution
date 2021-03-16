@@ -7,6 +7,7 @@ import lu.uni.serval.ikora.core.model.TestCase;
 
 public class SmellRecord implements Record {
     private final String version;
+    private final String projectName;
     private final String testCaseName;
     private final int testCaseSize;
     private final int testCaseSequence;
@@ -18,6 +19,7 @@ public class SmellRecord implements Record {
 
     public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricRawValue, double smellMetricNormalizedValue, long fixesCount) {
         this.version = version;
+        this.projectName = testCase.getProject() != null ? testCase.getProject().getName() : "<NONE>";
         this.testCaseName = testCase.toString();
         this.testCaseSize = KeywordStatistics.getSize(testCase).getTestCaseSize();
         this.testCaseSequence = KeywordStatistics.getSequenceSize(testCase);
@@ -30,6 +32,10 @@ public class SmellRecord implements Record {
 
     public String getVersion() {
         return version;
+    }
+
+    public String getProjectName() {
+        return projectName;
     }
 
     public String getTestCaseName() {
@@ -65,10 +71,11 @@ public class SmellRecord implements Record {
     }
 
     @Override
-    public Object[] getValues(){
+    public Object[] getValues(boolean isHashNames){
         return new Object[] {
                 this.getVersion(),
-                Hash.sha512(this.getTestCaseName()),
+                isHashNames ? Hash.sha512(this.getProjectName()) : this.getProjectName(),
+                isHashNames ? Hash.sha512(this.getTestCaseName()) : this.getTestCaseName(),
                 String.valueOf(this.getTestCaseSize()),
                 String.valueOf(this.getTestCaseSequence()),
                 String.valueOf(this.getTestCaseLevel()),
@@ -83,6 +90,7 @@ public class SmellRecord implements Record {
     public String[] getKeys() {
         return new String[] {
                 "version",
+                "project_name",
                 "test_case_name",
                 "test_case_size",
                 "test_case_sequence",

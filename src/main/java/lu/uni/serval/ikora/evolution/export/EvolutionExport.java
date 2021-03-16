@@ -23,10 +23,12 @@ public class EvolutionExport implements Closeable {
 
     private final Map<Statistics, Exporter> exporterMap;
     private final Exporter.Strategy strategy;
+    private final boolean isHashNames;
 
-    public EvolutionExport(Exporter.Strategy strategy, Map<Statistics, File> outputFiles){
-        exporterMap = new HashMap<>();
+    public EvolutionExport(Exporter.Strategy strategy, Map<Statistics, File> outputFiles, boolean isHashNames){
+        this.exporterMap = new HashMap<>();
         this.strategy = strategy;
+        this.isHashNames = isHashNames;
 
         for(Map.Entry<Statistics, File> outputFile: outputFiles.entrySet()){
             initializeExporter(outputFile.getKey(), outputFile.getValue());

@@ -2,6 +2,7 @@ package lu.uni.serval.ikora.evolution.results;
 
 import lu.uni.serval.ikora.core.model.Argument;
 import lu.uni.serval.ikora.core.utils.ArgumentUtils;
+import lu.uni.serval.ikora.evolution.utils.Hash;
 
 import java.util.List;
 
@@ -75,15 +76,15 @@ public class VariableChangeRecord implements Record {
     }
 
     @Override
-    public Object[] getValues() {
+    public Object[] getValues(boolean isHashName) {
         return new String[] {
-                this.beforeCall,
-                this.beforeName,
-                this.beforeValues,
+                isHashName ? Hash.sha512(this.beforeCall) : this.beforeCall,
+                isHashName ? Hash.sha512(this.beforeName) : this.beforeName,
+                isHashName ? Hash.sha512(this.beforeValues) : this.beforeValues,
                 this.beforeType,
-                this.afterCall,
-                this.afterName,
-                this.afterValues,
+                isHashName ? Hash.sha512(this.afterCall) : this.afterCall,
+                isHashName ? Hash.sha512(this.afterName) : this.afterName,
+                isHashName ? Hash.sha512(this.afterValues) : this.afterValues,
                 this.afterType
         };
     }

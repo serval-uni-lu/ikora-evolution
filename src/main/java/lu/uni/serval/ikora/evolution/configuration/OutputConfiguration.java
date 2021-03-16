@@ -14,8 +14,10 @@ public class OutputConfiguration {
     private File testCsvFile;
     @JsonProperty(value = "variables changes")
     private File variableChangesCsvFile;
-    @JsonProperty(value = "strategy")
+    @JsonProperty(value = "strategy", defaultValue = "CSV")
     private Exporter.Strategy strategy = Exporter.Strategy.CSV;
+    @JsonProperty(value = "hash names", defaultValue = "false")
+    private boolean hashNames = false;
 
     public File getSmellsCsvFile() {
         return smellsCsvFile;
@@ -64,5 +66,13 @@ public class OutputConfiguration {
 
     public void setStrategy(Exporter.Strategy strategy){
         this.strategy = strategy;
+    }
+
+    public boolean isHashNames() {
+        return hashNames;
+    }
+
+    public void setHashNames(boolean hashNames) {
+        this.hashNames = hashNames;
     }
 }
