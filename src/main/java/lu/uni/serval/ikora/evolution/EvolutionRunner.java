@@ -5,7 +5,7 @@ import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
 import lu.uni.serval.ikora.evolution.results.TestRecord;
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
 import lu.uni.serval.ikora.evolution.export.EvolutionExport;
-import lu.uni.serval.ikora.evolution.results.SmellRecordAccumulator;
+import lu.uni.serval.ikora.evolution.smells.SmellRecordAccumulator;
 import lu.uni.serval.ikora.evolution.results.VersionRecord;
 import lu.uni.serval.ikora.evolution.versions.FolderProvider;
 import lu.uni.serval.ikora.evolution.versions.VersionProvider;
