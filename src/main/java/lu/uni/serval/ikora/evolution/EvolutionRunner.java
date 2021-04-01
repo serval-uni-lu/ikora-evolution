@@ -27,6 +27,7 @@ import lu.uni.serval.ikora.core.analytics.difference.NodeMatcher;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -57,7 +58,7 @@ public class EvolutionRunner {
             Projects previousVersion = null;
 
             for(Projects version: versionProvider){
-                logger.info(String.format("Starting analysis for version %s...", version.getVersionId()));
+                logger.log(Level.INFO, "Starting analysis for version {}...", version.getVersionId());
                 reset(previousVersion, version, versionProvider instanceof FolderProvider);
 
                 computeVersionStatistics(version);
@@ -68,7 +69,7 @@ public class EvolutionRunner {
 
                 computeVariableChanges();
 
-                logger.info(String.format("Analysis for version %s done.", version.getVersionId()));
+                logger.log(Level.INFO, "Analysis for version {} done.", version.getVersionId());
             }
         }
     }

@@ -20,6 +20,8 @@ public class Hash {
         }
     }
 
+    private Hash() {}
+
     public static String sha512(String text){
         md.update(text.getBytes());
         return DatatypeConverter.printHexBinary(md.digest());

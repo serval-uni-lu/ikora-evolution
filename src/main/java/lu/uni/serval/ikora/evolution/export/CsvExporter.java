@@ -4,6 +4,7 @@ import lu.uni.serval.ikora.evolution.results.Record;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +24,7 @@ public class CsvExporter implements Exporter {
         final File folder = new File(FilenameUtils.getFullPathNoEndSeparator(output));
 
         if(folder.mkdirs()){
-            logger.info(String.format("Create folder %s", folder.getAbsolutePath()));
+            logger.log(Level.INFO, "Create folder {}", folder.getAbsolutePath());
         }
 
         this.out = new FileWriter(output);

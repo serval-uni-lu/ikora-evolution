@@ -4,6 +4,7 @@ import lu.uni.serval.commons.git.utils.Frequency;
 import lu.uni.serval.commons.git.utils.GitCommit;
 import lu.uni.serval.commons.git.utils.GitUtils;
 import lu.uni.serval.commons.git.utils.LocalRepository;
+import org.apache.logging.log4j.Level;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,25 +48,25 @@ public class GitProvider implements VersionProvider {
             return Collections.singleton(localRepository.getLocation());
         }
 
-        Set<File> projectFolders = new HashSet<>(projectFolderNames.size());
+        Set<File> folders = new HashSet<>(projectFolderNames.size());
 
         File repositoryFolder = localRepository.getLocation();
         for(String projectFolderName: projectFolderNames){
             File projectFolder = new File(repositoryFolder, projectFolderName);
 
             if(projectFolder.exists()){
-                projectFolders.add(projectFolder);
+                folders.add(projectFolder);
             }
             else {
-                logger.warn(String.format("Folder %s does not exists in repository %s on %s",
+                logger.log(Level.WARN, "Folder {} does not exists in repository {} on {}",
                         projectFolderName,
                         localRepository.getRemoteUrl(),
                         localRepository.getGitCommit().getDate().toString()
-                ));
+                );
             }
         }
 
-        return projectFolders;
+        return folders;
     }
 
     @Override
@@ -113,7 +114,7 @@ public class GitProvider implements VersionProvider {
                         projects.setDate(date);
                     }
                 } catch (GitAPIException | IOException e) {
-                    logger.error(String.format("Git API error (this iteration will be ignored): %s", e.getMessage()));
+                    logger.log(Level.ERROR, "Git API error (this iteration will be ignored): {}", e.getMessage());
                     projects = next();
                 }
 

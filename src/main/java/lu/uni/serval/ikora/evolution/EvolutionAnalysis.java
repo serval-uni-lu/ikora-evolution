@@ -15,6 +15,8 @@ import java.io.*;
 public class EvolutionAnalysis {
     private static final Logger logger = LogManager.getLogger(EvolutionAnalysis.class);
 
+    private static final String CONFIG_OPTION = "config";
+
     public static void main(String[] args) {
         try{
             final EvolutionConfiguration configuration = getConfiguration(args);
@@ -35,15 +37,15 @@ public class EvolutionAnalysis {
     private static EvolutionConfiguration getConfiguration(String[] args) throws ParseException, IOException {
         Options options = new Options();
 
-        options.addOption("config", true, "path to the json configuration file");
+        options.addOption(CONFIG_OPTION, true, "path to the json configuration file");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        if(!cmd.hasOption("config")){
-            throw new MissingArgumentException("config");
+        if(!cmd.hasOption(CONFIG_OPTION)){
+            throw new MissingArgumentException(CONFIG_OPTION);
         }
 
-        return ConfigurationParser.parse(cmd.getOptionValue("config"));
+        return ConfigurationParser.parse(cmd.getOptionValue(CONFIG_OPTION));
     }
 }

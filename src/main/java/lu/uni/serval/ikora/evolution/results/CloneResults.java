@@ -15,11 +15,6 @@ public class CloneResults {
     }
 
     public Clones<KeywordDefinition> getKeywords(Projects version){
-        if(keywords.get(version) == null){
-            Clones<KeywordDefinition> clones = KeywordCloneDetection.findClones(version);
-            keywords.put(version, clones);
-        }
-
-        return keywords.get(version);
+        return keywords.computeIfAbsent(version, KeywordCloneDetection::findClones);
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,7 +26,7 @@ public class ConfigurationParser {
         final File file = new File(config);
 
         if(file.exists()){
-            logger.info(String.format("Loading configuration from '%s'...", config));
+            logger.log(Level.INFO, "Loading configuration from '{}'...", config);
             configuration = mapper.readValue(file, EvolutionConfiguration.class);
         }
         else if(config.trim().startsWith("{")){
@@ -33,7 +34,7 @@ public class ConfigurationParser {
             configuration = mapper.readValue(config, EvolutionConfiguration.class);
         }
         else{
-            throw new IOException(String.format("Failed to read configuration file provide a valid path or a valid json file:\n%s", config));
+            throw new IOException(String.format("Failed to read configuration file provide a valid path or a valid json file:%n%s", config));
         }
 
         logger.info("Configuration loaded.");

@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExporterFactory {
+    private ExporterFactory() {}
+
     public static EvolutionExport fromConfiguration(EvolutionConfiguration configuration){
         OutputConfiguration outputConfiguration = configuration.getOutputConfiguration();
         Map<EvolutionExport.Statistics, File> outputFiles = new HashMap<>();
