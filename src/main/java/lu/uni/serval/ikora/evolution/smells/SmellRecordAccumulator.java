@@ -68,9 +68,9 @@ public class SmellRecordAccumulator {
             case OVER_CHECKING:
             case HIDING_TEST_DATA_IN_FIXTURE_CODE: return isFix(nodes, edit, Edit.Type.REMOVE_STEP);
 
-            case SNEAKY_CHECKING: isFix(nodes, edit, Edit.Type.REMOVE_NODE);
+            case SNEAKY_CHECKING: return isFix(nodes, edit, Edit.Type.REMOVE_NODE);
 
-            case LACK_OF_DOCUMENTATION: isFix(nodes, edit, Edit.Type.ADD_DOCUMENTATION);
+            case LACK_OF_DOCUMENTATION: return isFix(nodes, edit, Edit.Type.ADD_DOCUMENTATION);
 
             case MIDDLE_MAN: return isFixMiddleMan(nodes, edit);
             case LONG_TEST_STEPS: return isFixLongTestSteps(nodes, edit, configuration);
