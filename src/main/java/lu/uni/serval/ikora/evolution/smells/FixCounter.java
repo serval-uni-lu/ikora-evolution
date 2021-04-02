@@ -14,6 +14,8 @@ import lu.uni.serval.ikora.smells.utils.NLPUtils;
 import java.util.*;
 
 public class FixCounter {
+    private FixCounter() {}
+
     public static long count(SmellMetric.Type type, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
         if(previousNodes == null){
             return 0;
