@@ -5,7 +5,7 @@ import lu.uni.serval.ikora.evolution.configuration.OutputConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class ExporterFactory {
@@ -13,7 +13,7 @@ public class ExporterFactory {
 
     public static EvolutionExport fromConfiguration(EvolutionConfiguration configuration){
         OutputConfiguration outputConfiguration = configuration.getOutputConfiguration();
-        Map<EvolutionExport.Statistics, File> outputFiles = new HashMap<>();
+        Map<EvolutionExport.Statistics, File> outputFiles = new EnumMap<>(EvolutionExport.Statistics.class);
 
         File smellsCsvFile = outputConfiguration.getSmellsCsvFile();
         if(smellsCsvFile != null){

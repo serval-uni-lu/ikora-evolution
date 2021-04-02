@@ -61,7 +61,7 @@ public class GitProvider implements VersionProvider {
                 logger.log(Level.WARN, "Folder {} does not exists in repository {} on {}",
                         projectFolderName,
                         localRepository.getRemoteUrl(),
-                        localRepository.getGitCommit().getDate().toString()
+                        localRepository.getGitCommit().getDate()
                 );
             }
         }

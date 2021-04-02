@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class EvolutionExport implements Closeable {
     private final boolean isHashNames;
 
     public EvolutionExport(Exporter.Strategy strategy, Map<Statistics, File> outputFiles, boolean isHashNames){
-        this.exporterMap = new HashMap<>();
+        this.exporterMap = new EnumMap<>(Statistics.class);
         this.strategy = strategy;
         this.isHashNames = isHashNames;
 

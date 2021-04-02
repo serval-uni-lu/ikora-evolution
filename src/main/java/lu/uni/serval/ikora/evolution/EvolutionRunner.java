@@ -188,7 +188,7 @@ public class EvolutionRunner {
                 final List<String> beforeValues = ArgumentUtils.getArgumentValues(argPair.getLeft()).stream().map(Pair::getLeft).collect(Collectors.toList());
                 final List<String> afterValues = ArgumentUtils.getArgumentValues(argPair.getRight()).stream().map(Pair::getLeft).collect(Collectors.toList());
 
-                if(beforeValues.size() > 0 && afterValues.size() > 0 && Collections.disjoint(beforeValues, afterValues)){
+                if(!beforeValues.isEmpty() && !afterValues.isEmpty() && Collections.disjoint(beforeValues, afterValues)){
                     final VariableChangeRecord record = new VariableChangeRecord(argPair.getLeft(), beforeValues, argPair.getRight(), afterValues);
                     this.exporter.export(EvolutionExport.Statistics.VARIABLE_CHANGES, record);
                 }
