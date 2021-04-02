@@ -131,10 +131,6 @@ public class FixCounter {
             return isFix(nodes, edit, Edit.Type.CHANGE_VALUE_TYPE);
         }
 
-        if(edit.getLeft() instanceof Assignment){
-            return isFix(nodes, edit, Edit.Type.REMOVE_STEP);
-        }
-
         return false;
     }
 

@@ -35,6 +35,17 @@ class EvolutionRunnerTest {
     }
 
     @Test
+    void testCalculateResultsOnTheFly() throws IOException, InvalidGitRepositoryException, GitAPIException {
+        final List<SmellRecord> records = executeAnalysis("calculate-expected-results-on-the-fly", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
+                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.CALCULATE_EXPECTED_RESULTS_ON_THE_FLY.name()))
+                .collect(Collectors.toList());
+
+        assertEquals(2, records.size());
+        assertEquals(0, records.get(0).getFixesCount());
+        assertEquals(1, records.get(1).getFixesCount());
+    }
+
+    @Test
     void testConditionalAssertionAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("conditional-assertion", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.CONDITIONAL_ASSERTION.name()))
