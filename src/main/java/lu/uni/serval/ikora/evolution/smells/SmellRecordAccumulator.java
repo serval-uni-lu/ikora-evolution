@@ -7,6 +7,7 @@ import lu.uni.serval.ikora.smells.*;
 
 import lu.uni.serval.ikora.evolution.results.Record;
 import lu.uni.serval.ikora.evolution.results.SmellRecord;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -14,11 +15,22 @@ public class SmellRecordAccumulator {
     private final List<Record> records = new ArrayList<>();
     private final Map<SmellMetric.Type, Set<SourceNode>> nodes = new EnumMap<>(SmellMetric.Type.class);
 
-    public void addTestCase(String version, TestCase testCase, SmellResults smells, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
+    public void addTestCase(String version,
+                            TestCase testCase,
+                            SmellResults smells,
+                            Set<Edit> edits,
+                            Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs,
+                            Map<SmellMetric.Type, Set<SourceNode>> previousNodes,
+                            SmellConfiguration configuration){
         updateNodes(smells);
 
         for(SmellResult smell: smells){
-            long fixes = FixCounter.count(smell.getType(), edits, previousNodes, configuration);
+            long fixes = 0;
+
+            if(previousNodes != null){
+                fixes = FixCounter.count(testCase, smell.getType(), edits, pairs, previousNodes.getOrDefault(smell.getType(), new HashSet<>()), configuration);
+            }
+
             records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getRawValue(), smell.getNormalizedValue(), fixes));
         }
     }

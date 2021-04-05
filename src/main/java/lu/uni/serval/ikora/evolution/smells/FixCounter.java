@@ -5,26 +5,47 @@ import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.*;
 import lu.uni.serval.ikora.core.utils.Ast;
 import lu.uni.serval.ikora.core.utils.Cfg;
+import lu.uni.serval.ikora.evolution.utils.VersionUtils;
 import lu.uni.serval.ikora.smells.NodeUtils;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.utils.LocatorUtils;
 import lu.uni.serval.ikora.smells.utils.NLPUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FixCounter {
     private FixCounter() {}
 
-    public static long count(SmellMetric.Type type, Set<Edit> edits, Map<SmellMetric.Type, Set<SourceNode>> previousNodes, SmellConfiguration configuration){
-        if(previousNodes == null){
+    public static long count(TestCase testCase,
+                             SmellMetric.Type type,
+                             Set<Edit> edits,
+                             Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs,
+                             Set<SourceNode> previousNodes,
+                             SmellConfiguration configuration){
+        final Set<SourceNode> testNodes = VersionUtils.findOther(pairs, testCase)
+                .map(t -> getTestNodes((TestCase) t, previousNodes))
+                .orElse(Collections.emptySet());
+
+        if(testNodes.isEmpty()){
             return 0;
         }
 
-        return edits.stream().filter(c -> isFix(type, previousNodes.getOrDefault(type, new HashSet<>()), c, configuration)).count();
+        return edits.stream().filter(e -> isFix(type, testNodes, e, configuration)).count();
     }
 
-    private static boolean isFix(SmellMetric.Type type, Set<SourceNode> nodes, Edit edit, SmellConfiguration configuration){
+    private static Set<SourceNode> getTestNodes(TestCase oldTestCase, Set<SourceNode> previousNodes) {
+        return previousNodes.stream()
+                .filter(n -> oldTestCase == n || Cfg.isCalledBy(n, oldTestCase))
+                .collect(Collectors.toSet());
+    }
+
+    private static boolean isFix(SmellMetric.Type type,
+                                 Set<SourceNode> nodes,
+                                 Edit edit,
+                                 SmellConfiguration configuration){
         switch (type){
             case HARDCODED_ENVIRONMENT_CONFIGURATIONS:
             case HARD_CODED_VALUES: return isFix(nodes, edit, Edit.Type.CHANGE_VALUE_TYPE);
@@ -50,7 +71,7 @@ public class FixCounter {
             case COMPLICATED_SETUP_SCENARIOS: return isFixComplicatedSetup(nodes, edit);
             case COMPLEX_LOCATORS: return isFixComplexLocator(nodes, edit, configuration);
             case USING_PERSONAL_PRONOUN: return isFixUsingPersonalPronoun(nodes, edit);
-            case MISSING_ASSERTION: return isFixMissingAssertionCheck(nodes, edit);
+            case MISSING_ASSERTION: return isFixMissingAssertionCheck(edit);
             case CONDITIONAL_ASSERTION: return isFixConditionalAssertion(nodes, edit);
         }
 
@@ -159,17 +180,8 @@ public class FixCounter {
         return nodes.contains(edit.getLeft()) && !NLPUtils.isUsingPersonalPronoun((Step) edit.getRight());
     }
 
-    private static boolean isFixMissingAssertionCheck(Set<SourceNode> nodes, Edit edit) {
+    private static boolean isFixMissingAssertionCheck(Edit edit) {
         if(edit.getRight() == null){
-            return false;
-        }
-
-        final boolean isOfInterest = nodes.stream()
-                .filter(n -> KeywordDefinition.class.isAssignableFrom(n.getClass()))
-                .map(KeywordDefinition.class::cast)
-                .anyMatch(n -> Cfg.isCalledBy(edit.getRight(), n));
-
-        if(!isOfInterest){
             return false;
         }
 

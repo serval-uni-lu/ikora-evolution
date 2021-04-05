@@ -109,6 +109,19 @@ class EvolutionRunnerTest {
     }
 
     @Test
+    void testMissingAssertion() throws GitAPIException, IOException, InvalidGitRepositoryException {
+        final List<SmellRecord> records = executeAnalysis("missing-assertion", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
+                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.MISSING_ASSERTION.name()))
+                .collect(Collectors.toList());
+
+        final long numberFixes = records.stream().map(SmellRecord::getFixesCount).reduce(0L, Long::sum);
+
+        assertEquals(4, records.size());
+        assertEquals(0, records.get(0).getFixesCount());
+        assertEquals(1, numberFixes);
+    }
+
+    @Test
     void testVariablesEvolution() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<VariableChangeRecord> records = executeAnalysis("complex-locator", EvolutionExport.Statistics.VARIABLE_CHANGES, VariableChangeRecord.class);
         assertEquals(1, records.size());

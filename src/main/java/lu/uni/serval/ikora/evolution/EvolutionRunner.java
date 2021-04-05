@@ -137,7 +137,7 @@ public class EvolutionRunner {
         for(Project project: version){
             for(TestCase testCase: project.getTestCases()){
                 final SmellResults smellResults = detector.computeMetrics(testCase, smellConfiguration);
-                smellRecordAccumulator.addTestCase(versionId, testCase, smellResults, edits, previousNodes, smellConfiguration);
+                smellRecordAccumulator.addTestCase(versionId, testCase, smellResults, edits, pairs, previousNodes, smellConfiguration);
             }
         }
 
