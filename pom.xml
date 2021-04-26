@@ -151,13 +151,13 @@
         <dependency>
             <groupId>lu.uni.serval</groupId>
             <artifactId>ikora-smells</artifactId>
-            <version>0.1.9</version>
+            <version>0.1.10</version>
         </dependency>
 
         <dependency>
             <groupId>lu.uni.serval</groupId>
             <artifactId>commons-git-utils</artifactId>
-            <version>0.1.5</version>
+            <version>0.1.7</version>
         </dependency>
 
         <dependency>
