@@ -21,7 +21,7 @@ public class SmellRecord implements Record {
         this.version = version;
         this.projectName = testCase.getProject() != null ? testCase.getProject().getName() : "<NONE>";
         this.testCaseName = testCase.toString();
-        this.testCaseSize = KeywordStatistics.getSize(testCase).getTestCaseSize();
+        this.testCaseSize = KeywordStatistics.getSize(testCase).getTotalSize();
         this.testCaseSequence = KeywordStatistics.getSequenceSize(testCase);
         this.testCaseLevel = KeywordStatistics.getLevel(testCase);
         this.smellMetricName = smellMetricName;

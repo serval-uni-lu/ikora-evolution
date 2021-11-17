@@ -63,7 +63,7 @@ public class FixCounter {
 
             case SNEAKY_CHECKING: return isFix(nodes, edit, Edit.Type.REMOVE_NODE);
 
-            case LACK_OF_DOCUMENTATION: return isFix(nodes, edit, Edit.Type.ADD_DOCUMENTATION);
+            case MISSING_DOCUMENTATION: return isFix(nodes, edit, Edit.Type.ADD_DOCUMENTATION);
 
             case MIDDLE_MAN: return isFixMiddleMan(nodes, edit);
             case LONG_TEST_STEPS: return isFixLongTestSteps(nodes, edit, configuration);
