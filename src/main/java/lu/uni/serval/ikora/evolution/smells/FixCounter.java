@@ -17,6 +17,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FixCounter {
+    private final static Set<SmellMetric.Type> noAccumulation = new HashSet<>();
+
+    static {
+        noAccumulation.add(SmellMetric.Type.MISSING_ASSERTION);
+    }
+
     private FixCounter() {}
 
     public static long count(TestCase testCase,
@@ -31,6 +37,10 @@ public class FixCounter {
 
         if(testNodes.isEmpty()){
             return 0;
+        }
+
+        if(noAccumulation.contains(type)){
+            return edits.stream().anyMatch(e -> isFix(type, testNodes, e, configuration)) ? 1 : 0;
         }
 
         return edits.stream().filter(e -> isFix(type, testNodes, e, configuration)).count();
