@@ -2,7 +2,7 @@ package lu.uni.serval.ikora.evolution;
 
 import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
 import lu.uni.serval.ikora.evolution.export.ExporterFactory;
-import lu.uni.serval.ikora.evolution.results.Record;
+import lu.uni.serval.ikora.evolution.results.ChangeRecord;
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class EvolutionRunnerTest {
     @Test
     void testCalculateResultsOnTheFly() throws IOException, InvalidGitRepositoryException, GitAPIException {
         final List<SmellRecord> records = executeAnalysis("calculate-expected-results-on-the-fly", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
-                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.CALCULATE_EXPECTED_RESULTS_ON_THE_FLY.name()))
+                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.ON_THE_FLY.name()))
                 .collect(Collectors.toList());
 
         assertEquals(2, records.size());
@@ -59,7 +59,7 @@ class EvolutionRunnerTest {
     @Test
     void testComplexLocatorAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("complex-locator", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
-                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.COMPLEX_LOCATORS.name()))
+                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.SENSITIVE_LOCATOR.name()))
                 .collect(Collectors.toList());
 
         assertEquals(2, records.size());
@@ -85,7 +85,7 @@ class EvolutionRunnerTest {
     @Test
     void testCloneAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("clones", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
-                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.TEST_CLONES.name()))
+                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.ARMY_OF_CLONES.name()))
                 .collect(Collectors.toList());
 
         assertEquals(2, records.size());
@@ -135,7 +135,7 @@ class EvolutionRunnerTest {
         assertEquals("[password_field]", records.get(0).getAfterValues());
     }
 
-    private <T extends Record> List<T> executeAnalysis(String resourcesPath, EvolutionExport.Statistics statistics, Class<T> type) throws GitAPIException, IOException, InvalidGitRepositoryException {
+    private <T extends ChangeRecord> List<T> executeAnalysis(String resourcesPath, EvolutionExport.Statistics statistics, Class<T> type) throws GitAPIException, IOException, InvalidGitRepositoryException {
         final EvolutionConfiguration configuration = Helpers.createConfiguration(resourcesPath, statistics);
 
 

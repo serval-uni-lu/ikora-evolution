@@ -1,6 +1,7 @@
 package lu.uni.serval.ikora.evolution;
 
 import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
+import lu.uni.serval.ikora.core.utils.ValueFetcher;
 import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
 import lu.uni.serval.ikora.evolution.results.TestRecord;
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
@@ -17,7 +18,6 @@ import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.SmellResults;
 
 import lu.uni.serval.ikora.core.model.*;
-import lu.uni.serval.ikora.core.utils.ArgumentUtils;
 import lu.uni.serval.ikora.core.utils.LevenshteinDistance;
 import lu.uni.serval.ikora.core.analytics.clones.KeywordCloneDetection;
 import lu.uni.serval.ikora.core.analytics.clones.Clones;
@@ -185,12 +185,12 @@ public class EvolutionRunner {
             final List<Pair<Argument, Argument>> argPairs = LevenshteinDistance.getMapping(beforeArguments, afterArguments);
 
             for(Pair<Argument, Argument> argPair: argPairs){
-                final List<String> beforeValues = ArgumentUtils.getArgumentValues(argPair.getLeft()).stream().map(Pair::getLeft).collect(Collectors.toList());
-                final List<String> afterValues = ArgumentUtils.getArgumentValues(argPair.getRight()).stream().map(Pair::getLeft).collect(Collectors.toList());
+                final Set<String> beforeValues = ValueFetcher.getValues(argPair.getLeft());
+                final Set<String> afterValues = ValueFetcher.getValues(argPair.getRight());
 
                 if(!beforeValues.isEmpty() && !afterValues.isEmpty() && Collections.disjoint(beforeValues, afterValues)){
-                    final VariableChangeRecord record = new VariableChangeRecord(argPair.getLeft(), beforeValues, argPair.getRight(), afterValues);
-                    this.exporter.export(EvolutionExport.Statistics.VARIABLE_CHANGES, record);
+                    final VariableChangeRecord changeRecord = new VariableChangeRecord(argPair.getLeft(), beforeValues, argPair.getRight(), afterValues);
+                    this.exporter.export(EvolutionExport.Statistics.VARIABLE_CHANGES, changeRecord);
                 }
             }
         }

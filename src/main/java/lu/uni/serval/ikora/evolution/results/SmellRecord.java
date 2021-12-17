@@ -5,7 +5,7 @@ import lu.uni.serval.ikora.evolution.utils.Hash;
 import lu.uni.serval.ikora.core.analytics.KeywordStatistics;
 import lu.uni.serval.ikora.core.model.TestCase;
 
-public class SmellRecord implements Record {
+public class SmellRecord implements ChangeRecord {
     private final String version;
     private final String projectName;
     private final String testCaseName;

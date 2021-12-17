@@ -5,14 +5,14 @@ import lu.uni.serval.ikora.core.analytics.difference.Edit;
 
 import lu.uni.serval.ikora.smells.*;
 
-import lu.uni.serval.ikora.evolution.results.Record;
+import lu.uni.serval.ikora.evolution.results.ChangeRecord;
 import lu.uni.serval.ikora.evolution.results.SmellRecord;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
 public class SmellRecordAccumulator {
-    private final List<Record> records = new ArrayList<>();
+    private final List<ChangeRecord> records = new ArrayList<>();
     private final Map<SmellMetric.Type, Set<SourceNode>> nodes = new EnumMap<>(SmellMetric.Type.class);
 
     public void addTestCase(String version,
@@ -35,7 +35,7 @@ public class SmellRecordAccumulator {
         }
     }
 
-    public List<Record> getRecords() {
+    public List<ChangeRecord> getRecords() {
         return records;
     }
 

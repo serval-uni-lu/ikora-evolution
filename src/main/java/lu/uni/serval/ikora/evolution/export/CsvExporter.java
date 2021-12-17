@@ -1,6 +1,6 @@
 package lu.uni.serval.ikora.evolution.export;
 
-import lu.uni.serval.ikora.evolution.results.Record;
+import lu.uni.serval.ikora.evolution.results.ChangeRecord;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FilenameUtils;
@@ -32,16 +32,17 @@ public class CsvExporter implements Exporter {
     }
 
     private void initialize(String[] headers) throws IOException {
-        this.printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(headers));
+        final CSVFormat csv = CSVFormat.Builder.create().setHeader(headers).build();
+        this.printer = new CSVPrinter(out, csv);
     }
 
-    public void addRecord(Record record) throws IOException {
-        if(record == null){
+    public void addRecord(ChangeRecord changeRecord) throws IOException {
+        if(changeRecord == null){
             return;
         }
 
         if(this.printer == null){
-            initialize(record.getKeys());
+            initialize(changeRecord.getKeys());
         }
 
         if(printer == null){
@@ -49,14 +50,14 @@ public class CsvExporter implements Exporter {
         }
 
         try {
-            this.printer.printRecord(record.getValues(this.isHashNames));
+            this.printer.printRecord(changeRecord.getValues(this.isHashNames));
             this.printer.flush();
         } catch (IOException e) {
             this.printer.close();
         }
     }
 
-    public void addRecords(List<Record> records) throws IOException {
+    public void addRecords(List<ChangeRecord> records) throws IOException {
         if(records == null){
             return;
         }
@@ -70,8 +71,8 @@ public class CsvExporter implements Exporter {
         }
 
         try {
-            for(Record record: records){
-                this.printer.printRecord(record.getValues(this.isHashNames));
+            for(ChangeRecord changeRecord: records){
+                this.printer.printRecord(changeRecord.getValues(this.isHashNames));
             }
 
             this.printer.flush();

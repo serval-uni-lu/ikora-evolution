@@ -1,6 +1,6 @@
 package lu.uni.serval.ikora.evolution.export;
 
-import lu.uni.serval.ikora.evolution.results.Record;
+import lu.uni.serval.ikora.evolution.results.ChangeRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,7 +56,7 @@ public class EvolutionExport implements Closeable {
         }
     }
 
-    public void export(Statistics statistics, List<Record> records) throws IOException {
+    public void export(Statistics statistics, List<ChangeRecord> records) throws IOException {
         final Exporter exporter = exporterMap.get(statistics);
 
         if(exporter != null){
@@ -64,11 +64,11 @@ public class EvolutionExport implements Closeable {
         }
     }
 
-    public void export(Statistics statistics, Record record) throws IOException {
+    public void export(Statistics statistics, ChangeRecord changeRecord) throws IOException {
         final Exporter exporter = exporterMap.get(statistics);
 
         if(exporter != null){
-            exporter.addRecord(record);
+            exporter.addRecord(changeRecord);
         }
     }
 

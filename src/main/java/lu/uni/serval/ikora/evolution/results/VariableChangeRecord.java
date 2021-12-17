@@ -1,12 +1,11 @@
 package lu.uni.serval.ikora.evolution.results;
 
 import lu.uni.serval.ikora.core.model.Argument;
-import lu.uni.serval.ikora.core.utils.ArgumentUtils;
 import lu.uni.serval.ikora.evolution.utils.Hash;
 
-import java.util.List;
+import java.util.Set;
 
-public class VariableChangeRecord implements Record {
+public class VariableChangeRecord implements ChangeRecord {
     private final String beforeCall;
     private final String beforeName;
     private final String beforeType;
@@ -17,16 +16,16 @@ public class VariableChangeRecord implements Record {
     private final String afterType;
     private final String afterValues;
 
-    public VariableChangeRecord(Argument before, List<String> beforeValues, Argument after, List<String> afterValues) {
+    public VariableChangeRecord(Argument before, Set<String> beforeValues, Argument after, Set<String> afterValues) {
         this.beforeCall = before.getAstParent(true).getName();
         this.beforeName = before.getName();
         this.beforeValues = "[" + String.join(";", beforeValues) + "]";
-        this.beforeType = ArgumentUtils.getArgumentType(before).getSimpleName();
+        this.beforeType = before.getType().getName();
 
         this.afterCall = after.getAstParent(true).getName();
         this.afterName = after.getName();
         this.afterValues = "[" + String.join(";", afterValues) + "]";
-        this.afterType = ArgumentUtils.getArgumentType(after).getSimpleName();
+        this.afterType = after.getType().getName();
     }
 
     public String getBeforeCall() {

@@ -4,7 +4,7 @@ import lu.uni.serval.ikora.core.model.Projects;
 
 import java.time.Instant;
 
-public class VersionRecord implements Record {
+public class VersionRecord implements ChangeRecord {
     private final Instant date;
     private final int projects;
     private final int testCases;

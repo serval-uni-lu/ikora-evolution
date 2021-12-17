@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FixCounter {
-    private final static Set<SmellMetric.Type> noAccumulation = new HashSet<>();
+    private static final Set<SmellMetric.Type> noAccumulation = new HashSet<>();
 
     static {
         noAccumulation.add(SmellMetric.Type.MISSING_ASSERTION);
@@ -60,16 +60,15 @@ public class FixCounter {
             case HARDCODED_ENVIRONMENT_CONFIGURATIONS:
             case HARD_CODED_VALUES: return isFix(nodes, edit, Edit.Type.CHANGE_VALUE_TYPE);
 
-            case TEST_CLONES: return isFix(nodes, edit, Edit.Type.REMOVE_USER_KEYWORD);
+            case ARMY_OF_CLONES: return isFix(nodes, edit, Edit.Type.REMOVE_USER_KEYWORD);
 
-            case CONDITIONAL_TEST_LOGIC:
             case STINKY_SYNCHRONIZATION_SYNDROME:
             case LACK_OF_ENCAPSULATION: return isFix(nodes, edit, Edit.Type.REMOVE_STEP, Edit.Type.CHANGE_STEP);
 
-            case LOGGING_IN_FIXTURE_CODE:
+            case NOISY_LOGGING:
             case EAGER_TEST:
             case OVER_CHECKING:
-            case HIDING_TEST_DATA_IN_FIXTURE_CODE: return isFix(nodes, edit, Edit.Type.REMOVE_STEP);
+            case HIDING_TEST_DATA: return isFix(nodes, edit, Edit.Type.REMOVE_STEP);
 
             case SNEAKY_CHECKING: return isFix(nodes, edit, Edit.Type.REMOVE_NODE);
 
@@ -77,10 +76,10 @@ public class FixCounter {
 
             case MIDDLE_MAN: return isFixMiddleMan(nodes, edit);
             case LONG_TEST_STEPS: return isFixLongTestSteps(nodes, edit, configuration);
-            case CALCULATE_EXPECTED_RESULTS_ON_THE_FLY: return isFixCalculateExpectedResultsOnTheFly(nodes, edit);
+            case ON_THE_FLY: return isFixCalculateExpectedResultsOnTheFly(nodes, edit);
             case COMPLICATED_SETUP_SCENARIOS: return isFixComplicatedSetup(nodes, edit);
-            case COMPLEX_LOCATORS: return isFixComplexLocator(nodes, edit, configuration);
-            case USING_PERSONAL_PRONOUN: return isFixUsingPersonalPronoun(nodes, edit);
+            case SENSITIVE_LOCATOR: return isFixComplexLocator(nodes, edit, configuration);
+            case NARCISSISTIC: return isFixUsingPersonalPronoun(nodes, edit);
             case MISSING_ASSERTION: return isFixMissingAssertionCheck(edit);
             case CONDITIONAL_ASSERTION: return isFixConditionalAssertion(nodes, edit);
         }
@@ -120,7 +119,7 @@ public class FixCounter {
 
     private static KeywordDefinition getRelevantStep(Step step, Set<SourceNode> nodes){
         for(SourceNode node: nodes){
-            final Optional<KeywordDefinition> parent = Cfg.getCallerByName(step, node.getNameToken());
+            final Optional<KeywordDefinition> parent = Cfg.getCallerByName(step, node.getDefinitionToken());
 
             if(parent.isPresent() ){
                 return parent.get();

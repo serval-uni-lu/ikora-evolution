@@ -1,6 +1,6 @@
 package lu.uni.serval.ikora.evolution.export;
 
-import lu.uni.serval.ikora.evolution.results.Record;
+import lu.uni.serval.ikora.evolution.results.ChangeRecord;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.List;
 public class InMemoryExporter implements Exporter {
     private final String absolutePath;
     private final boolean isHashNames;
-    private final List<Record> records = new ArrayList<>();
+    private final List<ChangeRecord> records = new ArrayList<>();
 
     public InMemoryExporter(String absolutePath, boolean isHashNames) {
         this.isHashNames = isHashNames;
@@ -17,21 +17,21 @@ public class InMemoryExporter implements Exporter {
     }
 
     @Override
-    public void addRecord(Record record) throws IOException {
-        this.records.add(record);
+    public void addRecord(ChangeRecord changeRecord) throws IOException {
+        this.records.add(changeRecord);
     }
 
     @Override
-    public void addRecords(List<Record> records) throws IOException {
+    public void addRecords(List<ChangeRecord> records) throws IOException {
         this.records.addAll(records);
     }
 
     @Override
     public void close() throws IOException {
-        //nothing to do;
+        //nothing to do
     }
 
-    public List<Record> getRecords() {
+    public List<ChangeRecord> getRecords() {
         return records;
     }
 
