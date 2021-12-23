@@ -141,12 +141,7 @@ public class GitProvider implements VersionProvider {
                     break;
                 }
 
-                if(commit == GitCommit.none()){
-                    commit = current;
-                    continue;
-                }
-
-                if(current.getDate().isAfter(commit.getDate())){
+                if(commit == GitCommit.none() || current.getDate().isAfter(commit.getDate())){
                     commit = current;
                 }
             }

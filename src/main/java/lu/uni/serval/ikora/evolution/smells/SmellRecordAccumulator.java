@@ -3,6 +3,7 @@ package lu.uni.serval.ikora.evolution.smells;
 import lu.uni.serval.ikora.core.model.*;
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 
+import lu.uni.serval.ikora.evolution.smells.fix.FixCounter;
 import lu.uni.serval.ikora.smells.*;
 
 import lu.uni.serval.ikora.evolution.results.BaseRecord;
