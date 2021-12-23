@@ -113,6 +113,36 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <configuration>
+                    <verbose>false</verbose>
+                    <organizationName>University of Luxembourg</organizationName>
+                    <inceptionYear>2020</inceptionYear>
+                    <projectName>Ikora Evolution</projectName>
+                    <licenseName>apache2</licenseName>
+                    <licenseResolver>${project.baseUri}/src/license</licenseResolver>
+                    <excludes>
+                        <exclude>**/*.json</exclude>
+                        <exclude>**/*.properties</exclude>
+                        <exclude>**/*.xml</exclude>
+                        <exclude>**/*.robot</exclude>
+                        <exclude>**/*.txt</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>license-check</id>
+                        <goals>
+                            <goal>check-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
