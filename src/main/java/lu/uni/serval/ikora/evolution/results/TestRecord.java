@@ -7,7 +7,7 @@ import lu.uni.serval.ikora.evolution.utils.Hash;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TestRecord implements ChangeRecord {
+public class TestRecord implements BaseRecord {
     final String project;
     final String suite;
     final String name;

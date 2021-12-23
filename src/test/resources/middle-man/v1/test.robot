@@ -1,3 +1,6 @@
+*** Settings ***
+Library    Selenium2Library
+
 *** Test Cases ***
 Valid Login
     User "demo" logs in with password "mode"

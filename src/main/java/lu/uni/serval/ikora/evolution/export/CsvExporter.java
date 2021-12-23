@@ -1,6 +1,6 @@
 package lu.uni.serval.ikora.evolution.export;
 
-import lu.uni.serval.ikora.evolution.results.ChangeRecord;
+import lu.uni.serval.ikora.evolution.results.BaseRecord;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FilenameUtils;
@@ -36,13 +36,13 @@ public class CsvExporter implements Exporter {
         this.printer = new CSVPrinter(out, csv);
     }
 
-    public void addRecord(ChangeRecord changeRecord) throws IOException {
-        if(changeRecord == null){
+    public void addRecord(BaseRecord baseRecord) throws IOException {
+        if(baseRecord == null){
             return;
         }
 
         if(this.printer == null){
-            initialize(changeRecord.getKeys());
+            initialize(baseRecord.getKeys());
         }
 
         if(printer == null){
@@ -50,14 +50,14 @@ public class CsvExporter implements Exporter {
         }
 
         try {
-            this.printer.printRecord(changeRecord.getValues(this.isHashNames));
+            this.printer.printRecord(baseRecord.getValues(this.isHashNames));
             this.printer.flush();
         } catch (IOException e) {
             this.printer.close();
         }
     }
 
-    public void addRecords(List<ChangeRecord> records) throws IOException {
+    public void addRecords(List<BaseRecord> records) throws IOException {
         if(records == null){
             return;
         }
@@ -71,8 +71,8 @@ public class CsvExporter implements Exporter {
         }
 
         try {
-            for(ChangeRecord changeRecord: records){
-                this.printer.printRecord(changeRecord.getValues(this.isHashNames));
+            for(BaseRecord baseRecord : records){
+                this.printer.printRecord(baseRecord.getValues(this.isHashNames));
             }
 
             this.printer.flush();

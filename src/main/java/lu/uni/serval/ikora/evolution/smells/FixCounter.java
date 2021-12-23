@@ -2,6 +2,7 @@ package lu.uni.serval.ikora.evolution.smells;
 
 import lu.uni.serval.ikora.core.analytics.KeywordStatistics;
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
+import lu.uni.serval.ikora.core.builder.resolver.ValueResolver;
 import lu.uni.serval.ikora.core.model.*;
 import lu.uni.serval.ikora.core.utils.Ast;
 import lu.uni.serval.ikora.core.utils.Cfg;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FixCounter {
     private static final Set<SmellMetric.Type> noAccumulation = new HashSet<>();
@@ -78,13 +80,13 @@ public class FixCounter {
             case LONG_TEST_STEPS: return isFixLongTestSteps(nodes, edit, configuration);
             case ON_THE_FLY: return isFixCalculateExpectedResultsOnTheFly(nodes, edit);
             case COMPLICATED_SETUP_SCENARIOS: return isFixComplicatedSetup(nodes, edit);
-            case SENSITIVE_LOCATOR: return isFixComplexLocator(nodes, edit, configuration);
+            case SENSITIVE_LOCATOR: return isFixSensitiveLocator(nodes, edit, configuration);
             case NARCISSISTIC: return isFixUsingPersonalPronoun(nodes, edit);
             case MISSING_ASSERTION: return isFixMissingAssertionCheck(edit);
             case CONDITIONAL_ASSERTION: return isFixConditionalAssertion(nodes, edit);
-        }
 
-        throw new IllegalArgumentException(String.format("Computing fix for %s is not supported", type.name()));
+            default: throw new IllegalArgumentException(String.format("Computing fix for %s is not supported", type.name()));
+        }
     }
 
     private static boolean isFix(Set<SourceNode> nodes, Edit edit, Edit.Type... types){
@@ -137,7 +139,7 @@ public class FixCounter {
         if(edit.getType() == Edit.Type.CHANGE_STEP){
             final Optional<UserKeyword> parent = Ast.getParentByType(edit.getLeft(), UserKeyword.class);
 
-            if(!parent.isPresent() || !nodes.contains(parent.get())){
+            if(parent.isEmpty() || !nodes.contains(parent.get())){
                 return false;
             }
 
@@ -175,8 +177,15 @@ public class FixCounter {
         return false;
     }
 
-    private static boolean isFixComplexLocator(Set<SourceNode> nodes, Edit edit, SmellConfiguration configuration) {
-        return nodes.contains(edit.getLeft())
+    private static boolean isFixSensitiveLocator(Set<SourceNode> nodes, Edit edit, SmellConfiguration configuration) {
+        boolean containing = nodes.contains(edit.getLeft()) ||
+                nodes.stream().filter(Argument.class::isInstance)
+                .map(Argument.class::cast)
+                .flatMap(n -> ValueResolver.getValueNodes(n).stream())
+                .flatMap(n -> n instanceof VariableAssignment ? ((VariableAssignment)n).getValues().stream() : Stream.of(n))
+                .anyMatch(n -> n == edit.getLeft() || n == edit.getLeft().getAstParent(false));
+
+        return containing
                 && Literal.class.isAssignableFrom(edit.getRight().getClass())
                 && !LocatorUtils.isComplex(edit.getRight().getName(), configuration.getMaximumLocatorSize());
     }

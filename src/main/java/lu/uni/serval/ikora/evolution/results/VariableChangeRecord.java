@@ -5,7 +5,7 @@ import lu.uni.serval.ikora.evolution.utils.Hash;
 
 import java.util.Set;
 
-public class VariableChangeRecord implements ChangeRecord {
+public class VariableChangeRecord implements BaseRecord {
     private final String beforeCall;
     private final String beforeName;
     private final String beforeType;

@@ -1,3 +1,6 @@
+*** Settings ***
+Library    Selenium2Library
+
 *** Test Cases ***
 Valid Login
     User "demo" logs in with password "mode"
@@ -20,4 +23,4 @@ Submit Credentials
     Click Button    login_button
 
 *** Variables ***
-${PASSWORD_FIELD}      css:.covid-form > div > div.react-grid-Container > div > div > div.react-grid-Header > div > div > div:nth-child(3) > div
+${PASSWORD_FIELD}      password_field

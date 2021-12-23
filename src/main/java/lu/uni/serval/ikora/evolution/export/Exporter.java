@@ -1,6 +1,6 @@
 package lu.uni.serval.ikora.evolution.export;
 
-import lu.uni.serval.ikora.evolution.results.ChangeRecord;
+import lu.uni.serval.ikora.evolution.results.BaseRecord;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -12,6 +12,6 @@ public interface Exporter extends Closeable {
         CSV
     }
 
-    void addRecord(ChangeRecord record) throws IOException;
-    void addRecords(List<ChangeRecord> records) throws IOException;
+    void addRecord(BaseRecord baseRecord) throws IOException;
+    void addRecords(List<BaseRecord> baseRecords) throws IOException;
 }

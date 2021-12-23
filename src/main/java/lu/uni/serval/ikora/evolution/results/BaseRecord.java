@@ -1,6 +1,6 @@
 package lu.uni.serval.ikora.evolution.results;
 
-public interface ChangeRecord {
+public interface BaseRecord {
     String[] getKeys();
     Object[] getValues(boolean isHashNames);
 }

@@ -2,7 +2,7 @@ package lu.uni.serval.ikora.evolution;
 
 import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
 import lu.uni.serval.ikora.evolution.export.ExporterFactory;
-import lu.uni.serval.ikora.evolution.results.ChangeRecord;
+import lu.uni.serval.ikora.evolution.results.BaseRecord;
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
@@ -58,13 +58,15 @@ class EvolutionRunnerTest {
 
     @Test
     void testComplexLocatorAnalysis() throws GitAPIException, IOException, InvalidGitRepositoryException {
-        final List<SmellRecord> records = executeAnalysis("complex-locator", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
+        final List<SmellRecord> records = executeAnalysis("sensitive-locator", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.SENSITIVE_LOCATOR.name()))
                 .collect(Collectors.toList());
 
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
+        assertEquals(1, records.get(0).getSmellMetricRawValue());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(0, records.get(1).getSmellMetricRawValue());
     }
 
     @Test
@@ -123,10 +125,10 @@ class EvolutionRunnerTest {
 
     @Test
     void testVariablesEvolution() throws GitAPIException, IOException, InvalidGitRepositoryException {
-        final List<VariableChangeRecord> records = executeAnalysis("complex-locator", EvolutionExport.Statistics.VARIABLE_CHANGES, VariableChangeRecord.class);
+        final List<VariableChangeRecord> records = executeAnalysis("sensitive-locator", EvolutionExport.Statistics.VARIABLE_CHANGES, VariableChangeRecord.class);
         assertEquals(1, records.size());
-        assertEquals("LocatorType", records.get(0).getBeforeType());
-        assertEquals("LocatorType", records.get(0).getAfterType());
+        assertEquals("locator", records.get(0).getBeforeType());
+        assertEquals("locator", records.get(0).getAfterType());
         assertEquals("${PASSWORD_FIELD}", records.get(0).getBeforeName());
         assertEquals("${PASSWORD_FIELD}", records.get(0).getAfterName());
         assertEquals("Input Text", records.get(0).getBeforeCall());
@@ -135,7 +137,7 @@ class EvolutionRunnerTest {
         assertEquals("[password_field]", records.get(0).getAfterValues());
     }
 
-    private <T extends ChangeRecord> List<T> executeAnalysis(String resourcesPath, EvolutionExport.Statistics statistics, Class<T> type) throws GitAPIException, IOException, InvalidGitRepositoryException {
+    private <T extends BaseRecord> List<T> executeAnalysis(String resourcesPath, EvolutionExport.Statistics statistics, Class<T> type) throws GitAPIException, IOException, InvalidGitRepositoryException {
         final EvolutionConfiguration configuration = Helpers.createConfiguration(resourcesPath, statistics);
 
 

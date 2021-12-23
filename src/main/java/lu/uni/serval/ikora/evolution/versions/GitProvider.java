@@ -41,33 +41,7 @@ public class GitProvider implements VersionProvider {
         this.projectFolders.put(localRepository, projectFolders);
     }
 
-    private Set<File> getProjectFolders(LocalRepository localRepository){
-        Set<String> projectFolderNames = this.projectFolders.get(localRepository);
 
-        if(projectFolderNames == null || projectFolderNames.isEmpty()){
-            return Collections.singleton(localRepository.getLocation());
-        }
-
-        Set<File> folders = new HashSet<>(projectFolderNames.size());
-
-        File repositoryFolder = localRepository.getLocation();
-        for(String projectFolderName: projectFolderNames){
-            File projectFolder = new File(repositoryFolder, projectFolderName);
-
-            if(projectFolder.exists()){
-                folders.add(projectFolder);
-            }
-            else {
-                logger.log(Level.WARN, "Folder {} does not exists in repository {} on {}",
-                        projectFolderName,
-                        localRepository.getRemoteUrl(),
-                        localRepository.getGitCommit().getDate()
-                );
-            }
-        }
-
-        return folders;
-    }
 
     @Override
     public File getRootFolder() throws IOException {
@@ -91,82 +65,121 @@ public class GitProvider implements VersionProvider {
 
     @Override
     public Iterator<Projects> iterator() {
-        return new Iterator<Projects>() {
-            private final List<Instant> dates = getDates();
-            private final Iterator<Instant> dateIterator = dates.iterator();
+        return new ProjectIterator(projectFolders, frequency, repositories);
+    }
 
-            @Override
-            public boolean hasNext() {
-                return dateIterator.hasNext();
+    public static class ProjectIterator implements Iterator<Projects> {
+        private final Map<LocalRepository, Set<String>> projectFolders;
+        private final Frequency frequency;
+        private final Map<LocalRepository, List<GitCommit>> repositories;
+        private final Iterator<Instant> dateIterator;
+
+        public ProjectIterator(Map<LocalRepository, Set<String>> projectFolders, Frequency frequency, Map<LocalRepository, List<GitCommit>> repositories) {
+            this.projectFolders = projectFolders;
+            this.frequency = frequency;
+            this.repositories = repositories;
+            this.dateIterator = getDates().iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return dateIterator.hasNext();
+        }
+
+        @Override
+        public Projects next() {
+            Projects projects = new Projects();
+
+            try {
+                final Instant date = dateIterator.next();
+
+                for(Map.Entry<LocalRepository, GitCommit> entry: getLastCommits(date).entrySet()){
+                    GitUtils.checkout(entry.getKey().getGit(), entry.getValue().getId());
+                    final BuildResult build = Builder.build(getProjectFolders(entry.getKey()), new BuildConfiguration(), true);
+                    projects.addProjects(build.getProjects());
+                    projects.setDate(date);
+                }
+            } catch (GitAPIException | IOException e) {
+                logger.log(Level.ERROR, "Git API error (this iteration will be ignored): {}", e.getMessage());
+                projects = next();
             }
 
-            @Override
-            public Projects next() {
-                Projects projects = new Projects();
+            return projects;
+        }
 
-                try {
-                    final Instant date = dateIterator.next();
+        private Map<LocalRepository, GitCommit> getLastCommits(Instant date){
+            Map<LocalRepository, GitCommit> lastCommits = new HashMap<>(repositories.size());
 
-                    for(Map.Entry<LocalRepository, GitCommit> entry: getLastCommits(date).entrySet()){
-                        GitUtils.checkout(entry.getKey().getGit(), entry.getValue().getId());
-                        final BuildResult build = Builder.build(getProjectFolders(entry.getKey()), new BuildConfiguration(), true);
-                        projects.addProjects(build.getProjects());
-                        projects.setDate(date);
-                    }
-                } catch (GitAPIException | IOException e) {
-                    logger.log(Level.ERROR, "Git API error (this iteration will be ignored): {}", e.getMessage());
-                    projects = next();
+            for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
+                GitCommit commit = lastCommitBeforeDate(entry.getValue(), date);
+                lastCommits.put(entry.getKey(), commit);
+            }
+
+            return lastCommits;
+        }
+
+        private List<Instant> getDates(){
+            List<GitCommit> allCommits = new ArrayList<>();
+
+            for(List<GitCommit> commits: repositories.values()){
+                allCommits.addAll(commits);
+            }
+
+            allCommits = allCommits.stream().sorted(Comparator.comparing(GitCommit::getDate)).collect(Collectors.toList());
+            allCommits = GitUtils.filterCommitsByFrequency(allCommits, frequency);
+
+            return allCommits.stream()
+                    .map(GitCommit::getDate)
+                    .collect(Collectors.toList());
+        }
+
+        private GitCommit lastCommitBeforeDate(List<GitCommit> commits, Instant date){
+            GitCommit commit = GitCommit.none();
+
+            for(GitCommit current: commits){
+                if(current.getDate().isAfter(date)){
+                    break;
                 }
 
-                return projects;
-            }
-
-            private Map<LocalRepository, GitCommit> getLastCommits(Instant date){
-                Map<LocalRepository, GitCommit> lastCommits = new HashMap<>(repositories.size());
-
-                for(Map.Entry<LocalRepository, List<GitCommit>> entry: repositories.entrySet()){
-                    GitCommit commit = lastCommitBeforeDate(entry.getValue(), date);
-                    lastCommits.put(entry.getKey(), commit);
+                if(commit == GitCommit.none()){
+                    commit = current;
+                    continue;
                 }
 
-                return lastCommits;
-            }
-
-            private List<Instant> getDates(){
-                List<GitCommit> allCommits = new ArrayList<>();
-
-                for(List<GitCommit> commits: repositories.values()){
-                    allCommits.addAll(commits);
+                if(current.getDate().isAfter(commit.getDate())){
+                    commit = current;
                 }
-
-                allCommits = allCommits.stream().sorted(Comparator.comparing(GitCommit::getDate)).collect(Collectors.toList());
-                allCommits = GitUtils.filterCommitsByFrequency(allCommits, frequency);
-
-                return allCommits.stream()
-                        .map(GitCommit::getDate)
-                        .collect(Collectors.toList());
             }
 
-            private GitCommit lastCommitBeforeDate(List<GitCommit> commits, Instant date){
-                GitCommit commit = GitCommit.none();
+            return commit;
+        }
 
-                for(GitCommit current: commits){
-                    if(current.getDate().isAfter(date)){
-                        break;
-                    }
+        private Set<File> getProjectFolders(LocalRepository localRepository){
+            Set<String> projectFolderNames = this.projectFolders.get(localRepository);
 
-                    if(commit == GitCommit.none()){
-                        commit = current;
-                        continue;
-                    }
+            if(projectFolderNames == null || projectFolderNames.isEmpty()){
+                return Collections.singleton(localRepository.getLocation());
+            }
 
-                    if(current.getDate().isAfter(commit.getDate())){
-                        commit = current;
-                    }
+            Set<File> folders = new HashSet<>(projectFolderNames.size());
+
+            File repositoryFolder = localRepository.getLocation();
+            for(String projectFolderName: projectFolderNames){
+                File projectFolder = new File(repositoryFolder, projectFolderName);
+
+                if(projectFolder.exists()){
+                    folders.add(projectFolder);
                 }
-
-                return commit;
+                else {
+                    logger.log(Level.WARN, "Folder {} does not exists in repository {} on {}",
+                            projectFolderName,
+                            localRepository.getRemoteUrl(),
+                            localRepository.getGitCommit().getDate()
+                    );
+                }
             }
-        };
+
+            return folders;
+        }
     }
 }

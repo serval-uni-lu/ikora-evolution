@@ -1,3 +1,6 @@
+*** Settings ***
+Library    Selenium2Library
+
 *** Test Cases ***
 Valid Login
     Input username    user
