@@ -4,7 +4,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
  * #%L
  * Ikora Evolution
  * %%
- * Copyright (C) 2020 - 2021 University of Luxembourg
+ * Copyright (C) 2020 - 2022 University of Luxembourg
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,37 @@ package lu.uni.serval.ikora.evolution.smells.fix;
  */
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
+import lu.uni.serval.ikora.core.model.Assignment;
+import lu.uni.serval.ikora.core.model.KeywordCall;
 import lu.uni.serval.ikora.core.model.SourceNode;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 
+import java.util.Optional;
 import java.util.Set;
 
-public class FixHardcodedEnvironmentConfigurations extends FixDetection{
-    public FixHardcodedEnvironmentConfigurations(SmellConfiguration configuration) {
+public class FixHiddenTestData extends FixDetection{
+    protected FixHiddenTestData(SmellConfiguration configuration) {
         super(configuration);
     }
 
     @Override
     public boolean isFix(Set<SourceNode> nodes, Edit edit) {
-        return isDefaultFix(nodes, edit, Edit.Type.CHANGE_VALUE_TYPE);
+        if(!edit.getType().equals(Edit.Type.REMOVE_STEP)){
+            return false;
+        }
+
+        if(isDefaultFix(nodes, edit, Edit.Type.REMOVE_STEP)){
+            return true;
+        }
+
+        if(edit.getLeft() instanceof Assignment){
+            final Optional<KeywordCall> keywordCall = ((Assignment) edit.getLeft()).getKeywordCall();
+
+            if(keywordCall.isPresent()){
+                return nodes.contains(keywordCall.get());
+            }
+        }
+
+        return false;
     }
 }

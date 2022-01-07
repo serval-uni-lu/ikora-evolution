@@ -4,7 +4,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
  * #%L
  * Ikora Evolution
  * %%
- * Copyright (C) 2020 - 2021 University of Luxembourg
+ * Copyright (C) 2020 - 2022 University of Luxembourg
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class FixNarcissistic extends FixDetection{
 
     @Override
     public boolean isFix(Set<SourceNode> nodes, Edit edit) {
-        if(edit.getType() != Edit.Type.CHANGE_NAME){
+        if(edit.getType() != Edit.Type.CHANGE_STEP){
             return false;
         }
 

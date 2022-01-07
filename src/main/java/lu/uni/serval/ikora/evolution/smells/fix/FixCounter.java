@@ -4,7 +4,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
  * #%L
  * Ikora Evolution
  * %%
- * Copyright (C) 2020 - 2021 University of Luxembourg
+ * Copyright (C) 2020 - 2022 University of Luxembourg
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -75,9 +75,9 @@ public class FixCounter {
             case ARMY_OF_CLONES: return new FixArmyOfClones(configuration).isFix(nodes, edit);
             case CONDITIONAL_ASSERTION: return new FixConditionalAssertion(configuration).isFix(nodes, edit);
             case EAGER_TEST: return new FixEagerTest(configuration).isFix(nodes, edit);
-            case HARDCODED_ENVIRONMENT_CONFIGURATIONS: return new FixHardcodedEnvironmentConfigurations(configuration).isFix(nodes, edit);
+            case HARDCODED_ENVIRONMENT_CONFIGURATIONS: return new FixHardcodedEnvironment(configuration).isFix(nodes, edit);
             case HARD_CODED_VALUES: return new FixHardCodedValues(configuration).isFix(nodes, edit);
-            case HIDING_TEST_DATA: return new FixHidingTestData(configuration).isFix(nodes, edit);
+            case HIDING_TEST_DATA: return new FixHiddenTestData(configuration).isFix(nodes, edit);
             case LACK_OF_ENCAPSULATION: return new FixLackOfEncapsulation(configuration).isFix(nodes, edit);
             case LONG_TEST_STEPS: return new FixLongTestSteps(configuration).isFix(nodes, edit);
             case MIDDLE_MAN: return new FixMiddleMan(configuration).isFix(nodes, edit);
@@ -91,7 +91,7 @@ public class FixCounter {
             case SNEAKY_CHECKING: return new FixSneakyChecking(configuration).isFix(nodes, edit);
             case STINKY_SYNCHRONIZATION_SYNDROME: return new FixStinkySynchronizationSyndrome(configuration).isFix(nodes, edit);
 
-            default: throw new IllegalArgumentException(String.format("Computing fix for %s is not supported", type.name()));
+            default: return false;
         }
     }
 }

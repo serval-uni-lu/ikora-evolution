@@ -4,7 +4,7 @@ package lu.uni.serval.ikora.evolution;
  * #%L
  * Ikora Evolution
  * %%
- * Copyright (C) 2020 - 2021 University of Luxembourg
+ * Copyright (C) 2020 - 2022 University of Luxembourg
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
