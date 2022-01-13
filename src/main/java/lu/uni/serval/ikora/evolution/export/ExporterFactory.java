@@ -62,8 +62,10 @@ public class ExporterFactory {
         switch (strategy){
             case IN_MEMORY: return new InMemoryExporter(absolutePath, isHashNames);
             case CSV: return new CsvExporter(absolutePath, isHashNames);
+            default: throw new IllegalArgumentException(String.format(
+                        "Exporter strategy expect IN_MEMORY or CSV but got '%s' instead",
+                        strategy.name()
+                    ));
         }
-
-        return null;
     }
 }

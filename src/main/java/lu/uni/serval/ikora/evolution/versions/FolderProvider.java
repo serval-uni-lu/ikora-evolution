@@ -99,6 +99,10 @@ public class FolderProvider implements VersionProvider{
                         final LocalDate date2 = LocalDate.from(dateTimeFormatter.parse(name2));
                         compare = date1.compareTo(date2);
                         break;
+                    default: throw new IllegalArgumentException(String.format(
+                            "Expected VERSION or DATE to sort folders, but got '%s' instead",
+                            nameFormat.name()
+                        ));
                 }
 
                 return compare;

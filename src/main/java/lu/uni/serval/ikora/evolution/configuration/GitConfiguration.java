@@ -34,7 +34,7 @@ public class GitConfiguration {
     @JsonProperty(value = "locations", required = true)
     private Set<GitLocation> locations = Collections.emptySet();
     @JsonProperty(value = "default branch", defaultValue = "master")
-    private String defaultBranch = "master";
+    private String defaultBranch = null;
     @JsonProperty("branch exceptions")
     private Map<String, String> branchExceptions = Collections.emptyMap();
     @JsonProperty(value = "token")
