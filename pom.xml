@@ -4,13 +4,13 @@
 
     <groupId>lu.uni.serval</groupId>
     <artifactId>ikora-evolution</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
 
     <scm>
         <connection>scm:git:git://github.com/serval-uni-lu/ikora-evolution.git</connection>
         <developerConnection>scm:git:git@github.com:serval-uni-lu/serval-uni-lu.git</developerConnection>
         <url>https://github.com/serval-uni-lu/ikora-evolution</url>
-        <tag>HEAD</tag>
+        <tag>ikora-evolution-0.1.0</tag>
     </scm>
 
     <licenses>
