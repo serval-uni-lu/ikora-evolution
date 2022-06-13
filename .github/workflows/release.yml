@@ -26,6 +26,13 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+      - name: Extract tag name
+        id: tag
+        uses: actions/github-script@0.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            return context.payload.ref.replace(/\/refs\/tags\//, '');
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -33,6 +40,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/ikora-evolution-${{ github.ref }}-jar-with-dependencies.jar
-          asset_name: ikora-evolution-${{ github.ref }}.jar
+          asset_path: ./target/${{ steps.tag.outputs.result }}-jar-with-dependencies.jar
+          asset_name: ${{ steps.tag.outputs.result }}.jar
           asset_content_type: application/jar
