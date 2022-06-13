@@ -4,7 +4,7 @@ on:
     tags:
       - 'ikora\-evolution\-[0-9]+.[0-9]+.[0-9]+'
 jobs:
-  build_release:
+  release:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
