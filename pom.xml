@@ -10,6 +10,7 @@
         <connection>scm:git:git://github.com/serval-uni-lu/ikora-evolution.git</connection>
         <developerConnection>scm:git:git@github.com:serval-uni-lu/serval-uni-lu.git</developerConnection>
         <url>https://github.com/serval-uni-lu/ikora-evolution</url>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
