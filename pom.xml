@@ -7,9 +7,9 @@
     <version>0.1.0</version>
 
     <scm>
-        <connection>scm:git:git://github.com/UL-SnT-Serval/ikora-evolution.git</connection>
-        <developerConnection>scm:git:git@github.com:UL-SnT-Serval/UL-SnT-Serval.git</developerConnection>
-        <url>https://github.com/UL-SnT-Serval/ikora-evolution</url>
+        <connection>scm:git:git://github.com/serval-uni-lu/ikora-evolution.git</connection>
+        <developerConnection>scm:git:git@github.com:serval-uni-lu/serval-uni-lu.git</developerConnection>
+        <url>https://github.com/serval-uni-lu/ikora-evolution</url>
         <tag>ikora-evolution-0.1.0</tag>
     </scm>
 
