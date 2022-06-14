@@ -39,6 +39,6 @@ public class FixNarcissistic extends FixDetection{
             return false;
         }
 
-        return nodes.contains(edit.getLeft()) && !NLPUtils.isUsingPersonalPronoun((Step) edit.getRight());
+        return nodes.contains(edit.getLeft()) && !NLPUtils.isUsingPersonalPronoun(edit.getRight().getName());
     }
 }

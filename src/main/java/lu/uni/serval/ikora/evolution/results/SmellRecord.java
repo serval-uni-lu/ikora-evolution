@@ -20,10 +20,9 @@ package lu.uni.serval.ikora.evolution.results;
  * #L%
  */
 
-import lu.uni.serval.ikora.evolution.utils.Hash;
-
 import lu.uni.serval.ikora.core.analytics.KeywordStatistics;
 import lu.uni.serval.ikora.core.model.TestCase;
+import lu.uni.serval.ikora.evolution.utils.Hash;
 
 public class SmellRecord implements BaseRecord {
     private final String version;

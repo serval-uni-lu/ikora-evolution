@@ -74,7 +74,6 @@ public class FixCounter {
         switch (type){
             case ARMY_OF_CLONES: return new FixArmyOfClones(configuration).isFix(nodes, edit);
             case CONDITIONAL_ASSERTION: return new FixConditionalAssertion(configuration).isFix(nodes, edit);
-            case EAGER_TEST: return new FixEagerTest(configuration).isFix(nodes, edit);
             case HARDCODED_ENVIRONMENT_CONFIGURATIONS: return new FixHardcodedEnvironment(configuration).isFix(nodes, edit);
             case HARD_CODED_VALUES: return new FixHardCodedValues(configuration).isFix(nodes, edit);
             case HIDING_TEST_DATA: return new FixHiddenTestData(configuration).isFix(nodes, edit);

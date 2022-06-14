@@ -23,9 +23,9 @@ package lu.uni.serval.ikora.evolution.utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class Hash {
     private static final Logger logger = LogManager.getLogger(Hash.class);
@@ -44,6 +44,6 @@ public class Hash {
 
     public static String sha512(String text){
         md.update(text.getBytes());
-        return DatatypeConverter.printHexBinary(md.digest());
+        return Arrays.toString(md.digest());
     }
 }
