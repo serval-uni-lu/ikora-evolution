@@ -26,6 +26,7 @@ import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
 import lu.uni.serval.ikora.evolution.results.TestRecord;
 import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
 import lu.uni.serval.ikora.evolution.export.EvolutionExport;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.evolution.smells.SmellRecordAccumulator;
 import lu.uni.serval.ikora.evolution.results.VersionRecord;
 import lu.uni.serval.ikora.evolution.versions.FolderProvider;
@@ -62,7 +63,7 @@ public class EvolutionRunner {
     private final EvolutionExport exporter;
     private final EvolutionConfiguration configuration;
     private final Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs;
-
+    private final History history;
     private Set<Edit> edits;
 
     public EvolutionRunner(EvolutionExport exporter, EvolutionConfiguration configuration){
@@ -70,6 +71,7 @@ public class EvolutionRunner {
         this.configuration = configuration;
         this.pairs = new HashSet<>();
         this.edits = null;
+        this.history = new History();
     }
 
     public void execute() throws IOException, GitAPIException, InvalidGitRepositoryException {
@@ -157,7 +159,7 @@ public class EvolutionRunner {
         for(Project project: version){
             for(TestCase testCase: project.getTestCases()){
                 final SmellResults smellResults = detector.computeMetrics(testCase, smellConfiguration);
-                smellRecordAccumulator.addTestCase(versionId, testCase, smellResults, edits, pairs, previousNodes, smellConfiguration);
+                smellRecordAccumulator.addTestCase(versionId, testCase, smellResults, edits, pairs, previousNodes, smellConfiguration, history);
             }
         }
 

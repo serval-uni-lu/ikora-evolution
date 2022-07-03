@@ -23,25 +23,27 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.SourceNode;
 import lu.uni.serval.ikora.core.model.Variable;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Set;
 
 public class FixOnTheFly extends FixDetection{
-    protected FixOnTheFly(SmellConfiguration configuration) {
-        super(configuration);
+    protected FixOnTheFly(SmellConfiguration configuration, History history) {
+        super(SmellMetric.Type.ON_THE_FLY, configuration, history);
     }
 
     @Override
-    public boolean isFix(Set<SourceNode> nodes, Edit edit) {
+    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
         if(edit.getLeft() == null){
-            return false;
+            return FixResult.noFix();
         }
 
         if(Variable.class.isAssignableFrom(edit.getLeft().getClass())){
-            return isDefaultFix(nodes, edit, Edit.Type.CHANGE_VALUE_TYPE);
+            return getDefaultFix(nodes, edit, Edit.Type.CHANGE_VALUE_TYPE);
         }
 
-        return false;
+        return FixResult.noFix();
     }
 }

@@ -26,25 +26,31 @@ import lu.uni.serval.ikora.core.model.KeywordDefinition;
 import lu.uni.serval.ikora.core.model.SourceNode;
 import lu.uni.serval.ikora.core.model.Step;
 import lu.uni.serval.ikora.core.utils.Cfg;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Optional;
 import java.util.Set;
 
 public class FixLongTestSteps extends FixDetection{
-    protected FixLongTestSteps(SmellConfiguration configuration) {
-        super(configuration);
+    protected FixLongTestSteps(SmellConfiguration configuration, History history) {
+        super(SmellMetric.Type.LONG_TEST_STEPS, configuration, history);
     }
 
     @Override
-    public boolean isFix(Set<SourceNode> nodes, Edit edit) {
+    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
         final KeywordDefinition previousStep = getPreviousStep(edit, nodes);
 
         if(previousStep == null){
-            return false;
+            return FixResult.noFix();
         }
 
-        return KeywordStatistics.getSequenceSize(previousStep) > configuration.getMaximumStepSize();
+        if(KeywordStatistics.getSequenceSize(previousStep) > configuration.getMaximumStepSize()){
+            return getFixResult(edit);
+        }
+
+        return FixResult.noFix();
     }
 
     private static KeywordDefinition getPreviousStep(Edit edit, Set<SourceNode> nodes){

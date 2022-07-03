@@ -21,42 +21,48 @@ package lu.uni.serval.ikora.evolution.smells.fix;
  */
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
-import lu.uni.serval.ikora.core.model.Keyword;
-import lu.uni.serval.ikora.core.model.SourceNode;
-import lu.uni.serval.ikora.core.model.Step;
-import lu.uni.serval.ikora.core.model.UserKeyword;
+import lu.uni.serval.ikora.core.model.*;
 import lu.uni.serval.ikora.core.utils.Ast;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Optional;
 import java.util.Set;
 
 public class FixMiddleMan extends FixDetection{
-    protected FixMiddleMan(SmellConfiguration configuration) {
-        super(configuration);
+    protected FixMiddleMan(SmellConfiguration configuration, History history) {
+        super(SmellMetric.Type.MIDDLE_MAN, configuration, history);
     }
 
     @Override
-    public boolean isFix(Set<SourceNode> nodes, Edit edit) {
-        if(isDefaultFix(nodes, edit, Edit.Type.REMOVE_USER_KEYWORD)){
-            return true;
+    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
+        FixResult result = getDefaultFix(nodes, edit, Edit.Type.REMOVE_USER_KEYWORD);
+        if(result.isValid()){
+            return FixResult.noFix();
         }
 
         if(edit.getType() == Edit.Type.CHANGE_STEP){
             final Optional<UserKeyword> parent = Ast.getParentByType(edit.getLeft(), UserKeyword.class);
 
             if(parent.isEmpty() || !nodes.contains(parent.get())){
-                return false;
+                return FixResult.noFix();
             }
 
             if(!Step.class.isAssignableFrom(edit.getRight().getClass())){
-                return false;
+                return FixResult.noFix();
             }
 
-            return ((Step)edit.getRight()).getKeywordCall()
-                    .filter(call -> call.getKeywordType() != Keyword.Type.USER).isPresent();
+            final Optional<KeywordCall> keywordCall = ((Step) edit.getRight()).getKeywordCall()
+                    .filter(call -> call.getKeywordType() != Keyword.Type.USER);
+
+            if(keywordCall.isPresent()){
+                return getFixResult(edit);
+            }
+
+            return FixResult.noFix();
         }
 
-        return false;
+        return FixResult.noFix();
     }
 }

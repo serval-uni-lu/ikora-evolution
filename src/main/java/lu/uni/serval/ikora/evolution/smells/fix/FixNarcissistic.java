@@ -22,23 +22,28 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.SourceNode;
-import lu.uni.serval.ikora.core.model.Step;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.utils.NLPUtils;
 
 import java.util.Set;
 
 public class FixNarcissistic extends FixDetection{
-    protected FixNarcissistic(SmellConfiguration configuration) {
-        super(configuration);
+    protected FixNarcissistic(SmellConfiguration configuration, History history) {
+        super(SmellMetric.Type.NARCISSISTIC, configuration, history);
     }
 
     @Override
-    public boolean isFix(Set<SourceNode> nodes, Edit edit) {
+    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
         if(edit.getType() != Edit.Type.CHANGE_STEP){
-            return false;
+            return FixResult.noFix();
         }
 
-        return nodes.contains(edit.getLeft()) && !NLPUtils.isUsingPersonalPronoun(edit.getRight().getName());
+        if(nodes.contains(edit.getLeft()) && !NLPUtils.isUsingPersonalPronoun(edit.getRight().getName())){
+            return getFixResult(edit);
+        }
+
+        return FixResult.noFix();
     }
 }

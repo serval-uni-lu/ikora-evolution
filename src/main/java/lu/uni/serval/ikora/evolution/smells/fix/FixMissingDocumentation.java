@@ -22,17 +22,19 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Set;
 
 public class FixMissingDocumentation extends FixDetection{
-    protected FixMissingDocumentation(SmellConfiguration configuration) {
-        super(configuration);
+    protected FixMissingDocumentation(SmellConfiguration configuration, History history) {
+        super(SmellMetric.Type.MISSING_DOCUMENTATION, configuration, history);
     }
 
     @Override
-    public boolean isFix(Set<SourceNode> nodes, Edit edit) {
-        return isDefaultFix(nodes, edit, Edit.Type.ADD_DOCUMENTATION);
+    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
+        return getDefaultFix(nodes, edit, Edit.Type.ADD_DOCUMENTATION);
     }
 }

@@ -24,34 +24,37 @@ import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.Assignment;
 import lu.uni.serval.ikora.core.model.KeywordCall;
 import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Optional;
 import java.util.Set;
 
 public class FixHiddenTestData extends FixDetection{
-    protected FixHiddenTestData(SmellConfiguration configuration) {
-        super(configuration);
+    protected FixHiddenTestData(SmellConfiguration configuration, History history) {
+        super(SmellMetric.Type.HIDING_TEST_DATA, configuration, history);
     }
 
     @Override
-    public boolean isFix(Set<SourceNode> nodes, Edit edit) {
+    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
         if(!edit.getType().equals(Edit.Type.REMOVE_STEP)){
-            return false;
+            return FixResult.noFix();
         }
 
-        if(isDefaultFix(nodes, edit, Edit.Type.REMOVE_STEP)){
-            return true;
+        FixResult result = getDefaultFix(nodes, edit, Edit.Type.REMOVE_STEP);
+        if(result.isValid()){
+            return getFixResult(edit);
         }
 
         if(edit.getLeft() instanceof Assignment){
             final Optional<KeywordCall> keywordCall = ((Assignment) edit.getLeft()).getKeywordCall();
 
-            if(keywordCall.isPresent()){
-                return nodes.contains(keywordCall.get());
+            if(keywordCall.isPresent() && nodes.contains(keywordCall.get())){
+                return getFixResult(edit);
             }
         }
 
-        return false;
+        return FixResult.noFix();
     }
 }
