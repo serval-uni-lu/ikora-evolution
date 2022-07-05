@@ -23,11 +23,11 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.*;
 import lu.uni.serval.ikora.core.utils.Cfg;
+import lu.uni.serval.ikora.evolution.versions.Changes;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.evolution.utils.VersionUtils;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,12 +37,11 @@ public class FixAccumulator {
 
     public static Set<FixResult> collect(TestCase testCase,
                              SmellMetric.Type type,
-                             Set<Edit> edits,
-                             Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs,
+                             Changes changes,
                              Set<SourceNode> previousNodes,
                              SmellConfiguration configuration,
                              History history){
-        final Set<SourceNode> testNodes = VersionUtils.findOther(pairs, testCase)
+        final Set<SourceNode> testNodes = VersionUtils.findOther(changes.getPairs(), testCase)
                 .map(t -> getTestNodes((TestCase) t, previousNodes))
                 .orElse(Collections.emptySet());
 
@@ -50,7 +49,7 @@ public class FixAccumulator {
             return Collections.emptySet();
         }
 
-        return edits.stream()
+        return changes.getEdits().stream()
                 .map(e -> getFix(type, testNodes, e, configuration, history))
                 .filter(FixResult::isValid)
                 .collect(Collectors.toSet());

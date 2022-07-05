@@ -50,11 +50,6 @@ public class ExporterFactory {
             outputFiles.put(EvolutionExport.Statistics.TEST, testsCsvFile);
         }
 
-        File variableChangesCsVFile = outputConfiguration.getVariableChangesCsvFile();
-        if(projectsCsvFile != null){
-            outputFiles.put(EvolutionExport.Statistics.VARIABLE_CHANGES, variableChangesCsVFile);
-        }
-
         return new EvolutionExport(outputConfiguration.getStrategy(), outputFiles, outputConfiguration.isHashNames());
     }
 

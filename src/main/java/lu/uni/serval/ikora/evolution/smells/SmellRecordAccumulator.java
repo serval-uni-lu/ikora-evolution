@@ -21,15 +21,14 @@ package lu.uni.serval.ikora.evolution.smells;
  */
 
 import lu.uni.serval.ikora.core.model.*;
-import lu.uni.serval.ikora.core.analytics.difference.Edit;
 
+import lu.uni.serval.ikora.evolution.versions.Changes;
 import lu.uni.serval.ikora.evolution.smells.fix.FixAccumulator;
 import lu.uni.serval.ikora.evolution.smells.fix.FixResult;
 import lu.uni.serval.ikora.smells.*;
 
 import lu.uni.serval.ikora.evolution.results.BaseRecord;
 import lu.uni.serval.ikora.evolution.results.SmellRecord;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -40,20 +39,19 @@ public class SmellRecordAccumulator {
     public void addTestCase(String version,
                             TestCase testCase,
                             SmellResults smells,
-                            Set<Edit> edits,
-                            Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs,
+                            Changes changes,
                             Map<SmellMetric.Type, Set<SourceNode>> previousNodes,
                             SmellConfiguration configuration,
                             History history){
         updateNodes(smells);
 
         for(SmellResult smell: smells){
-            history.addSmell(smell, pairs, previousNodes);
+            history.addSmell(smell, changes);
             Set<FixResult> fixes = Collections.emptySet();
 
             if(previousNodes != null){
                 final Set<SourceNode> previous = previousNodes.getOrDefault(smell.getType(), new HashSet<>());
-                fixes = FixAccumulator.collect(testCase, smell.getType(), edits, pairs, previous, configuration, history);
+                fixes = FixAccumulator.collect(testCase, smell.getType(), changes, previous, configuration, history);
             }
 
             records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getRawValue(), smell.getNormalizedValue(), fixes));

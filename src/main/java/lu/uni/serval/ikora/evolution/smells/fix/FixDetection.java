@@ -51,7 +51,7 @@ public abstract class FixDetection {
 
     protected FixResult getFixResult(Edit edit){
         final SourceNode fixed = edit.getRight();
-        final Sequence sequence = history.findSequence(edit).orElse(new Sequence(type));
+        final Sequence sequence = history.findSequence(type, edit).orElse(new Sequence(type));
         return new FixResult(type, fixed, sequence);
     }
 

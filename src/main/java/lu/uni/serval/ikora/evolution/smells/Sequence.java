@@ -3,39 +3,43 @@ package lu.uni.serval.ikora.evolution.smells;
 import lu.uni.serval.ikora.core.model.SourceNode;
 import lu.uni.serval.ikora.smells.SmellMetric;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Sequence {
     private final SmellMetric.Type type;
-    private final List<SourceNode> nodes;
-
-    private SourceNode lastNode;
+    private final List<SourceNode> nodeList;
 
     public Sequence(SmellMetric.Type type){
         this.type = type;
-        this.nodes = new LinkedList<>();
-        this.lastNode = null;
+        this.nodeList = new LinkedList<>();
     }
 
     public SmellMetric.Type getType(){
         return type;
     }
 
-    public SourceNode getLastNode(){
-        return lastNode;
-    }
-
-    List<SourceNode> getNodes(){
-        return nodes;
-    }
-
     public void addNode(SourceNode node){
-        nodes.add(node);
-        lastNode = node;
+        nodeList.add(node);
     }
 
     public int getNumberVersions(){
-        return this.nodes.size();
+        return this.nodeList.size();
+    }
+
+    public boolean contains(int lastVersions, SourceNode node) {
+        if(node == null){
+            return false;
+        }
+
+        int counter = 0;
+        ListIterator<SourceNode> it = nodeList.listIterator(nodeList.size());
+        while(lastVersions > counter++ && it.hasPrevious()){
+            SourceNode current = it.previous();
+            if(current == node){
+                return true;
+            }
+        }
+
+        return false;
     }
 }
