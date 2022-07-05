@@ -47,6 +47,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(2, records.get(1).getFixesCount());
+        assertEquals(1, records.get(1).getVersionsCount());
     }
 
     @Test

@@ -6,9 +6,9 @@ import lu.uni.serval.ikora.smells.SmellMetric;
 
 public class FixResult {
     private boolean isValid;
-    private SmellMetric.Type type;
-    private SourceNode node;
-    private Sequence sequence;
+    private final SmellMetric.Type type;
+    private final SourceNode node;
+    private final Sequence sequence;
 
     public FixResult(SmellMetric.Type type, SourceNode node, Sequence sequence){
         this.isValid = true;
@@ -26,6 +26,14 @@ public class FixResult {
 
     public boolean isValid() {
         return this.isValid;
+    }
+
+    public SmellMetric.Type getType() {
+        return type;
+    }
+
+    public SourceNode getNode() {
+        return node;
     }
 
     public Sequence getSequence(){
