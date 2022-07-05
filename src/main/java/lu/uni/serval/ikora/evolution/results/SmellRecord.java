@@ -22,7 +22,10 @@ package lu.uni.serval.ikora.evolution.results;
 
 import lu.uni.serval.ikora.core.analytics.KeywordStatistics;
 import lu.uni.serval.ikora.core.model.TestCase;
+import lu.uni.serval.ikora.evolution.smells.fix.FixResult;
 import lu.uni.serval.ikora.evolution.utils.Hash;
+
+import java.util.Set;
 
 public class SmellRecord implements BaseRecord {
     private final String version;
@@ -35,8 +38,9 @@ public class SmellRecord implements BaseRecord {
     private final double smellMetricRawValue;
     private final double smellMetricNormalizedValue;
     private final long fixesCount;
+    private final double versionsCount;
 
-    public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricRawValue, double smellMetricNormalizedValue, long fixesCount) {
+    public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricRawValue, double smellMetricNormalizedValue, Set<FixResult> fixes) {
         this.version = version;
         this.projectName = testCase.getProject() != null ? testCase.getProject().getName() : "<NONE>";
         this.testCaseName = testCase.toString();
@@ -46,7 +50,8 @@ public class SmellRecord implements BaseRecord {
         this.smellMetricName = smellMetricName;
         this.smellMetricRawValue = smellMetricRawValue;
         this.smellMetricNormalizedValue = smellMetricNormalizedValue;
-        this.fixesCount = fixesCount;
+        this.fixesCount = fixes.size();
+        this.versionsCount = computeAgerageNumberVersions(fixes);
     }
 
     public String getVersion() {
@@ -89,6 +94,10 @@ public class SmellRecord implements BaseRecord {
         return fixesCount;
     }
 
+    public double getVersionsCount() {
+        return versionsCount;
+    }
+
     @Override
     public Object[] getValues(boolean isHashNames){
         return new Object[] {
@@ -101,7 +110,8 @@ public class SmellRecord implements BaseRecord {
                 this.getSmellMetricName(),
                 String.valueOf(this.getSmellMetricRawValue()),
                 String.valueOf(this.getSmellMetricNormalizedValue()),
-                String.valueOf(this.getFixesCount())
+                String.valueOf(this.getFixesCount()),
+                String.valueOf(this.getVersionsCount())
         };
     }
 
@@ -117,7 +127,19 @@ public class SmellRecord implements BaseRecord {
                 "smell_name",
                 "smell_raw_value",
                 "smell_normalized_value",
-                "fixes"
+                "fixes",
+                "versions_count"
         };
+    }
+
+    private double computeAgerageNumberVersions(Set<FixResult> fixes){
+        if(fixes.isEmpty()){
+            return 0.;
+        }
+
+        return fixes.stream()
+                .mapToDouble(f -> f.getSequence().getNumberVersions())
+                .average()
+                .orElse(Double.NaN);
     }
 }

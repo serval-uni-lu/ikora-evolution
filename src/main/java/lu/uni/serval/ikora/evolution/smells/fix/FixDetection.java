@@ -22,25 +22,38 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.evolution.smells.History;
+import lu.uni.serval.ikora.evolution.smells.Sequence;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Arrays;
 import java.util.Set;
 
 public abstract class FixDetection {
+    protected final SmellMetric.Type type;
     protected final SmellConfiguration configuration;
+    protected final History history;
 
-    protected FixDetection(SmellConfiguration configuration) {
+    protected FixDetection(SmellMetric.Type type, SmellConfiguration configuration, History history) {
+        this.type = type;
         this.configuration = configuration;
+        this.history = history;
     }
 
-    protected boolean isDefaultFix(Set<SourceNode> nodes, Edit edit, Edit.Type... types){
-        if(Arrays.stream(types).noneMatch(t -> edit.getType() == t)){
-            return false;
+    protected FixResult getDefaultFix(Set<SourceNode> nodes, Edit edit, Edit.Type... types){
+        if(Arrays.stream(types).anyMatch(t -> edit.getType() == t) && nodes.contains(edit.getLeft())){
+            return getFixResult(edit);
         }
 
-        return nodes.contains(edit.getLeft());
+        return FixResult.noFix();
     }
 
-    public abstract boolean isFix(Set<SourceNode> nodes, Edit edit);
+    protected FixResult getFixResult(Edit edit){
+        final SourceNode fixed = edit.getRight();
+        final Sequence sequence = history.findSequence(type, edit).orElse(new Sequence(type));
+        return new FixResult(type, fixed, sequence);
+    }
+
+    public abstract FixResult getFix(Set<SourceNode> nodes, Edit edit);
 }

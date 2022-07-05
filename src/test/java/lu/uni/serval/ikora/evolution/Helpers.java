@@ -59,7 +59,6 @@ public class Helpers {
         final OutputConfiguration outputConfiguration = new OutputConfiguration();
         outputConfiguration.setProjectsCsvFile(new File(outputFolder, "projects.csv"));
         outputConfiguration.setSmellsCsvFile(new File(outputFolder, "smells.csv"));
-        outputConfiguration.setVariableChangesCsvFile(new File(outputFolder, "variable_changes.csv"));
         outputConfiguration.setStrategy(Exporter.Strategy.IN_MEMORY);
 
         final EvolutionConfiguration evolutionConfiguration = new EvolutionConfiguration();

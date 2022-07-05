@@ -22,17 +22,19 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Set;
 
 public class FixOverChecking extends FixDetection {
-    protected FixOverChecking(SmellConfiguration configuration) {
-        super(configuration);
+    protected FixOverChecking(SmellConfiguration configuration, History history) {
+        super(SmellMetric.Type.OVER_CHECKING, configuration, history);
     }
 
     @Override
-    public boolean isFix(Set<SourceNode> nodes, Edit edit) {
-        return isDefaultFix(nodes, edit, Edit.Type.REMOVE_STEP);
+    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
+        return getDefaultFix(nodes, edit, Edit.Type.REMOVE_STEP);
     }
 }

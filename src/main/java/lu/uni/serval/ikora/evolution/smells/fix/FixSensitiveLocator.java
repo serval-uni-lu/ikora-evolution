@@ -26,22 +26,28 @@ import lu.uni.serval.ikora.core.model.Argument;
 import lu.uni.serval.ikora.core.model.Literal;
 import lu.uni.serval.ikora.core.model.SourceNode;
 import lu.uni.serval.ikora.core.model.VariableAssignment;
+import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
+import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.utils.LocatorUtils;
 
 import java.util.Set;
 import java.util.stream.Stream;
 
 public class FixSensitiveLocator extends FixDetection{
-    protected FixSensitiveLocator(SmellConfiguration configuration) {
-        super(configuration);
+    protected FixSensitiveLocator(SmellConfiguration configuration, History history) {
+        super(SmellMetric.Type.SENSITIVE_LOCATOR, configuration, history);
     }
 
     @Override
-    public boolean isFix(Set<SourceNode> nodes, Edit edit) {
-        return isContaining(nodes, edit)
+    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
+        if(isContaining(nodes, edit)
                 && Literal.class.isAssignableFrom(edit.getRight().getClass())
-                && !LocatorUtils.isComplex(edit.getRight().getName(), configuration.getMaximumLocatorSize());
+                && !LocatorUtils.isComplex(edit.getRight().getName(), configuration.getMaximumLocatorSize())){
+            return getFixResult(edit);
+        }
+
+        return FixResult.noFix();
     }
 
     private boolean isContaining(Set<SourceNode> nodes, Edit edit){

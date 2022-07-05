@@ -42,4 +42,14 @@ public class VersionUtils {
 
         return Optional.empty();
     }
+
+    public static Optional<SourceNode> matchPrevious(Set<Pair<? extends SourceNode, ? extends SourceNode>> pairs, SourceNode node) {
+        for(Pair<? extends SourceNode, ? extends SourceNode> pair: pairs){
+            if(pair.getRight() == node) {
+                return Optional.ofNullable(pair.getLeft());
+            }
+        }
+
+        return Optional.empty();
+    }
 }

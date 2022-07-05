@@ -32,8 +32,7 @@ public class OutputConfiguration {
     private File projectsCsvFile;
     @JsonProperty(value = "tests")
     private File testCsvFile;
-    @JsonProperty(value = "variables changes")
-    private File variableChangesCsvFile;
+
     @JsonProperty(value = "strategy", defaultValue = "CSV")
     private Exporter.Strategy strategy = Exporter.Strategy.CSV;
     @JsonProperty(value = "hash names", defaultValue = "false")
@@ -61,14 +60,6 @@ public class OutputConfiguration {
 
     public void setTestCsvFile(File testCsvFile) {
         this.testCsvFile = testCsvFile;
-    }
-
-    public File getVariableChangesCsvFile() {
-        return variableChangesCsvFile;
-    }
-
-    public void setVariableChangesCsvFile(File variableChangesCsvFile) {
-        this.variableChangesCsvFile = variableChangesCsvFile;
     }
 
     public Exporter.Strategy getStrategy() {

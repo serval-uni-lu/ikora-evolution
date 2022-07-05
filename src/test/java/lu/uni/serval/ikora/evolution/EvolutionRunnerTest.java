@@ -23,7 +23,6 @@ package lu.uni.serval.ikora.evolution;
 import lu.uni.serval.commons.git.exception.InvalidGitRepositoryException;
 import lu.uni.serval.ikora.evolution.export.ExporterFactory;
 import lu.uni.serval.ikora.evolution.results.BaseRecord;
-import lu.uni.serval.ikora.evolution.results.VariableChangeRecord;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
 import lu.uni.serval.ikora.evolution.configuration.EvolutionConfiguration;
@@ -48,6 +47,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(2, records.get(1).getFixesCount());
+        assertEquals(1, records.get(1).getVersionsCount());
     }
 
     @Test
@@ -81,6 +81,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getVersionsCount());
     }
 
     @Test
@@ -194,7 +195,7 @@ class EvolutionRunnerTest {
     }
 
     @Test
-    void testStinkySynchronizationSyndromeFix() throws GitAPIException, IOException, InvalidGitRepositoryException {
+    void testStickySynchronizationSyndromeFix() throws GitAPIException, IOException, InvalidGitRepositoryException {
         final List<SmellRecord> records = executeAnalysis("stinky-synchronization-syndrome", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.STINKY_SYNCHRONIZATION_SYNDROME.name()))
                 .collect(Collectors.toList());
@@ -202,6 +203,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1, records.get(1).getVersionsCount());
     }
 
     @Test
@@ -213,20 +215,6 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
-    }
-
-    @Test
-    void testVariablesEvolution() throws GitAPIException, IOException, InvalidGitRepositoryException {
-        final List<VariableChangeRecord> records = executeAnalysis("sensitive-locator", EvolutionExport.Statistics.VARIABLE_CHANGES, VariableChangeRecord.class);
-        assertEquals(1, records.size());
-        assertEquals("locator", records.get(0).getBeforeType());
-        assertEquals("locator", records.get(0).getAfterType());
-        assertEquals("${PASSWORD_FIELD}", records.get(0).getBeforeName());
-        assertEquals("${PASSWORD_FIELD}", records.get(0).getAfterName());
-        assertEquals("Input Text", records.get(0).getBeforeCall());
-        assertEquals("Input Text", records.get(0).getAfterCall());
-        assertEquals("[css:.covid-form > div > div.react-grid-Container > div > div > div.react-grid-Header > div > div > div:nth-child(3) > div]", records.get(0).getBeforeValues());
-        assertEquals("[password_field]", records.get(0).getAfterValues());
     }
 
     private <T extends BaseRecord> List<T> executeAnalysis(String resourcesPath, EvolutionExport.Statistics statistics, Class<T> type) throws GitAPIException, IOException, InvalidGitRepositoryException {
