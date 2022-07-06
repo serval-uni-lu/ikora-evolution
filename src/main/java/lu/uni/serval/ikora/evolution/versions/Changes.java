@@ -6,6 +6,7 @@ import lu.uni.serval.ikora.core.analytics.difference.NodeMatcher;
 import lu.uni.serval.ikora.core.model.KeywordDefinition;
 import lu.uni.serval.ikora.core.model.Projects;
 import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.core.model.VariableAssignment;
 import lu.uni.serval.ikora.core.utils.Ast;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -48,40 +49,56 @@ public class Changes {
     }
 
     public Optional<SourceNode> findPreviousNode(SourceNode node){
-        final Optional<KeywordDefinition> keyword = Ast.getParentByType(node, KeywordDefinition.class);
+        Optional<SourceNode> parent = getParent(node);
 
-        if(keyword.isEmpty()){
+        if(parent.isEmpty()){
             return Optional.empty();
         }
 
-        final Optional<KeywordDefinition> previousKeyword = pairs.stream()
-                .filter(p -> p.getRight() == keyword.get())
+        final Optional<SourceNode> previousParent = pairs.stream()
+                .filter(p -> p.getRight() == parent.get())
                 .map(Pair::getLeft)
-                .map(KeywordDefinition.class::cast)
+                .map(SourceNode.class::cast)
                 .findAny();
 
-        if(previousKeyword.isEmpty()){
+        if(previousParent.isEmpty()){
             return Optional.empty();
         }
 
-        return findPreviousNode(node, previousKeyword.get(), keyword.get());
+        return findPreviousNode(node, previousParent.get(), parent.get());
     }
 
-    private Optional<SourceNode> findPreviousNode(SourceNode node, KeywordDefinition k1, KeywordDefinition k2){
+    private Optional<SourceNode> getParent(SourceNode node){
+        final Optional<KeywordDefinition> keyword = Ast.getParentByType(node, KeywordDefinition.class);
+
+        if(keyword.isPresent()){
+            return keyword.map(SourceNode.class::cast);
+        }
+
+        final Optional<VariableAssignment> assignment = Ast.getParentByType(node, VariableAssignment.class);
+
+        if(assignment.isPresent()){
+            return assignment.map(SourceNode.class::cast);
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<SourceNode> findPreviousNode(SourceNode node, SourceNode p1, SourceNode p2){
         final Deque<SourceNode> parents = new LinkedList<>();
         SourceNode parent = node;
 
         while(true){
             parents.push(parent);
 
-            if(parent == k2 || parent == null){
+            if(parent == p2 || parent == null){
                 break;
             }
 
             parent = parent.getAstParent();
         }
 
-        List<SourceNode> candidates = k1.getAstChildren();
+        List<SourceNode> candidates = p1.getAstChildren();
         Optional<SourceNode> candidate = Optional.empty();
 
         while (!parents.isEmpty()){

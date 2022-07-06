@@ -63,7 +63,7 @@ public class EvolutionRunner {
         this.history = new History();
     }
 
-    public void execute() throws IOException, GitAPIException, InvalidGitRepositoryException {
+    public void execute() throws IOException, GitAPIException, InvalidGitRepositoryException, InterruptedException {
         try (VersionProvider versionProvider = VersionProviderFactory.fromConfiguration(configuration)) {
             SmellRecordAccumulator previousRecords = null;
             Projects previousVersion = null;
@@ -91,7 +91,7 @@ public class EvolutionRunner {
         this.exporter.export(EvolutionExport.Statistics.PROJECT, new VersionRecord(version));
     }
 
-    private SmellRecordAccumulator computeSmells(Projects version, SmellRecordAccumulator previousRecords, Changes changes) throws IOException {
+    private SmellRecordAccumulator computeSmells(Projects version, SmellRecordAccumulator previousRecords, Changes changes) throws IOException, InterruptedException {
         if(!this.exporter.contains(EvolutionExport.Statistics.SMELL)){
             return new SmellRecordAccumulator();
         }
@@ -112,7 +112,7 @@ public class EvolutionRunner {
         }
     }
 
-    private SmellRecordAccumulator findSmells(Projects version, Changes changes, SmellRecordAccumulator previousRecords){
+    private SmellRecordAccumulator findSmells(Projects version, Changes changes, SmellRecordAccumulator previousRecords) throws InterruptedException {
         final SmellConfiguration smellConfiguration = this.configuration.getSmellConfiguration();
         final SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
         final Map<SmellMetric.Type, Set<SourceNode>> previousNodes = previousRecords != null ? previousRecords.getNodes() : null;

@@ -37,7 +37,7 @@ public class EvolutionAnalysis {
 
     private static final String CONFIG_OPTION = "config";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         try{
             final EvolutionConfiguration configuration = getConfiguration(args);
 
