@@ -57,6 +57,7 @@ public class Changes {
 
         final Optional<SourceNode> previousParent = pairs.stream()
                 .filter(p -> p.getRight() == parent.get())
+                .filter(p -> p.getLeft() != null)
                 .map(Pair::getLeft)
                 .map(SourceNode.class::cast)
                 .findAny();
@@ -95,10 +96,10 @@ public class Changes {
                 break;
             }
 
-            parent = parent.getAstParent();
+            parent = parent.getAstParent(false);
         }
 
-        List<SourceNode> candidates = p1.getAstChildren();
+        List<SourceNode> candidates = Collections.singletonList(p1);
         Optional<SourceNode> candidate = Optional.empty();
 
         while (!parents.isEmpty()){
@@ -108,6 +109,8 @@ public class Changes {
             if(candidate.isEmpty()){
                 return Optional.empty();
             }
+
+            candidates = candidate.get().getAstChildren();
         }
 
         return candidate;
@@ -115,6 +118,11 @@ public class Changes {
 
     private Optional<SourceNode> findBestCandidate(SourceNode current, List<SourceNode> candidates){
         for(SourceNode candidate: candidates){
+            final Optional<Edit> edit = edits.stream().filter(e -> e.getRight() == current).findAny();
+            if(edit.isPresent()){
+                return Optional.of(edit.get().getLeft());
+            }
+
             if(current.differences(candidate).isEmpty()){
                 return Optional.of(candidate);
             }

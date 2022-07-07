@@ -217,6 +217,17 @@ class EvolutionRunnerTest {
         assertEquals(1, records.get(1).getFixesCount());
     }
 
+    @Test
+    void testVersionCount() throws GitAPIException, IOException, InvalidGitRepositoryException, InterruptedException {
+        final List<SmellRecord> records = executeAnalysis("history", EvolutionExport.Statistics.SMELL, SmellRecord.class).stream()
+                .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.HARD_CODED_VALUES.name()))
+                .collect(Collectors.toList());
+
+        assertEquals(3, records.size());
+        assertEquals(1, records.get(2).getFixesCount());
+        assertEquals(2., records.get(2).getVersionsCount());
+    }
+
     private <T extends BaseRecord> List<T> executeAnalysis(String resourcesPath, EvolutionExport.Statistics statistics, Class<T> type) throws GitAPIException, IOException, InvalidGitRepositoryException, InterruptedException {
         final EvolutionConfiguration configuration = Helpers.createConfiguration(resourcesPath, statistics);
 
