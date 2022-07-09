@@ -23,6 +23,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 import lu.uni.serval.ikora.core.analytics.KeywordStatistics;
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.KeywordDefinition;
+import lu.uni.serval.ikora.core.model.Projects;
 import lu.uni.serval.ikora.core.model.SourceNode;
 import lu.uni.serval.ikora.core.model.Step;
 import lu.uni.serval.ikora.core.utils.Cfg;
@@ -31,7 +32,6 @@ import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Optional;
-import java.util.Set;
 
 public class FixLongTestSteps extends FixDetection{
     protected FixLongTestSteps(SmellConfiguration configuration, History history) {
@@ -39,21 +39,21 @@ public class FixLongTestSteps extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
-        final KeywordDefinition previousStep = getPreviousStep(edit, nodes);
+    public FixResult getFix(Projects version, Edit edit) {
+        final KeywordDefinition previousStep = getPreviousStep(edit, version);
 
         if(previousStep == null){
             return FixResult.noFix();
         }
 
         if(KeywordStatistics.getSequenceSize(previousStep) > configuration.getMaximumStepSize()){
-            return getFixResult(edit);
+            return getFixResult(version, edit);
         }
 
         return FixResult.noFix();
     }
 
-    private static KeywordDefinition getPreviousStep(Edit edit, Set<SourceNode> nodes){
+    private KeywordDefinition getPreviousStep(Edit edit, Projects version){
         if(edit.getType() != Edit.Type.REMOVE_STEP){
             return null;
         }
@@ -62,11 +62,11 @@ public class FixLongTestSteps extends FixDetection{
             return null;
         }
 
-        return getRelevantStep((Step) edit.getLeft(), nodes);
+        return getRelevantStep((Step) edit.getLeft(), version);
     }
 
-    private static KeywordDefinition getRelevantStep(Step step, Set<SourceNode> nodes){
-        for(SourceNode node: nodes){
+    private KeywordDefinition getRelevantStep(Step step, Projects version){
+        for(SourceNode node: getPreviousSmellyNodes(version)){
             final Optional<KeywordDefinition> parent = Cfg.getCallerByName(step, node.getDefinitionToken());
 
             if(parent.isPresent() ){

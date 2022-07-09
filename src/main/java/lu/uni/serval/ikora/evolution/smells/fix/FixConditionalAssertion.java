@@ -22,13 +22,11 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.Keyword;
-import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.core.model.Projects;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.NodeUtils;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
-
-import java.util.Set;
 
 public class FixConditionalAssertion extends FixDetection{
     protected FixConditionalAssertion(SmellConfiguration configuration, History history) {
@@ -36,9 +34,9 @@ public class FixConditionalAssertion extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
-        if(nodes.contains(edit.getLeft()) && NodeUtils.isCallType(edit.getRight(), Keyword.Type.ASSERTION, true)){
-            return getFixResult(edit);
+    public FixResult getFix(Projects version, Edit edit) {
+        if(getPreviousSmellyNodes(version).contains(edit.getLeft()) && NodeUtils.isCallType(edit.getRight(), Keyword.Type.ASSERTION, true)){
+            return getFixResult(version, edit);
         }
 
         return FixResult.noFix();

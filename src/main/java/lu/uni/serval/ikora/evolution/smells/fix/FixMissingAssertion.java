@@ -26,25 +26,23 @@ import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
 
-import java.util.Set;
-
 public class FixMissingAssertion extends FixDetection{
     protected FixMissingAssertion(SmellConfiguration configuration, History history) {
         super(SmellMetric.Type.MISSING_ASSERTION, configuration, history);
     }
 
     @Override
-    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
+    public FixResult getFix(Projects version, Edit edit) {
         if(edit.getRight() == null){
             return FixResult.noFix();
         }
 
         if(edit.getType() == Edit.Type.ADD_STEP && isAddAssertion((Step)edit.getRight())){
-            return getFixResult(edit);
+            return getFixResult(version, edit);
         }
 
         if(edit.getType() == Edit.Type.ADD_USER_KEYWORD && isAddAssertion((UserKeyword) edit.getRight())){
-            return getFixResult(edit);
+            return getFixResult(version, edit);
         }
 
         return FixResult.noFix();

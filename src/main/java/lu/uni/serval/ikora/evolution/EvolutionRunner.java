@@ -27,14 +27,12 @@ import lu.uni.serval.ikora.evolution.export.EvolutionExport;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.evolution.smells.SmellRecordAccumulator;
 import lu.uni.serval.ikora.evolution.results.VersionRecord;
-import lu.uni.serval.ikora.evolution.versions.Changes;
 import lu.uni.serval.ikora.evolution.versions.FolderProvider;
 import lu.uni.serval.ikora.evolution.versions.VersionProvider;
 
 import lu.uni.serval.ikora.evolution.versions.VersionProviderFactory;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellDetector;
-import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.SmellResults;
 
 import lu.uni.serval.ikora.core.model.*;
@@ -47,7 +45,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.IOException;
-import java.util.*;
 
 public class EvolutionRunner {
     private static final Logger logger = LogManager.getLogger(EvolutionRunner.class);
@@ -65,8 +62,7 @@ public class EvolutionRunner {
 
     public void execute() throws IOException, GitAPIException, InvalidGitRepositoryException, InterruptedException {
         try (VersionProvider versionProvider = VersionProviderFactory.fromConfiguration(configuration)) {
-            SmellRecordAccumulator previousRecords = null;
-            Projects previousVersion = null;
+            this.history.setIgnoreProjectName(versionProvider instanceof FolderProvider);
 
             for(Projects version: versionProvider){
                 logger.log(Level.INFO, "Starting analysis for version {}...", version.getVersionId());
@@ -74,9 +70,8 @@ public class EvolutionRunner {
                 computeVersionStatistics(version);
                 computeTestStatistics(version);
 
-                final Changes changes = Changes.fromVersions(previousVersion, version, versionProvider instanceof FolderProvider);
-                previousRecords = computeSmells(version, previousRecords, changes);
-                previousVersion = version;
+                this.history.addVersion(version);
+                computeSmells(version);
 
                 logger.log(Level.INFO, "Analysis for version {} done.", version.getVersionId());
             }
@@ -91,15 +86,15 @@ public class EvolutionRunner {
         this.exporter.export(EvolutionExport.Statistics.PROJECT, new VersionRecord(version));
     }
 
-    private SmellRecordAccumulator computeSmells(Projects version, SmellRecordAccumulator previousRecords, Changes changes) throws IOException, InterruptedException {
+    private void computeSmells(Projects version) throws IOException, InterruptedException {
         if(!this.exporter.contains(EvolutionExport.Statistics.SMELL)){
-            return new SmellRecordAccumulator();
+            new SmellRecordAccumulator();
+            return;
         }
 
-        SmellRecordAccumulator smellRecordAccumulator = findSmells(version, changes, previousRecords);
+        SmellRecordAccumulator smellRecordAccumulator = findSmells(version);
         this.exporter.export(EvolutionExport.Statistics.SMELL, smellRecordAccumulator.getRecords());
 
-        return smellRecordAccumulator;
     }
 
     private void computeTestStatistics(Projects version) throws IOException {
@@ -112,12 +107,10 @@ public class EvolutionRunner {
         }
     }
 
-    private SmellRecordAccumulator findSmells(Projects version, Changes changes, SmellRecordAccumulator previousRecords) throws InterruptedException {
+    private SmellRecordAccumulator findSmells(Projects version) throws InterruptedException {
         final SmellConfiguration smellConfiguration = this.configuration.getSmellConfiguration();
         final SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
-        final Map<SmellMetric.Type, Set<SourceNode>> previousNodes = previousRecords != null ? previousRecords.getNodes() : null;
         final SmellDetector detector = SmellDetector.all();
-        final String versionId = version.getVersionId();
         final Clones<KeywordDefinition> clones = KeywordCloneDetection.findClones(version);
 
         smellConfiguration.setClones(clones);
@@ -125,7 +118,8 @@ public class EvolutionRunner {
         for(Project project: version){
             for(TestCase testCase: project.getTestCases()){
                 final SmellResults smellResults = detector.computeMetrics(testCase, smellConfiguration);
-                smellRecordAccumulator.addTestCase(versionId, testCase, smellResults, changes, previousNodes, smellConfiguration, history);
+                history.addSmells(version, smellResults);
+                smellRecordAccumulator.addTestCase(version, testCase, smellResults, smellConfiguration, history);
             }
         }
 

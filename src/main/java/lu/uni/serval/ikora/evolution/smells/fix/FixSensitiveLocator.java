@@ -22,10 +22,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.builder.resolver.ValueResolver;
-import lu.uni.serval.ikora.core.model.Argument;
-import lu.uni.serval.ikora.core.model.Literal;
-import lu.uni.serval.ikora.core.model.SourceNode;
-import lu.uni.serval.ikora.core.model.VariableAssignment;
+import lu.uni.serval.ikora.core.model.*;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
@@ -40,11 +37,11 @@ public class FixSensitiveLocator extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
-        if(isContaining(nodes, edit)
+    public FixResult getFix(Projects version, Edit edit) {
+        if(isContaining(getPreviousSmellyNodes(version), edit)
                 && Literal.class.isAssignableFrom(edit.getRight().getClass())
                 && !LocatorUtils.isComplex(edit.getRight().getName(), configuration.getMaximumLocatorSize())){
-            return getFixResult(edit);
+            return getFixResult(version, edit);
         }
 
         return FixResult.noFix();

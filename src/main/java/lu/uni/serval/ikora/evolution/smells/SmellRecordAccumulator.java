@@ -22,7 +22,6 @@ package lu.uni.serval.ikora.evolution.smells;
 
 import lu.uni.serval.ikora.core.model.*;
 
-import lu.uni.serval.ikora.evolution.versions.Changes;
 import lu.uni.serval.ikora.evolution.smells.fix.FixAccumulator;
 import lu.uni.serval.ikora.evolution.smells.fix.FixResult;
 import lu.uni.serval.ikora.smells.*;
@@ -34,43 +33,26 @@ import java.util.*;
 
 public class SmellRecordAccumulator {
     private final List<BaseRecord> records = new ArrayList<>();
-    private final Map<SmellMetric.Type, Set<SourceNode>> nodes = new EnumMap<>(SmellMetric.Type.class);
 
-    public void addTestCase(String version,
+    public void addTestCase(Projects version,
                             TestCase testCase,
                             SmellResults smells,
-                            Changes changes,
-                            Map<SmellMetric.Type, Set<SourceNode>> previousNodes,
                             SmellConfiguration configuration,
                             History history){
-        updateNodes(smells);
+
 
         for(SmellResult smell: smells){
-            history.addSmell(smell, changes);
             Set<FixResult> fixes = Collections.emptySet();
 
-            if(previousNodes != null){
-                final Set<SourceNode> previous = previousNodes.getOrDefault(smell.getType(), new HashSet<>());
-                fixes = FixAccumulator.collect(testCase, smell.getType(), changes, previous, configuration, history);
+            if(history.hasPreviousVersion()){
+                fixes = FixAccumulator.collect(version, testCase, smell.getType(), configuration, history);
             }
 
-            records.add(new SmellRecord(version, testCase, smell.getType().name(), smell.getRawValue(), smell.getNormalizedValue(), fixes));
+            records.add(new SmellRecord(version.getVersionId(), testCase, smell.getType().name(), smell.getRawValue(), smell.getNormalizedValue(), fixes));
         }
     }
 
     public List<BaseRecord> getRecords() {
         return records;
-    }
-
-    public Map<SmellMetric.Type, Set<SourceNode>> getNodes() {
-        return nodes;
-    }
-
-    private void updateNodes(SmellResults smells){
-        for(SmellResult smell: smells){
-            final Set<SourceNode> nodesByType = nodes.getOrDefault(smell.getType(), new HashSet<>());
-            nodesByType.addAll(smell.getNodes());
-            nodes.putIfAbsent(smell.getType(), nodesByType);
-        }
     }
 }

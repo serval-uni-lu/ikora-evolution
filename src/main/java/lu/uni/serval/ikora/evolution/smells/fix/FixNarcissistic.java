@@ -21,13 +21,11 @@ package lu.uni.serval.ikora.evolution.smells.fix;
  */
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
-import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.core.model.Projects;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.utils.NLPUtils;
-
-import java.util.Set;
 
 public class FixNarcissistic extends FixDetection{
     protected FixNarcissistic(SmellConfiguration configuration, History history) {
@@ -35,13 +33,13 @@ public class FixNarcissistic extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
+    public FixResult getFix(Projects version, Edit edit) {
         if(edit.getType() != Edit.Type.CHANGE_STEP){
             return FixResult.noFix();
         }
 
-        if(nodes.contains(edit.getLeft()) && !NLPUtils.isUsingPersonalPronoun(edit.getRight().getName())){
-            return getFixResult(edit);
+        if(wasSmelly(version, edit) && !NLPUtils.isUsingPersonalPronoun(edit.getRight().getName())){
+            return getFixResult(version, edit);
         }
 
         return FixResult.noFix();

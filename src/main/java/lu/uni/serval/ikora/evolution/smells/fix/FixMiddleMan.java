@@ -28,7 +28,6 @@ import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.util.Optional;
-import java.util.Set;
 
 public class FixMiddleMan extends FixDetection{
     protected FixMiddleMan(SmellConfiguration configuration, History history) {
@@ -36,8 +35,8 @@ public class FixMiddleMan extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Set<SourceNode> nodes, Edit edit) {
-        FixResult result = getDefaultFix(nodes, edit, Edit.Type.REMOVE_USER_KEYWORD);
+    public FixResult getFix(Projects version, Edit edit) {
+        FixResult result = getDefaultFix(version, edit, Edit.Type.REMOVE_USER_KEYWORD);
         if(result.isValid()){
             return FixResult.noFix();
         }
@@ -45,7 +44,7 @@ public class FixMiddleMan extends FixDetection{
         if(edit.getType() == Edit.Type.CHANGE_STEP){
             final Optional<UserKeyword> parent = Ast.getParentByType(edit.getLeft(), UserKeyword.class);
 
-            if(parent.isEmpty() || !nodes.contains(parent.get())){
+            if(parent.isEmpty() || !wasSmelly(version, parent.get())){
                 return FixResult.noFix();
             }
 
@@ -57,7 +56,7 @@ public class FixMiddleMan extends FixDetection{
                     .filter(call -> call.getKeywordType() != Keyword.Type.USER);
 
             if(keywordCall.isPresent()){
-                return getFixResult(edit);
+                return getFixResult(version, edit);
             }
 
             return FixResult.noFix();

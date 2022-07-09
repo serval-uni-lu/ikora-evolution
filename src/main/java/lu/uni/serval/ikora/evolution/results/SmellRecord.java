@@ -51,7 +51,7 @@ public class SmellRecord implements BaseRecord {
         this.smellMetricRawValue = smellMetricRawValue;
         this.smellMetricNormalizedValue = smellMetricNormalizedValue;
         this.fixesCount = fixes.size();
-        this.versionsCount = computeAgerageNumberVersions(fixes);
+        this.versionsCount = computeVersionCount(fixes);
     }
 
     public String getVersion() {
@@ -128,17 +128,25 @@ public class SmellRecord implements BaseRecord {
                 "smell_raw_value",
                 "smell_normalized_value",
                 "fixes",
-                "versions_count"
+                "before_fix_version_count",
+                "before_fix_days"
         };
     }
 
-    private double computeAgerageNumberVersions(Set<FixResult> fixes){
+    private double computeVersionCount(Set<FixResult> fixes){
         if(fixes.isEmpty()){
             return 0.;
         }
 
         return fixes.stream()
-                .mapToDouble(f -> f.getSequence().getNumberVersions())
+                .mapToDouble(FixResult::getNumberVersions)
+                .average()
+                .orElse(Double.NaN);
+    }
+
+    private double computeDuration(Set<FixResult> fixes){
+        return fixes.stream()
+                .mapToDouble(f -> f.getDuration().toDays())
                 .average()
                 .orElse(Double.NaN);
     }

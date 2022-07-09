@@ -21,9 +21,9 @@ package lu.uni.serval.ikora.evolution.smells.fix;
  */
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
+import lu.uni.serval.ikora.core.model.Projects;
 import lu.uni.serval.ikora.core.model.SourceNode;
 import lu.uni.serval.ikora.evolution.smells.History;
-import lu.uni.serval.ikora.evolution.smells.Sequence;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
 
@@ -41,19 +41,30 @@ public abstract class FixDetection {
         this.history = history;
     }
 
-    protected FixResult getDefaultFix(Set<SourceNode> nodes, Edit edit, Edit.Type... types){
-        if(Arrays.stream(types).anyMatch(t -> edit.getType() == t) && nodes.contains(edit.getLeft())){
-            return getFixResult(edit);
+    public abstract FixResult getFix(Projects version, Edit edit);
+
+    protected FixResult getDefaultFix(Projects version, Edit edit, Edit.Type... types){
+        if(Arrays.stream(types).anyMatch(t -> edit.getType() == t) && wasSmelly(version, edit)){
+            return getFixResult(version, edit);
         }
 
         return FixResult.noFix();
     }
 
-    protected FixResult getFixResult(Edit edit){
+    protected FixResult getFixResult(Projects version, Edit edit){
         final SourceNode fixed = edit.getRight();
-        final Sequence sequence = history.findSequence(type, edit).orElse(new Sequence(type));
-        return new FixResult(type, fixed, sequence);
+        return new FixResult(type, fixed, history.getSequence(version, edit));
     }
 
-    public abstract FixResult getFix(Set<SourceNode> nodes, Edit edit);
+    protected Set<SourceNode> getPreviousSmellyNodes(Projects version){
+        return history.getPreviousSmellyNodes(version, type);
+    }
+
+    protected boolean wasSmelly(Projects version, Edit edit){
+        return wasSmelly(version, edit.getLeft());
+    }
+
+    protected boolean wasSmelly(Projects version, SourceNode previousNode){
+        return getPreviousSmellyNodes(version).contains(previousNode);
+    }
 }
