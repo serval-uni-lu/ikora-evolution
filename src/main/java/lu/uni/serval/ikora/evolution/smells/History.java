@@ -75,6 +75,10 @@ public class History {
     }
 
     public Optional<SourceNode> findPreviousNode(Projects version, SourceNode node){
+        if(node == null){
+            return Optional.empty();
+        }
+
         final Optional<VersionPairs> pair = findPreviousPair(version);
 
         if(pair.isEmpty()){
@@ -85,6 +89,10 @@ public class History {
     }
 
     public List<SourceNode> getSequence(Projects version, SourceNode node){
+        if(node == null){
+            return Collections.emptyList();
+        }
+
         final List<SourceNode> history = new LinkedList<>();
         history.add(node);
 
@@ -98,6 +106,7 @@ public class History {
 
             node = previousNode.get();
             history.add(node);
+
             previousPair = findPreviousPair(previousPair.get().getLeftVersion());
         }
 
