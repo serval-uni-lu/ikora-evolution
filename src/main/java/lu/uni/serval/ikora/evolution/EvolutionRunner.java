@@ -27,6 +27,7 @@ import lu.uni.serval.ikora.evolution.export.EvolutionExport;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.evolution.smells.SmellRecordAccumulator;
 import lu.uni.serval.ikora.evolution.results.VersionRecord;
+import lu.uni.serval.ikora.evolution.smells.fix.FixAccumulator;
 import lu.uni.serval.ikora.evolution.versions.FolderProvider;
 import lu.uni.serval.ikora.evolution.versions.VersionProvider;
 
@@ -51,13 +52,15 @@ public class EvolutionRunner {
 
     private final EvolutionExport exporter;
     private final EvolutionConfiguration configuration;
-
     private final History history;
+
+    private final FixAccumulator fixAccumulator;
 
     public EvolutionRunner(EvolutionExport exporter, EvolutionConfiguration configuration){
         this.exporter = exporter;
         this.configuration = configuration;
         this.history = new History();
+        this.fixAccumulator = new FixAccumulator(this.configuration.getSmellConfiguration(), this.history);
     }
 
     public void execute() throws IOException, GitAPIException, InvalidGitRepositoryException, InterruptedException {
@@ -88,7 +91,7 @@ public class EvolutionRunner {
 
     private void computeSmells(Projects version) throws IOException, InterruptedException {
         if(!this.exporter.contains(EvolutionExport.Statistics.SMELL)){
-            new SmellRecordAccumulator();
+            new SmellRecordAccumulator(fixAccumulator);
             return;
         }
 
@@ -109,7 +112,7 @@ public class EvolutionRunner {
 
     private SmellRecordAccumulator findSmells(Projects version) throws InterruptedException {
         final SmellConfiguration smellConfiguration = this.configuration.getSmellConfiguration();
-        final SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator();
+        final SmellRecordAccumulator smellRecordAccumulator = new SmellRecordAccumulator(fixAccumulator);
         final SmellDetector detector = SmellDetector.all();
         final Clones<KeywordDefinition> clones = KeywordCloneDetection.findClones(version);
 
@@ -119,7 +122,7 @@ public class EvolutionRunner {
             for(TestCase testCase: project.getTestCases()){
                 final SmellResults smellResults = detector.computeMetrics(testCase, smellConfiguration);
                 history.addSmells(version, smellResults);
-                smellRecordAccumulator.addTestCase(version, testCase, smellResults, smellConfiguration, history);
+                smellRecordAccumulator.addTestCase(version, testCase, smellResults);
             }
         }
 

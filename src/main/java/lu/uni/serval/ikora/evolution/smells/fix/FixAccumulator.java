@@ -30,14 +30,42 @@ import lu.uni.serval.ikora.smells.SmellMetric;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FixAccumulator {
-    private FixAccumulator() {}
+import static lu.uni.serval.ikora.smells.SmellMetric.Type.*;
 
-    public static Set<FixResult> collect(Projects version,
-                                         TestCase testCase,
-                                         SmellMetric.Type type,
-                                         SmellConfiguration configuration,
-                                         History history){
+public class FixAccumulator {
+    private final History history;
+    private final EnumMap<SmellMetric.Type, FixDetection> fixDetectionMap;
+
+    public FixAccumulator(SmellConfiguration configuration, History history) {
+        this.history = history;
+        this.fixDetectionMap = new EnumMap<>(SmellMetric.Type.class);
+        initialize(configuration);
+    }
+
+    private void initialize(SmellConfiguration configuration) {
+        this.fixDetectionMap.put(ARMY_OF_CLONES, new FixArmyOfClones(configuration, history));
+        this.fixDetectionMap.put(CONDITIONAL_ASSERTION, new FixConditionalAssertion(configuration, history));
+        this.fixDetectionMap.put(HARDCODED_ENVIRONMENT_CONFIGURATIONS, new FixHardcodedEnvironment(configuration, history));
+        this.fixDetectionMap.put(HARD_CODED_VALUES, new FixHardCodedValues(configuration, history));
+        this.fixDetectionMap.put(HIDING_TEST_DATA, new FixHiddenTestData(configuration, history));
+        this.fixDetectionMap.put(LACK_OF_ENCAPSULATION, new FixLackOfEncapsulation(configuration, history));
+        this.fixDetectionMap.put(LONG_TEST_STEPS, new FixLongTestSteps(configuration, history));
+        this.fixDetectionMap.put(MIDDLE_MAN, new FixMiddleMan(configuration, history));
+        this.fixDetectionMap.put(MISSING_ASSERTION, new FixMissingAssertion(configuration, history));
+        this.fixDetectionMap.put(MISSING_DOCUMENTATION, new FixMissingDocumentation(configuration, history));
+        this.fixDetectionMap.put(NARCISSISTIC, new FixNarcissistic(configuration, history));
+        this.fixDetectionMap.put(NOISY_LOGGING, new FixNoisyLogging(configuration, history));
+        this.fixDetectionMap.put(ON_THE_FLY, new FixOnTheFly(configuration, history));
+        this.fixDetectionMap.put(OVER_CHECKING, new FixOverChecking(configuration, history));
+        this.fixDetectionMap.put(SENSITIVE_LOCATOR, new FixSensitiveLocator(configuration, history));
+        this.fixDetectionMap.put(SNEAKY_CHECKING, new FixSneakyChecking(configuration, history));
+        this.fixDetectionMap.put(STINKY_SYNCHRONIZATION_SYNDROME, new FixStinkySynchronizationSyndrome(configuration, history));
+    }
+
+    public Set<FixResult> collect(Projects version, TestCase testCase, SmellMetric.Type type){
+        if(!this.history.hasPreviousVersion()){
+            return Collections.emptySet();
+        }
 
         final Optional<SourceNode> previousTestCase = history.findPreviousNode(version, testCase);
 
@@ -51,7 +79,7 @@ public class FixAccumulator {
 
         return history.getEdits(version).stream()
                 .filter(e -> checkTestCase(e, (TestCase) previousTestCase.get(), testCase))
-                .map(e -> getFix(version, type, e, configuration, history))
+                .map(e -> getFix(version, type, e))
                 .filter(FixResult::isValid)
                 .collect(Collectors.toSet());
     }
@@ -66,31 +94,13 @@ public class FixAccumulator {
         return node == testCase || Cfg.isCalledBy(node, testCase);
     }
 
-    private static FixResult getFix(Projects version,
-                                    SmellMetric.Type type,
-                                    Edit edit,
-                                    SmellConfiguration configuration,
-                                    History history){
-        switch (type){
-            case ARMY_OF_CLONES: return new FixArmyOfClones(configuration, history).getFix(version, edit);
-            case CONDITIONAL_ASSERTION: return new FixConditionalAssertion(configuration, history).getFix(version, edit);
-            case HARDCODED_ENVIRONMENT_CONFIGURATIONS: return new FixHardcodedEnvironment(configuration, history).getFix(version, edit);
-            case HARD_CODED_VALUES: return new FixHardCodedValues(configuration, history).getFix(version, edit);
-            case HIDING_TEST_DATA: return new FixHiddenTestData(configuration, history).getFix(version, edit);
-            case LACK_OF_ENCAPSULATION: return new FixLackOfEncapsulation(configuration, history).getFix(version, edit);
-            case LONG_TEST_STEPS: return new FixLongTestSteps(configuration, history).getFix(version, edit);
-            case MIDDLE_MAN: return new FixMiddleMan(configuration, history).getFix(version, edit);
-            case MISSING_ASSERTION: return new FixMissingAssertion(configuration, history).getFix(version, edit);
-            case MISSING_DOCUMENTATION: return new FixMissingDocumentation(configuration, history).getFix(version, edit);
-            case NARCISSISTIC: return new FixNarcissistic(configuration, history).getFix(version, edit);
-            case NOISY_LOGGING: return new FixNoisyLogging(configuration, history).getFix(version, edit);
-            case ON_THE_FLY: return new FixOnTheFly(configuration, history).getFix(version, edit);
-            case OVER_CHECKING: return new FixOverChecking(configuration, history).getFix(version, edit);
-            case SENSITIVE_LOCATOR: return new FixSensitiveLocator(configuration, history).getFix(version, edit);
-            case SNEAKY_CHECKING: return new FixSneakyChecking(configuration, history).getFix(version, edit);
-            case STINKY_SYNCHRONIZATION_SYNDROME: return new FixStinkySynchronizationSyndrome(configuration, history).getFix(version, edit);
+    private FixResult getFix(Projects version, SmellMetric.Type type, Edit edit){
+        final FixDetection fixDetection = this.fixDetectionMap.get(type);
 
-            default: return FixResult.noFix();
+        if(fixDetection == null){
+            return FixResult.noFix();
         }
+
+        return fixDetection.getFix(version, edit);
     }
 }

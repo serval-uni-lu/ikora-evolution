@@ -33,21 +33,15 @@ import java.util.*;
 
 public class SmellRecordAccumulator {
     private final List<BaseRecord> records = new ArrayList<>();
+    private final FixAccumulator fixAccumulator;
 
-    public void addTestCase(Projects version,
-                            TestCase testCase,
-                            SmellResults smells,
-                            SmellConfiguration configuration,
-                            History history){
+    public SmellRecordAccumulator(FixAccumulator fixAccumulator) {
+        this.fixAccumulator = fixAccumulator;
+    }
 
-
+    public void addTestCase(Projects version, TestCase testCase, SmellResults smells){
         for(SmellResult smell: smells){
-            Set<FixResult> fixes = Collections.emptySet();
-
-            if(history.hasPreviousVersion()){
-                fixes = FixAccumulator.collect(version, testCase, smell.getType(), configuration, history);
-            }
-
+            final Set<FixResult> fixes = fixAccumulator.collect(version, testCase, smell.getType());
             records.add(new SmellRecord(version.getVersionId(), testCase, smell.getType().name(), smell.getRawValue(), smell.getNormalizedValue(), fixes));
         }
     }

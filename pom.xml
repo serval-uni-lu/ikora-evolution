@@ -216,7 +216,7 @@
         <dependency>
             <groupId>lu.uni.serval</groupId>
             <artifactId>ikora-smells</artifactId>
-            <version>0.1.18-SNAPSHOT</version>
+            <version>0.1.19</version>
         </dependency>
 
         <dependency>
