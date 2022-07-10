@@ -52,8 +52,7 @@ public abstract class FixDetection {
     }
 
     protected FixResult getFixResult(Projects version, Edit edit){
-        final SourceNode fixed = edit.getRight();
-        return new FixResult(type, version, fixed, history.getSequence(version, edit));
+        return new FixResult(type, version, history.getSequence(version, edit));
     }
 
     protected Set<SourceNode> getPreviousSmellyNodes(Projects version){

@@ -27,26 +27,26 @@ import lu.uni.serval.ikora.smells.SmellMetric;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class FixResult {
     private boolean isValid;
     private final SmellMetric.Type type;
     private final Projects version;
-    private final SourceNode node;
     private final List<SourceNode> history;
 
-    public FixResult(SmellMetric.Type type, Projects version, SourceNode node, List<SourceNode>history){
+    public FixResult(SmellMetric.Type type, Projects version, List<SourceNode>history){
         this.isValid = true;
         this.type = type;
         this.version = version;
-        this.node = node;
         this.history = history;
     }
 
     public static FixResult noFix(){
-        FixResult result = new FixResult(null, null, null, null);
+        FixResult result = new FixResult(null, null, null);
         result.isValid = false;
 
         return result;
@@ -65,21 +65,32 @@ public class FixResult {
     }
 
     public Duration getDuration() {
-        final Optional<Instant> end = getDate();
+        final Instant end = version.getDate();
+        final Instant start = getIntroductionDate();
 
-        if(end.isEmpty()){
+        if(start == null || end == null){
             return Duration.ZERO;
         }
 
-        Instant start = history.stream().map(n -> n.getProject().getDate()).min(Instant::compareTo).orElse(end.get());
-        return Duration.between(start, end.get());
+        return Duration.between(start, end);
     }
 
-    public Optional<Instant> getDate(){
-        if(this.node != null){
-            return Optional.of(this.node.getProject().getDate());
+    private Instant getIntroductionDate(){
+        List<Instant> dates = history.stream()
+                .map(SourceNode::getProject)
+                .filter(Objects::nonNull)
+                .map(Project::getDate)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if(dates.isEmpty()){
+            return version.getDate();
         }
 
-        return this.version.asSet().stream().max(Project::compareTo).map(Project::getDate);
+        if(dates.size() == 1){
+            return dates.iterator().next();
+        }
+
+        return Collections.min(dates);
     }
 }
