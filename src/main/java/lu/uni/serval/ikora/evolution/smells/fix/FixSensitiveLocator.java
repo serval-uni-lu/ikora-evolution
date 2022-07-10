@@ -28,6 +28,7 @@ import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
 import lu.uni.serval.ikora.smells.utils.LocatorUtils;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -48,11 +49,17 @@ public class FixSensitiveLocator extends FixDetection{
     }
 
     private boolean isContaining(Set<SourceNode> nodes, Edit edit){
+        if(edit.getLeft() == null){
+            return false;
+        }
+
         return nodes.contains(edit.getLeft()) ||
         nodes.stream().filter(Argument.class::isInstance)
                 .map(Argument.class::cast)
                 .flatMap(n -> ValueResolver.getValueNodes(n).stream())
+                .filter(Objects::nonNull)
                 .flatMap(n -> n instanceof VariableAssignment ? ((VariableAssignment)n).getValues().stream() : Stream.of(n))
+                .filter(Objects::nonNull)
                 .anyMatch(n -> n == edit.getLeft() || n == edit.getLeft().getAstParent(false));
     }
 }
