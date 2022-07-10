@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.File;
 
-public class FolderConfiguration {
+public class FolderConfiguration extends Configuration {
     public enum NameFormat{
         VERSION,
         DATE

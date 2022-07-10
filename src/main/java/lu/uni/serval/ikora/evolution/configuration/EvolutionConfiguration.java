@@ -23,7 +23,7 @@ package lu.uni.serval.ikora.evolution.configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 
-public class EvolutionConfiguration {
+public class EvolutionConfiguration extends Configuration {
     @JsonProperty(value = "git")
     private GitConfiguration gitConfiguration;
     @JsonProperty(value = "folder")

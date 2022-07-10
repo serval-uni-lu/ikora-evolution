@@ -65,6 +65,10 @@ public abstract class FixDetection {
     }
 
     protected boolean wasSmelly(Projects version, SourceNode previousNode){
+        if(previousNode == null){
+            return false;
+        }
+
         return getPreviousSmellyNodes(version).contains(previousNode);
     }
 }

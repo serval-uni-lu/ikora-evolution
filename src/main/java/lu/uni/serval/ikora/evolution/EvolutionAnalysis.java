@@ -66,6 +66,6 @@ public class EvolutionAnalysis {
             throw new MissingArgumentException(CONFIG_OPTION);
         }
 
-        return ConfigurationParser.parse(cmd.getOptionValue(CONFIG_OPTION));
+        return ConfigurationParser.parse(cmd.getOptionValue(CONFIG_OPTION), EvolutionConfiguration.class);
     }
 }

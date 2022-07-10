@@ -25,7 +25,7 @@ import lu.uni.serval.ikora.evolution.export.Exporter;
 
 import java.io.File;
 
-public class OutputConfiguration {
+public class OutputConfiguration extends Configuration {
     @JsonProperty(value = "smells")
     private File smellsCsvFile;
     @JsonProperty(value = "projects")
@@ -39,6 +39,10 @@ public class OutputConfiguration {
     private boolean hashNames = false;
 
     public File getSmellsCsvFile() {
+        if(smellsCsvFile != null && !smellsCsvFile.isAbsolute()){
+            return new File(getFolder(), smellsCsvFile.getPath());
+        }
+
         return smellsCsvFile;
     }
 
@@ -47,6 +51,10 @@ public class OutputConfiguration {
     }
 
     public File getProjectsCsvFile() {
+        if(projectsCsvFile != null && !projectsCsvFile.isAbsolute()){
+            return new File(getFolder(), projectsCsvFile.getPath());
+        }
+
         return projectsCsvFile;
     }
 
@@ -55,6 +63,10 @@ public class OutputConfiguration {
     }
 
     public File getTestCsvFile() {
+        if(testCsvFile != null && !testCsvFile.isAbsolute()){
+            return new File(getFolder(), testCsvFile.getPath());
+        }
+
         return testCsvFile;
     }
 

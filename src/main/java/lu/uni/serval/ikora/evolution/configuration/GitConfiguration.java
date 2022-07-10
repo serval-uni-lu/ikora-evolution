@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class GitConfiguration {
+public class GitConfiguration extends Configuration {
     private String url;
     private String group;
     @JsonProperty(value = "locations", required = true)

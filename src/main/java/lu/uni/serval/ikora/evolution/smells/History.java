@@ -10,6 +10,7 @@ import lu.uni.serval.ikora.smells.SmellResult;
 import lu.uni.serval.ikora.smells.SmellResults;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class History {
     Map<Projects, Map<SmellMetric.Type, Set<SourceNode>>> smellyNodes = new HashMap<>();
@@ -47,7 +48,7 @@ public class History {
 
         for(SmellResult smell: smellResults){
             final Set<SourceNode> nodesByType = nodes.getOrDefault(smell.getType(), new HashSet<>());
-            nodesByType.addAll(smell.getNodes());
+            nodesByType.addAll(smell.getNodes().stream().filter(Objects::nonNull).collect(Collectors.toSet()));
             nodes.putIfAbsent(smell.getType(), nodesByType);
         }
     }

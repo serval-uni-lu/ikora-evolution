@@ -20,10 +20,14 @@ package lu.uni.serval.ikora.evolution.configuration;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
+import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,29 +40,73 @@ public class ConfigurationParser {
 
     private ConfigurationParser() {}
 
-    public static EvolutionConfiguration parse(String config) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new Jdk8Module());
-        mapper.registerModule(new JavaTimeModule());
+    public static <T extends Configuration> T parse(String config, Class<T> type) throws IOException {
+        File file = new File(config);
 
-        EvolutionConfiguration configuration;
-
-        final File file = new File(config);
-
-        if(file.exists()){
-            logger.log(Level.INFO, "Loading configuration from '{}'...", config);
-            configuration = mapper.readValue(file, EvolutionConfiguration.class);
-        }
-        else if(config.trim().startsWith("{")){
-            logger.info("Loading configuration from content string...");
-            configuration = mapper.readValue(config, EvolutionConfiguration.class);
-        }
-        else{
-            throw new IOException(String.format("Failed to read configuration file provide a valid path or a valid json file:%n%s", config));
+        if(!file.exists()){
+            throw new IOException(String.format("Configuration file '%s' does not exist!", file.getAbsolutePath()));
         }
 
-        logger.info("Configuration loaded.");
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModules(new Jdk8Module(), new FolderModule(file.getParentFile()));
+        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+
+        final T configuration = mapper.readValue(file, type);
+
+        logger.printf(Level.INFO,
+                "Configuration loaded from '%s'",
+                config
+        );
 
         return configuration;
+    }
+
+    public static class FolderModule extends SimpleModule {
+        private final File folder;
+
+        FolderModule(File folder){
+            this.folder = folder;
+        }
+
+        @Override
+        public void setupModule(SetupContext context) {
+            super.setupModule(context);
+            context.addBeanDeserializerModifier(new BeanDeserializerModifier()
+            {
+                @Override public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer)
+                {
+                    if (Configuration.class.isAssignableFrom(beanDesc.getBeanClass())){
+                        return new Modifier((JsonDeserializer<Configuration>)deserializer, folder);
+                    }
+
+                    return deserializer;
+                }
+            });
+        }
+    }
+
+    public static class Modifier extends StdDeserializer<Configuration> implements ResolvableDeserializer {
+        private final transient JsonDeserializer<Configuration> defaultDeserializer;
+        private final File folder;
+
+        public Modifier(JsonDeserializer<Configuration> defaultDeserializer, File folder) {
+            super(Configuration.class);
+
+            this.defaultDeserializer = defaultDeserializer;
+            this.folder = folder;
+        }
+
+        @Override
+        public void resolve(DeserializationContext context) throws JsonMappingException {
+            ((ResolvableDeserializer) defaultDeserializer).resolve(context);
+        }
+
+        @Override
+        public Configuration deserialize(JsonParser p, DeserializationContext context) throws IOException {
+            Configuration configuration = defaultDeserializer.deserialize(p, context);
+            configuration.setFolder(this.folder);
+
+            return configuration;
+        }
     }
 }
