@@ -47,7 +47,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(2, records.get(1).getFixesCount());
-        assertEquals(1, records.get(1).getVersionsCount());
+        assertEquals(1, records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -81,7 +81,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
-        assertEquals(1., records.get(1).getVersionsCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -203,7 +203,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
-        assertEquals(1, records.get(1).getVersionsCount());
+        assertEquals(1, records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -225,7 +225,7 @@ class EvolutionRunnerTest {
 
         assertEquals(3, records.size());
         assertEquals(1, records.get(2).getFixesCount());
-        assertEquals(2., records.get(2).getVersionsCount());
+        assertEquals(2., records.get(2).getBeforeFixVersionCount());
     }
 
     private <T extends BaseRecord> List<T> executeAnalysis(String resourcesPath, EvolutionExport.Statistics statistics, Class<T> type) throws GitAPIException, IOException, InvalidGitRepositoryException, InterruptedException {

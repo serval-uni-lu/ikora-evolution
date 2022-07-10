@@ -38,7 +38,8 @@ public class SmellRecord implements BaseRecord {
     private final double smellMetricRawValue;
     private final double smellMetricNormalizedValue;
     private final long fixesCount;
-    private final double versionsCount;
+    private final double beforeFixVersionCount;
+    private  final double beforeFixDaysCount;
 
     public SmellRecord(String version, TestCase testCase, String smellMetricName, double smellMetricRawValue, double smellMetricNormalizedValue, Set<FixResult> fixes) {
         this.version = version;
@@ -51,7 +52,8 @@ public class SmellRecord implements BaseRecord {
         this.smellMetricRawValue = smellMetricRawValue;
         this.smellMetricNormalizedValue = smellMetricNormalizedValue;
         this.fixesCount = fixes.size();
-        this.versionsCount = computeVersionCount(fixes);
+        this.beforeFixVersionCount = computeVersionCount(fixes);
+        this.beforeFixDaysCount = computeDuration(fixes);
     }
 
     public String getVersion() {
@@ -94,8 +96,12 @@ public class SmellRecord implements BaseRecord {
         return fixesCount;
     }
 
-    public double getVersionsCount() {
-        return versionsCount;
+    public double getBeforeFixVersionCount() {
+        return beforeFixVersionCount;
+    }
+
+    public double getBeforeFixDaysCount() {
+        return beforeFixDaysCount;
     }
 
     @Override
@@ -111,7 +117,8 @@ public class SmellRecord implements BaseRecord {
                 String.valueOf(this.getSmellMetricRawValue()),
                 String.valueOf(this.getSmellMetricNormalizedValue()),
                 String.valueOf(this.getFixesCount()),
-                String.valueOf(this.getVersionsCount())
+                String.valueOf(this.getBeforeFixVersionCount()),
+                String.valueOf(this.getBeforeFixDaysCount())
         };
     }
 
@@ -135,7 +142,7 @@ public class SmellRecord implements BaseRecord {
 
     private double computeVersionCount(Set<FixResult> fixes){
         if(fixes.isEmpty()){
-            return 0.;
+            return Double.NaN;
         }
 
         return fixes.stream()
@@ -145,6 +152,10 @@ public class SmellRecord implements BaseRecord {
     }
 
     private double computeDuration(Set<FixResult> fixes){
+        if(fixes.isEmpty()){
+            return Double.NaN;
+        }
+
         return fixes.stream()
                 .mapToDouble(f -> f.getDuration().toDays())
                 .average()
