@@ -156,9 +156,11 @@ public class SmellRecord implements BaseRecord {
             return Double.NaN;
         }
 
-        return fixes.stream()
-                .mapToDouble(f -> f.getDuration().toDays())
+        double hours = fixes.stream()
+                .mapToDouble(f -> f.getDuration().toHours())
                 .average()
                 .orElse(Double.NaN);
+
+        return Double.isNaN(hours) ? hours : hours / 24;
     }
 }
