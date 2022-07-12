@@ -138,7 +138,7 @@ public class History {
         return versionPairs.stream().filter(v -> v.getRightVersion() == version).findAny();
     }
 
-    private Optional<Projects> findPreviousVersion(Projects version){
+    public Optional<Projects> findPreviousVersion(Projects version){
         return findPreviousPair(version).map(VersionPairs::getLeftVersion);
     }
 

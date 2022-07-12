@@ -23,6 +23,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.Projects;
 import lu.uni.serval.ikora.core.model.SourceNode;
+import lu.uni.serval.ikora.core.model.TestCase;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
@@ -41,7 +42,7 @@ public abstract class FixDetection {
         this.history = history;
     }
 
-    public abstract FixResult getFix(Projects version, Edit edit);
+    public abstract FixResult getFix(Projects version, TestCase testCase, Edit edit);
 
     protected FixResult getDefaultFix(Projects version, Edit edit, Edit.Type... types){
         if(Arrays.stream(types).anyMatch(t -> edit.getType() == t) && wasSmelly(version, edit)){
@@ -53,6 +54,10 @@ public abstract class FixDetection {
 
     protected FixResult getFixResult(Projects version, Edit edit){
         return new FixResult(type, version, history.getSequence(version, edit));
+    }
+
+    protected FixResult getFixResult(Projects previousVersion, SourceNode previousNode){
+        return new FixResult(type, previousVersion, history.getSequence(previousVersion, previousNode));
     }
 
     protected Set<SourceNode> getPreviousSmellyNodes(Projects version){

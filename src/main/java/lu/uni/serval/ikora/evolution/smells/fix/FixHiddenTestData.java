@@ -24,6 +24,7 @@ import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.Assignment;
 import lu.uni.serval.ikora.core.model.KeywordCall;
 import lu.uni.serval.ikora.core.model.Projects;
+import lu.uni.serval.ikora.core.model.TestCase;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
@@ -36,7 +37,7 @@ public class FixHiddenTestData extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Projects version, Edit edit) {
+    public FixResult getFix(Projects version, TestCase testCase, Edit edit) {
         if(!edit.getType().equals(Edit.Type.REMOVE_STEP)){
             return FixResult.noFix();
         }

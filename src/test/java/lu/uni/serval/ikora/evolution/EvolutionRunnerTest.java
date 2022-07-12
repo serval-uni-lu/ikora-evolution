@@ -59,6 +59,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -70,6 +71,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -93,6 +95,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -104,6 +107,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -115,6 +119,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(2, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -126,6 +131,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -134,9 +140,15 @@ class EvolutionRunnerTest {
                 .filter(r -> r.getSmellMetricName().equals(SmellMetric.Type.MISSING_ASSERTION.name()))
                 .collect(Collectors.toList());
 
-        assertEquals(2, records.size());
+        assertEquals(3, records.size());
+
         assertEquals(0, records.get(0).getFixesCount());
+
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
+
+        assertEquals(0, records.get(2).getFixesCount());
+        assertEquals(Double.NaN, records.get(2).getBeforeFixVersionCount());
     }
 
     @Test
@@ -148,6 +160,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -159,6 +172,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -170,6 +184,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -181,6 +196,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(3, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -192,6 +208,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -203,7 +220,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
-        assertEquals(1, records.get(1).getBeforeFixVersionCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test
@@ -215,6 +232,7 @@ class EvolutionRunnerTest {
         assertEquals(2, records.size());
         assertEquals(0, records.get(0).getFixesCount());
         assertEquals(1, records.get(1).getFixesCount());
+        assertEquals(1., records.get(1).getBeforeFixVersionCount());
     }
 
     @Test

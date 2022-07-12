@@ -79,7 +79,7 @@ public class FixAccumulator {
 
         return history.getEdits(version).stream()
                 .filter(e -> checkTestCase(e, (TestCase) previousTestCase.get(), testCase))
-                .map(e -> getFix(version, type, e))
+                .map(e -> getFix(version, testCase, type, e))
                 .filter(FixResult::isValid)
                 .collect(Collectors.toSet());
     }
@@ -94,13 +94,13 @@ public class FixAccumulator {
         return node == testCase || Cfg.isCalledBy(node, testCase);
     }
 
-    private FixResult getFix(Projects version, SmellMetric.Type type, Edit edit){
+    private FixResult getFix(Projects version, TestCase testCase, SmellMetric.Type type, Edit edit){
         final FixDetection fixDetection = this.fixDetectionMap.get(type);
 
         if(fixDetection == null){
             return FixResult.noFix();
         }
 
-        return fixDetection.getFix(version, edit);
+        return fixDetection.getFix(version, testCase, edit);
     }
 }

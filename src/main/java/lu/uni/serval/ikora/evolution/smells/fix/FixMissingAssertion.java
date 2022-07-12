@@ -26,23 +26,40 @@ import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
 
+import java.util.Optional;
+
 public class FixMissingAssertion extends FixDetection{
     protected FixMissingAssertion(SmellConfiguration configuration, History history) {
         super(SmellMetric.Type.MISSING_ASSERTION, configuration, history);
     }
 
     @Override
-    public FixResult getFix(Projects version, Edit edit) {
+    public FixResult getFix(Projects version, TestCase testCase, Edit edit) {
         if(edit.getRight() == null){
             return FixResult.noFix();
         }
 
+        final Optional<Projects> previousVersion = history.findPreviousVersion(version);
+        if(previousVersion.isEmpty()){
+            return FixResult.noFix();
+        }
+
+        final Optional<SourceNode> previousTestCase = history.findPreviousNode(version, testCase);
+
+        if(previousTestCase.isEmpty()){
+            return FixResult.noFix();
+        }
+
+        if(!wasSmelly(version, previousTestCase.get())){
+            return FixResult.noFix();
+        }
+
         if(edit.getType() == Edit.Type.ADD_STEP && isAddAssertion((Step)edit.getRight())){
-            return getFixResult(version, edit);
+            return getFixResult(previousVersion.get(), previousTestCase.get());
         }
 
         if(edit.getType() == Edit.Type.ADD_USER_KEYWORD && isAddAssertion((UserKeyword) edit.getRight())){
-            return getFixResult(version, edit);
+            return getFixResult(previousVersion.get(), previousTestCase.get());
         }
 
         return FixResult.noFix();

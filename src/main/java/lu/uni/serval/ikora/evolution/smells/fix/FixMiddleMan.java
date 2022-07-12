@@ -35,7 +35,7 @@ public class FixMiddleMan extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Projects version, Edit edit) {
+    public FixResult getFix(Projects version, TestCase testCase, Edit edit) {
         FixResult result = getDefaultFix(version, edit, Edit.Type.REMOVE_USER_KEYWORD);
         if(result.isValid()){
             return FixResult.noFix();

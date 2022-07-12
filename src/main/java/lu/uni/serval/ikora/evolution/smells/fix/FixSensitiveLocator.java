@@ -38,7 +38,7 @@ public class FixSensitiveLocator extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Projects version, Edit edit) {
+    public FixResult getFix(Projects version, TestCase testCase, Edit edit) {
         if(isContaining(getPreviousSmellyNodes(version), edit)
                 && Literal.class.isAssignableFrom(edit.getRight().getClass())
                 && !LocatorUtils.isComplex(edit.getRight().getName(), configuration.getMaximumLocatorSize())){

@@ -22,6 +22,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.Projects;
+import lu.uni.serval.ikora.core.model.TestCase;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
 import lu.uni.serval.ikora.smells.SmellMetric;
@@ -33,7 +34,7 @@ public class FixSneakyChecking extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Projects version, Edit edit) {
+    public FixResult getFix(Projects version, TestCase testCase, Edit edit) {
         return getDefaultFix(version, edit, Edit.Type.REMOVE_NODE, Edit.Type.REMOVE_USER_KEYWORD);
     }
 }

@@ -22,10 +22,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 
 import lu.uni.serval.ikora.core.analytics.KeywordStatistics;
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
-import lu.uni.serval.ikora.core.model.KeywordDefinition;
-import lu.uni.serval.ikora.core.model.Projects;
-import lu.uni.serval.ikora.core.model.SourceNode;
-import lu.uni.serval.ikora.core.model.Step;
+import lu.uni.serval.ikora.core.model.*;
 import lu.uni.serval.ikora.core.utils.Cfg;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
@@ -39,7 +36,7 @@ public class FixLongTestSteps extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Projects version, Edit edit) {
+    public FixResult getFix(Projects version, TestCase testCase, Edit edit) {
         final KeywordDefinition previousStep = getPreviousStep(edit, version);
 
         if(previousStep == null){

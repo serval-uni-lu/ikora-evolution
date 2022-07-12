@@ -23,6 +23,7 @@ package lu.uni.serval.ikora.evolution.smells.fix;
 import lu.uni.serval.ikora.core.analytics.difference.Edit;
 import lu.uni.serval.ikora.core.model.Keyword;
 import lu.uni.serval.ikora.core.model.Projects;
+import lu.uni.serval.ikora.core.model.TestCase;
 import lu.uni.serval.ikora.evolution.smells.History;
 import lu.uni.serval.ikora.smells.NodeUtils;
 import lu.uni.serval.ikora.smells.SmellConfiguration;
@@ -34,7 +35,7 @@ public class FixConditionalAssertion extends FixDetection{
     }
 
     @Override
-    public FixResult getFix(Projects version, Edit edit) {
+    public FixResult getFix(Projects version, TestCase testCase, Edit edit) {
         if(getPreviousSmellyNodes(version).contains(edit.getLeft()) && NodeUtils.isCallType(edit.getRight(), Keyword.Type.ASSERTION, true)){
             return getFixResult(version, edit);
         }
