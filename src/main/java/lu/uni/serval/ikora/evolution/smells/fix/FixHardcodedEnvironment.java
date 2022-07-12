@@ -29,7 +29,7 @@ import lu.uni.serval.ikora.smells.SmellMetric;
 
 public class FixHardcodedEnvironment extends FixDetection{
     public FixHardcodedEnvironment(SmellConfiguration configuration, History history) {
-        super(SmellMetric.Type.HARD_CODED_VALUES, configuration, history);
+        super(SmellMetric.Type.HARDCODED_ENVIRONMENT_CONFIGURATIONS, configuration, history);
     }
 
     @Override
